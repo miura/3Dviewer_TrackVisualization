@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path=""/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre6"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/imagej"/>
-	<classpathentry kind="output" path=""/>
+	<classpathentry kind="lib" path="/Applications/Fijitest/fiji/precompiled/VIB-lib.jar"/>
+	<classpathentry kind="lib" path="/Applications/Fijitest/fiji/precompiled/commons-math.jar"/>
+	<classpathentry kind="lib" path="/Applications/Fijitest/fiji/plugins/3D_Viewer.jar"/>
+	<classpathentry kind="lib" path="/Applications/Fijitest/fiji/java/macosx-java3d/Home/lib/ext/j3dcore.jar"/>
+	<classpathentry kind="lib" path="/Applications/Fijitest/fiji/java/macosx-java3d/Home/lib/ext/j3dutils.jar"/>
+	<classpathentry kind="lib" path="/Applications/Fijitest/fiji/java/macosx-java3d/Home/lib/ext/vecmath.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>
