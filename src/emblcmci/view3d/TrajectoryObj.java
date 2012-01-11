@@ -15,9 +15,9 @@ import javax.vecmath.Point3f;
 public class TrajectoryObj {
 	double id;
 	ArrayList<Point3f> dotList;
-	ArrayList<Double> timepoints;
+	ArrayList<Integer> timepoints;
 	
-	public TrajectoryObj(double id, ArrayList<Point3f> dotList, ArrayList<Double> timepoints){
+	public TrajectoryObj(double id, ArrayList<Point3f> dotList, ArrayList<Integer> timepoints){
 		this.id = id;
 		this.dotList = dotList;
 		this.timepoints = timepoints; //a vector with time points of the trajectory. 
