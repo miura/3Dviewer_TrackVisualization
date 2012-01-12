@@ -3,11 +3,15 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/java3d"/>
-	<classpathentry kind="lib" path="/Applications/Fijitest/fiji/plugins/3D_Viewer.jar" sourcepath="/Applications/Fijitest/fiji/src-plugins/3D_Viewer"/>
+	<classpathentry kind="lib" path="/Applications/Fijitest/fiji/plugins/3D_Viewer.jar" sourcepath="/Applications/Fijitest/fiji/src-plugins/3D_Viewer">
+		<attributes>
+			<attribute name="javadoc_location" value="http://132.187.25.13/ij3d/download/docs"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/imagej"/>
 	<classpathentry kind="lib" path="/Applications/Fijitest/fiji/precompiled/commons-math.jar"/>
-	<classpathentry kind="lib" path="/Applications/Fijitest/fiji/precompiled/VIB-lib.jar"/>
+	<classpathentry kind="lib" path="/Applications/Fijitest/fiji/jars/VIB-lib.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -87,6 +87,7 @@ public class Plot4d {
 			counter++;
 		}
 		this.trajlist = trajlist;
+		IJ.log("file loaded successfully");
 		return trajlist;
 	}
 	/** Loads coordinates of segmented particles.  
@@ -234,29 +235,39 @@ public class Plot4d {
 		for (i = timestart; i < timeend-1; i++){
 			//multiMeshA.add(new CustomMultiMesh());	
 			ArrayList<List> tubes = new ArrayList<List>();
-			float cR = i/(timeend -1 - timestart);
+			float cR = ((float) (i))/((float)(timeend -1 - timestart));
 			float cB = 1 - cR;
 			for (j = 0; j < tList.size(); j++) {
 				TrajectoryObj curtraj = tList.get(j);
 				if (CheckTimePointExists(i, curtraj.timepoints) && CheckTimePointExists(i+1, curtraj.timepoints)){
 					int ind = curtraj.timepoints.indexOf(i);										
-					tubes.add(curtraj.dotList.subList(ind, ind+2)); //add to addAll in java
-					IJ.log("index"+j + " frame" + i);
+					//tubes.add(curtraj.dotList.subList(ind, ind+2)); 
+					tubes.add(curtraj.dotList.subList(0, ind+1)); 
+					//IJ.log("frame" + i + " index"+j);
 				}
 			}
 	 
 			//adding progressive tracks to custommultimesh
 			for (j = i-timestart; j<timeend-timestart-1; j++ ){
 				for (k = 0; k < tubes.size(); k++){
-					CustomLineMesh clm = new CustomLineMesh(tubes.get(k), CustomLineMesh.CONTINUOUS, new Color3f(cR, (float) 0.6, cB), 0);
+					CustomLineMesh clm = new CustomLineMesh(tubes.get(k), CustomLineMesh.CONTINUOUS, new Color3f(cR, 0.6f, cB), 0);
 					multiMeshA.get(j).add(clm);
+					//IJ.log("frame" + j + "added tube" + k);
 				}
 			}
 		}
+		ArrayList<Content> meshcontents = new ArrayList<Content>();
+//		for (i = 1; i < 4; i++){
 		for (i = 0; i < multiMeshA.size(); i++){
-			Content ccs = ContentCreator.createContent(multiMeshA.get(i), "tubetime" + Integer.toString(i), i+1);
-			univ.addContent(ccs);
-		}		
+			Content ccs = ContentCreator.createContent(multiMeshA.get(i), "tubetime" + Integer.toString(i), i);
+//			Content ccs = ContentCreator.createContent(multiMeshA.get(i), "tubetime" + Integer.toString(i), i+1);
+			IJ.log("frame " + i + " be added to the universe");
+			IJ.log("...number of lines" + multiMeshA.get(i).size());
+			//univ.addContent(ccs);
+			meshcontents.add(ccs);
+			//univ.addContentLater(ccs);
+		}
+		univ.addContentLater(meshcontents);
 	}
 
 	/** track plotting using lines, only the last frame. 
@@ -270,8 +281,8 @@ public class Plot4d {
 		//CustomMultiMesh clmmProLine = new CustomMultiMesh();
 		for (i = timestart; i < timeend-1; i++){
 			ArrayList<List> tubes = new ArrayList<List>();
-			float cR = i/(timeend -1 - timestart);
-			float cB = 1 - cR;				
+			float cR = ((float) (i))/((float)(timeend -1 - timestart));
+			float cB = 1.0f - cR;				
 			for (j = 0; j < tList.size(); j++) {
 				TrajectoryObj curtraj = tList.get(j);
 				if (CheckTimePointExists(i, curtraj.timepoints) && CheckTimePointExists(i+1, curtraj.timepoints)){
@@ -283,7 +294,7 @@ public class Plot4d {
 			}
 			//adding progressive tracks to custommultimesh
 			for (k = 0; k < tubes.size(); k++){
-				CustomLineMesh clm = new CustomLineMesh(tubes.get(k), CustomLineMesh.CONTINUOUS, new Color3f(cR, (float) 0.6, cB), (float) 0.4);
+				CustomLineMesh clm = new CustomLineMesh(tubes.get(k), CustomLineMesh.CONTINUOUS, new Color3f(cR, 0.6f, cB), 0.4f);
 				LineMultiMesh.add(clm);
 			}
 
@@ -539,8 +550,10 @@ public class Plot4d {
 			spheres.addAll(sphere);		
 		}
 		//cc = ContentCreator.createContent(clmmProLine, "displacements" + Integer.toString(i), i-timestart);
-		Content cc = ContentCreator.createContent(clmmProLine, "displacements", 0);	
-		univ.addContent(cc);
+		
+		//folowing two lines works, but comment out. 20110112
+		//Content cc = ContentCreator.createContent(clmmProLine, "displacements", 0);	
+		//univ.addContent(cc);
 
 		Content cc2 = ContentCreator.createContent(clmmDispLine, "displacementsAxis", 0);	
 		univ.addContent(cc2);

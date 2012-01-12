@@ -65,15 +65,15 @@ public class Plot4dTest {
 		System.out.println("Java3D remderer: " + vuMap.get("j3d.renderer"));
 		p4d.PlotTimeColorCodedLineOnlyFinalFrame(timestart, timeend, this.trajlist);
 	}
-	
+	@Test
 	public void PlotTimeColorCodedLine(){
-		univ.show();
+		//univ.show();
 		p4d.PlotTimeColorCodedLine(timestart, timeend, this.trajlist);
 	}
 	public void plotTrackDisplacements(){
 		p4d.plotTrackDisplacements(timestart, timeend, this.trajlist, rx, ry, rz);
 	}
-	@Test	
+	//@Test
 	public void plotTrackNetDisplacements(){
 		p4d.plotTrackNetDisplacements(timestart, timeend, this.trajlist, rx, ry, rz);
 	}

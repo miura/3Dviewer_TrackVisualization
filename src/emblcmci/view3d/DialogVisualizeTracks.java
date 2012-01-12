@@ -1,19 +1,25 @@
 /**
- * 
+ * Plot 3D tracking results in 3Dviewer
+ * 20110112 first version
+ * @author miura (miura@embl.de)
  */
 package emblcmci.view3d;
 
 import ij.IJ;
 import ij.io.OpenDialog;
+import ij3d.Image3DUniverse;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -26,6 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 
 /**
  * @author miura
@@ -33,49 +40,94 @@ import javax.swing.SwingConstants;
  */
 public class DialogVisualizeTracks implements ActionListener {
 
+	//parameters
+	String datapath = "not selected yet";
+		//flags for plotting
+	boolean flagColorCodedTracks = false;
+	boolean flagTrackNodes = false;
+	boolean flagDynamicColorCodedTracks = false;
+	boolean flagDynamicTrackNodes = false;
+	boolean flagNetDisplacement = false;
+	Integer framestart = 0;
+	Integer frameend = 23;
+	Integer rx = 117;
+	Integer ry = 95;
+	Integer rz = 88;
+	
+	Image3DUniverse univ;
+	ArrayList<TrajectoryObj> tList;
+	
+	JFrame mainFrame;
 	JPanel panelTop;
+	JPanel panelToprow2;
+	private JPanel panelToprow3;
+	
 	JPanel panelCenter;
 	JPanel panelCenterLeft;
-	JPanel panelBottomRight;
-	JPanel panelToprow2;
-	JButton filechoosebutton = new JButton("Choose Track File...");
-	JRadioButton resultsTableImportSwitch = new JRadioButton();
-	JLabel filepathtext = new JLabel("---");
+	//JPanel panelBottomRight;
 
-	JTextField fieldStartframe = new JTextField(5);
-	JTextField fieldEndframe = new JTextField(5);	
-	JCheckBox ColorCodedTracks = new JCheckBox("Tracks (3D only)");
-	JCheckBox TrackNodes = new JCheckBox("Nodes (3D only)");
-	JCheckBox ColorCodedDyamicTracks = new JCheckBox("Dynamic Tracks");
-	JCheckBox DyamicTrackNodes = new JCheckBox("Dynamic Nodes");
-	JCheckBox NetDisplacements = new JCheckBox("Net Displacement");
-	private JTextField fieldRX = new JTextField();
-	private JTextField fieldRY = new JTextField();
-	private JTextField fieldRZ = new JTextField();
-	JButton doplotbutton = new JButton("Plot!");
-	JButton doclosebutton = new JButton("Close");
-	JLabel label;
-	JButton button;
-	JScrollPane scrollPane;
-	JTextArea textArea;
-	static int clicknum = 0;
-	String datapath = "not selected yet";
 	private JPanel panelFrames;
 	private JPanel panelBottom;
 	private JPanel panelBottom1;
 	private JPanel panelBottom2;
 	private JPanel panelRefPoints;
 
+	
+	JButton filechoosebutton = new JButton("Choose Track File...");
+	JRadioButton resultsTableImportSwitch = new JRadioButton();
+	JLabel filepathtext = new JLabel("---");
+
+	// central panel
+	JTextField fieldStartframe = new JTextField(Integer.toString(framestart), 4);
+	JTextField fieldEndframe = new JTextField(Integer.toString(frameend), 4);	
+	JCheckBox ColorCodedTracks = new JCheckBox("Tracks (3D only)");
+	JCheckBox TrackNodes = new JCheckBox("Nodes (3D only)");
+	JCheckBox ColorCodedDyamicTracks = new JCheckBox("Dynamic Tracks");
+	JCheckBox DyamicTrackNodes = new JCheckBox("Dynamic Nodes");
+	JCheckBox NetDisplacements = new JCheckBox("Net Displacement");
+	private JTextField fieldRX = new JTextField(Integer.toString(rx));
+	private JTextField fieldRY = new JTextField(Integer.toString(ry));
+	private JTextField fieldRZ = new JTextField(Integer.toString(rz));
+
+	JScrollPane scrollPane;
+	JTextArea textArea;
+	
+	//bottom
+	String plotinfohead = "   Plot Info: ";
+	JLabel plotinfo = new JLabel(plotinfohead);
+	JButton doplotbutton = new JButton("Plot!");
+	JButton doclosebutton = new JButton("Close");
+	
+	//examples (could be discarded)
+	JLabel label;
+	JButton button;
+	private JPanel panelBottom3;
+	static int clicknum = 0;
+	
+
+	
+	
+
 	public void showDialog(){
+		Font font1 = new Font("Default", Font.PLAIN, 12);
+		Font font1small = new Font("DefaultSmall", Font.PLAIN, 12);		
+		Font font2 = new Font("Serif", Font.BOLD, 15);
+		Font font3 = new Font("Times New Roman", Font.ITALIC, 15);
+		Font font4 = new Font("Arial", Font.ITALIC|Font.BOLD, 12);
+		
 		JFrame mainFrame = new JFrame("Visualize Tracks");
+		this.mainFrame = mainFrame;
+		//mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		mainFrame.setSize(640, 480);
-		mainFrame.setLocationRelativeTo(null);		
+		mainFrame.setSize(480, 640);
+		mainFrame.setLocationRelativeTo(null);
+		mainFrame.setFont(font3);
 		Container contentPane = mainFrame.getContentPane();
 		//FileChooserPanle
 		panelTop = new JPanel();
 		panelTop.setLayout(new GridLayout(3, 1));
 		panelTop.add(filechoosebutton);
+		filechoosebutton.setFont(font1small);
 		filechoosebutton.addActionListener(this);
 		
 
@@ -83,9 +135,14 @@ public class DialogVisualizeTracks implements ActionListener {
 		panelToprow2.setLayout(new GridLayout(1, 2));
 		panelToprow2.add(resultsTableImportSwitch);
 		resultsTableImportSwitch.setText("Use ResultsTable");
+		resultsTableImportSwitch.setFont(font1small);
 		resultsTableImportSwitch.addActionListener(this);
-		panelToprow2.add(filepathtext);
 		panelTop.add(panelToprow2);
+		panelToprow3 = new JPanel();
+		panelToprow3.add(filepathtext);
+		filepathtext.setFont(font1small);
+		panelTop.add(panelToprow3);
+		
 		
 		// center, parameter choosing and track lists in the right
 		panelCenter = new JPanel();
@@ -102,8 +159,10 @@ public class DialogVisualizeTracks implements ActionListener {
 				panelFrames.add(fieldEndframe);
 			panelCenterLeft.add(panelFrames);	
 			panelCenterLeft.add(ColorCodedTracks);
+			ColorCodedTracks.addActionListener(this);
 			panelCenterLeft.add(TrackNodes);
 			panelCenterLeft.add(ColorCodedDyamicTracks);
+			ColorCodedDyamicTracks.addActionListener(this);
 			panelCenterLeft.add(DyamicTrackNodes);
 			panelCenterLeft.add(NetDisplacements);			
 				panelRefPoints = new JPanel();
@@ -123,16 +182,30 @@ public class DialogVisualizeTracks implements ActionListener {
 		
 		// bottom buttons and infos
 		panelBottom = new JPanel();
-		panelBottom.setLayout(new GridLayout(2, 1));
+		panelBottom.setLayout(new GridLayout(3, 1));
 			panelBottom1 = new JPanel();	//information text field
 			panelBottom1.setLayout(new BoxLayout(panelBottom1, BoxLayout.X_AXIS));
-			panelBottom1.add(new JLabel("    Plot Info:"));
+			panelBottom1.add(plotinfo);
 			panelBottom2 = new JPanel();	//button for "plot" and "close"
 			panelBottom2.setLayout(new BoxLayout(panelBottom2, BoxLayout.X_AXIS));
 			panelBottom2.add(doplotbutton);
+			doplotbutton.addActionListener(this);
 			panelBottom2.add(doclosebutton);
+			doclosebutton.addActionListener(this);
+			panelBottom3 = new JPanel();
+			panelBottom3.setLayout(new BoxLayout(panelBottom3, BoxLayout.X_AXIS));
+			String testtext = "<html><p>   this is a test line to check if the " +
+			"line breaking autoatically works or not. Might add more information " +
+			"<br> about track details, stats and so on in this information panel. " +
+			"for example concerning trajectory numbers, length, time, displacement towards reference " +
+			"point and so on. this might be helpful in brah brah brah</p></html>";
+			panelBottom3.add(new JLabel(testtext));
 		panelBottom.add(panelBottom1);
 		panelBottom.add(panelBottom2);
+		panelBottom.add(panelBottom3);
+		panelBottom.setBorder(new EmptyBorder(10, 10, 10, 10) );
+		
+		//examples, couldbe ignored following two lines
 		label = new JLabel("empty");
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		
@@ -178,6 +251,40 @@ public class DialogVisualizeTracks implements ActionListener {
 				filepathtext.setText(datapath);
 			}
 		}
+		if (arg0.getSource() == ColorCodedTracks){
+			if (ColorCodedTracks.isSelected()){
+				ColorCodedDyamicTracks.setSelected(false);
+				DyamicTrackNodes.setSelected(false);
+			}
+		}
+		if (arg0.getSource() == ColorCodedDyamicTracks){
+			if (ColorCodedDyamicTracks.isSelected()){
+				ColorCodedTracks.setSelected(false);
+				TrackNodes.setSelected(false);
+			}
+		}
+		if (arg0.getSource() == doplotbutton){
+			if ((fieldStartframe.getText() != null) && (fieldEndframe.getText() != null)){
+				framestart = Integer.valueOf(fieldStartframe.getText());
+				frameend = Integer.valueOf(fieldEndframe.getText());
+				flagColorCodedTracks = ColorCodedTracks.isSelected();
+				flagTrackNodes = TrackNodes.isSelected();
+				flagDynamicColorCodedTracks = ColorCodedDyamicTracks.isSelected();
+				flagDynamicTrackNodes = DyamicTrackNodes.isSelected();
+				flagNetDisplacement = NetDisplacements.isSelected();
+				rx  = Integer.valueOf(fieldRX.getText());
+				ry  = Integer.valueOf(fieldRY.getText());
+				rz  = Integer.valueOf(fieldRZ.getText());
+				plotinfo.setText(plotinfohead + this.datapath);
+				doPlotting();
+			} else {
+				plotinfo.setText(plotinfohead + " need to set the frame range");
+			}
+		}
+		if (arg0.getSource() == doclosebutton){
+			WindowEvent windowClosing = new WindowEvent(this.mainFrame, WindowEvent.WINDOW_CLOSING);
+			mainFrame.dispatchEvent(windowClosing);			
+		}
 	}
 	
 	String fileChooseDialog(){
@@ -188,5 +295,31 @@ public class DialogVisualizeTracks implements ActionListener {
 		datapath = directory + name;
 		IJ.log(datapath);
 		return datapath;
+	}
+	
+	public void doPlotting(){
+		if (univ == null){
+			Image3DUniverse univ = new Image3DUniverse();
+			this.univ = univ; 
+		} 
+		//univ.show();
+		Plot4d p4d = new Plot4d(univ);
+		//if (FileExists)
+		tList = p4d.loadFileVolocity(datapath);
+		if ((framestart != null) && (frameend != null)){
+			if (flagColorCodedTracks) IJ.log("3D track selected"); //test
+			if (flagColorCodedTracks) 
+				p4d.PlotTimeColorCodedLineOnlyFinalFrame(framestart, frameend, tList);
+			if (flagDynamicColorCodedTracks)
+				p4d.PlotTimeColorCodedLine(framestart, frameend, tList);
+			if (flagNetDisplacement)
+				p4d.plotTrackNetDisplacements(framestart, frameend, tList, rx, ry, rz);			
+		} else {
+			plotinfo.setText(plotinfohead + " need to set the frame range");
+		}
+		univ.show();		
+
+			
+
 	}
 }
