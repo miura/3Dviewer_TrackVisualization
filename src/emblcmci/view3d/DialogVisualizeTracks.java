@@ -7,7 +7,9 @@ package emblcmci.view3d;
 
 import ij.IJ;
 import ij.io.OpenDialog;
+import ij3d.Content;
 import ij3d.Image3DUniverse;
+import ij3d.ImageWindow3D;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -19,8 +21,10 @@ import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -38,7 +42,7 @@ import javax.swing.border.EmptyBorder;
  * @author miura
  *
  */
-public class DialogVisualizeTracks implements ActionListener {
+public class DialogVisualizeTracks implements ActionListener, WindowListener {
 
 	//parameters
 	String datapath = "not selected yet";
@@ -83,7 +87,7 @@ public class DialogVisualizeTracks implements ActionListener {
 	JCheckBox ColorCodedTracks = new JCheckBox("Tracks (3D only)");
 	JCheckBox TrackNodes = new JCheckBox("Nodes (3D only)");
 	JCheckBox ColorCodedDyamicTracks = new JCheckBox("Dynamic Tracks");
-	JCheckBox DyamicTrackNodes = new JCheckBox("Dynamic Nodes");
+	JCheckBox DynamicTrackNodes = new JCheckBox("Dynamic Nodes");
 	JCheckBox NetDisplacements = new JCheckBox("Net Displacement");
 	private JTextField fieldRX = new JTextField(Integer.toString(rx));
 	private JTextField fieldRY = new JTextField(Integer.toString(ry));
@@ -97,11 +101,20 @@ public class DialogVisualizeTracks implements ActionListener {
 	JLabel plotinfo = new JLabel(plotinfohead);
 	JButton doplotbutton = new JButton("Plot!");
 	JButton doclosebutton = new JButton("Close");
+	JButton doAddbutton = new JButton("Add");
+
 	
 	//examples (could be discarded)
 	JLabel label;
 	JButton button;
 	private JPanel panelBottom3;
+	private Plot4d p4d;
+	private ImageWindow3D univwin;
+	private Content listColorcofdedTracks = null;
+	private ArrayList<Content> listStaticNodes;
+	private ArrayList<Content> listDynamicTracks;
+	private ArrayList<Content> listDynamicNodes;
+	private ArrayList listNetDisplacements;
 	static int clicknum = 0;
 	
 
@@ -126,6 +139,7 @@ public class DialogVisualizeTracks implements ActionListener {
 		//FileChooserPanle
 		panelTop = new JPanel();
 		panelTop.setLayout(new GridLayout(3, 1));
+		panelTop.setBorder(BorderFactory.createTitledBorder("Data Source"));
 		panelTop.add(filechoosebutton);
 		filechoosebutton.setFont(font1small);
 		filechoosebutton.addActionListener(this);
@@ -150,6 +164,7 @@ public class DialogVisualizeTracks implements ActionListener {
 
 			panelCenterLeft = new JPanel();
 			panelCenterLeft.setLayout(new GridLayout(10, 1));
+			panelCenterLeft.setBorder(BorderFactory.createTitledBorder("Parameters"));
 			//panelBottomLeft.add(new JLabel("Frame:"));
 				panelFrames = new JPanel();
 				panelFrames.setLayout(new BoxLayout(panelFrames, BoxLayout.X_AXIS));
@@ -159,12 +174,15 @@ public class DialogVisualizeTracks implements ActionListener {
 				panelFrames.add(fieldEndframe);
 			panelCenterLeft.add(panelFrames);	
 			panelCenterLeft.add(ColorCodedTracks);
-			ColorCodedTracks.addActionListener(this);
+				ColorCodedTracks.addActionListener(this);
 			panelCenterLeft.add(TrackNodes);
+				TrackNodes.addActionListener(this);
 			panelCenterLeft.add(ColorCodedDyamicTracks);
-			ColorCodedDyamicTracks.addActionListener(this);
-			panelCenterLeft.add(DyamicTrackNodes);
-			panelCenterLeft.add(NetDisplacements);			
+				ColorCodedDyamicTracks.addActionListener(this);
+			panelCenterLeft.add(DynamicTrackNodes);
+				DynamicTrackNodes.addActionListener(this);
+			panelCenterLeft.add(NetDisplacements);
+				NetDisplacements.addActionListener(this);
 				panelRefPoints = new JPanel();
 				panelRefPoints.setLayout(new BoxLayout(panelRefPoints, BoxLayout.X_AXIS));
 				panelRefPoints.add(new JLabel("   Reference XYZ:"));
@@ -172,7 +190,7 @@ public class DialogVisualizeTracks implements ActionListener {
 				panelRefPoints.add(fieldRY);
 				panelRefPoints.add(fieldRZ);
 			panelCenterLeft.add(panelRefPoints);
-			panelRefPoints.setVisible(true);//toggle this depend on the selection of relative meovements
+			panelRefPoints.setVisible(false);//toggle this depend on the selection of relative meovements
 
 		panelCenter.add(panelCenterLeft);
 		
@@ -192,6 +210,8 @@ public class DialogVisualizeTracks implements ActionListener {
 			doplotbutton.addActionListener(this);
 			panelBottom2.add(doclosebutton);
 			doclosebutton.addActionListener(this);
+			panelBottom2.add(doAddbutton);
+			doAddbutton.addActionListener(this);
 			panelBottom3 = new JPanel();
 			panelBottom3.setLayout(new BoxLayout(panelBottom3, BoxLayout.X_AXIS));
 			String testtext = "<html><p>   this is a test line to check if the " +
@@ -254,29 +274,53 @@ public class DialogVisualizeTracks implements ActionListener {
 		if (arg0.getSource() == ColorCodedTracks){
 			if (ColorCodedTracks.isSelected()){
 				ColorCodedDyamicTracks.setSelected(false);
-				DyamicTrackNodes.setSelected(false);
-			}
+				DynamicTrackNodes.setSelected(false);
+			} 
 		}
+		if (arg0.getSource() == TrackNodes){
+			if (TrackNodes.isSelected()){
+				ColorCodedDyamicTracks.setSelected(false);
+				DynamicTrackNodes.setSelected(false);
+			} 
+		}		
 		if (arg0.getSource() == ColorCodedDyamicTracks){
 			if (ColorCodedDyamicTracks.isSelected()){
 				ColorCodedTracks.setSelected(false);
 				TrackNodes.setSelected(false);
+				NetDisplacements.setSelected(false);
 			}
+		}
+		if (arg0.getSource() == DynamicTrackNodes){
+			if (DynamicTrackNodes.isSelected()){
+				ColorCodedTracks.setSelected(false);
+				TrackNodes.setSelected(false);
+				NetDisplacements.setSelected(false);				
+			}
+		}		
+		if (arg0.getSource() == NetDisplacements){
+			if (NetDisplacements.isSelected()){
+				panelRefPoints.setVisible(true);
+				ColorCodedDyamicTracks.setSelected(false);
+				DynamicTrackNodes.setSelected(false);				
+			} else
+				panelRefPoints.setVisible(false);				
 		}
 		if (arg0.getSource() == doplotbutton){
 			if ((fieldStartframe.getText() != null) && (fieldEndframe.getText() != null)){
+				doplotbutton.setEnabled(false);
 				framestart = Integer.valueOf(fieldStartframe.getText());
 				frameend = Integer.valueOf(fieldEndframe.getText());
 				flagColorCodedTracks = ColorCodedTracks.isSelected();
 				flagTrackNodes = TrackNodes.isSelected();
 				flagDynamicColorCodedTracks = ColorCodedDyamicTracks.isSelected();
-				flagDynamicTrackNodes = DyamicTrackNodes.isSelected();
+				flagDynamicTrackNodes = DynamicTrackNodes.isSelected();
 				flagNetDisplacement = NetDisplacements.isSelected();
 				rx  = Integer.valueOf(fieldRX.getText());
 				ry  = Integer.valueOf(fieldRY.getText());
 				rz  = Integer.valueOf(fieldRZ.getText());
 				plotinfo.setText(plotinfohead + this.datapath);
 				doPlotting();
+				
 			} else {
 				plotinfo.setText(plotinfohead + " need to set the frame range");
 			}
@@ -284,6 +328,28 @@ public class DialogVisualizeTracks implements ActionListener {
 		if (arg0.getSource() == doclosebutton){
 			WindowEvent windowClosing = new WindowEvent(this.mainFrame, WindowEvent.WINDOW_CLOSING);
 			mainFrame.dispatchEvent(windowClosing);			
+		}
+		if (arg0.getSource() == doAddbutton){
+				framestart = Integer.valueOf(fieldStartframe.getText());
+				frameend = Integer.valueOf(fieldEndframe.getText());
+				flagColorCodedTracks = ColorCodedTracks.isSelected();
+				flagTrackNodes = TrackNodes.isSelected();
+				flagDynamicColorCodedTracks = ColorCodedDyamicTracks.isSelected();
+				flagDynamicTrackNodes = DynamicTrackNodes.isSelected();
+				flagNetDisplacement = NetDisplacements.isSelected();
+				rx  = Integer.valueOf(fieldRX.getText());
+				ry  = Integer.valueOf(fieldRY.getText());
+				rz  = Integer.valueOf(fieldRZ.getText());
+				plotinfo.setText(plotinfohead + this.datapath);
+				addPlotting();
+				
+			} else {
+				plotinfo.setText(plotinfohead + " need to set the frame range");
+		}		
+		if (arg0.getSource() == doAddbutton){
+//			if ((this.univ != null) && (!univwin.isShowing()))
+//					univ.show();
+//			univ.addContent(listColorcofdedTracks);
 		}
 	}
 	
@@ -298,28 +364,132 @@ public class DialogVisualizeTracks implements ActionListener {
 	}
 	
 	public void doPlotting(){
-		if (univ == null){
-			Image3DUniverse univ = new Image3DUniverse();
-			this.univ = univ; 
-		} 
-		//univ.show();
-		Plot4d p4d = new Plot4d(univ);
-		//if (FileExists)
+
+		Image3DUniverse univ = null;
+		if (this.univ != null)
+			this.univ.close();
+		univ = new Image3DUniverse();
+		this.univ = univ;		
+		p4d = new Plot4d(univ);
 		tList = p4d.loadFileVolocity(datapath);
+		IJ.log("File loaded...");
+
 		if ((framestart != null) && (frameend != null)){
-			if (flagColorCodedTracks) IJ.log("3D track selected"); //test
-			if (flagColorCodedTracks) 
-				p4d.PlotTimeColorCodedLineOnlyFinalFrame(framestart, frameend, tList);
-			if (flagDynamicColorCodedTracks)
-				p4d.PlotTimeColorCodedLine(framestart, frameend, tList);
+			if (flagColorCodedTracks) {
+					listColorcofdedTracks = p4d.PlotTimeColorCodedLineOnlyFinalFrame(framestart, frameend, tList);
+					IJ.log("3D track plotted");
+			}
+			if (flagTrackNodes){
+				listStaticNodes = p4d.plotTrajectorySpheres(framestart, frameend, tList, true);
+				IJ.log("Dynamic nodes plotted");			
+			}
+			if (flagDynamicColorCodedTracks) {
+				listDynamicTracks = p4d.PlotTimeColorCodedLine(framestart, frameend, tList);
+				IJ.log("3D dynamic track plotting done");
+			}
+			if (flagDynamicTrackNodes){
+				listDynamicNodes = p4d.plotTrajectorySpheres(framestart, frameend, tList, false);
+				IJ.log("Dynamic nodes plotted");
+			}
 			if (flagNetDisplacement)
-				p4d.plotTrackNetDisplacements(framestart, frameend, tList, rx, ry, rz);			
+				listNetDisplacements = p4d.plotTrackNetDisplacements(framestart, frameend, tList, rx, ry, rz);			
+				IJ.log("Net Displaement vectors plotted");
 		} else {
 			plotinfo.setText(plotinfohead + " need to set the frame range");
 		}
-		univ.show();		
+		univ.show();
+		univwin = univ.getWindow();	
+		univwin.addWindowListener(this);
+	}
 
-			
+	public void addPlotting(){
+		int i;
+		Image3DUniverse univ = null;
+		if (this.univ == null)
+			return;
+		if (p4d == null)
+			return;
+		if (tList == null)
+			return;		
+		univ = this.univ;
+		if ((framestart != null) && (frameend != null)){
 
+			if ((flagColorCodedTracks) && (!listColorcofdedTracks.isVisible())) {
+					listColorcofdedTracks = p4d.PlotTimeColorCodedLineOnlyFinalFrame(framestart, frameend, tList);
+					IJ.log("3D track added");
+			}
+			if (flagTrackNodes){
+				for (i = 0; i < frameend-framestart +1; i++)
+					if (listStaticNodes.get(i).isVisibleAt(i))
+						return;
+				listStaticNodes = p4d.plotTrajectorySpheres(framestart, frameend, tList, true);
+				IJ.log("Dynamic nodes addded");			
+			}
+			if (flagDynamicColorCodedTracks) {
+				for (i = 0; i < frameend-framestart +1; i++)
+					if (listDynamicTracks.get(i).isVisibleAt(i))
+						return;
+				listDynamicTracks = p4d.PlotTimeColorCodedLine(framestart, frameend, tList);
+				IJ.log("3D dynamic track plotting added");
+			}
+			if (flagDynamicTrackNodes){
+				for (i = 0; i < frameend-framestart +1; i++)
+					if (listDynamicNodes.get(i).isVisibleAt(i))
+						return;
+				listDynamicNodes = p4d.plotTrajectorySpheres(framestart, frameend, tList, false);
+				IJ.log("Dynamic nodes added");
+			}
+			if (flagNetDisplacement)
+				listNetDisplacements = p4d.plotTrackNetDisplacements(framestart, frameend, tList, rx, ry, rz);			
+				IJ.log("Net Displaement vectors plotted");
+		} else {
+			plotinfo.setText(plotinfohead + " need to set the frame range");
+		}		
+		
+	}
+	@Override
+	public void windowActivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosed(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		if (arg0.getSource() == univwin){
+			this.univ = null;
+			doplotbutton.setEnabled(true);
+		}
+		
+	}
+
+	@Override
+	public void windowClosing(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowIconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowOpened(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }

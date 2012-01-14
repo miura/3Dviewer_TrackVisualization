@@ -5,6 +5,7 @@ import ij3d.Content;
 import ij3d.ContentCreator;
 import ij3d.Image3DUniverse;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -45,6 +46,13 @@ public class Plot4d {
 	//@SuppressWarnings("unchecked")
 	public ArrayList<TrajectoryObj> loadFileVolocity(String datapath){
 
+		File testaccess = new File(datapath);
+		if (!testaccess.exists()){
+			IJ.log("The file does not exists");
+			return null;
+		}
+		testaccess = null;
+		
 		CSVReader reader = null;
 		try {
 			reader = new CSVReader(new FileReader(datapath), ',');
@@ -225,9 +233,10 @@ public class Plot4d {
 	/** progressive track plotting using lines
 	 * time points are color-coded
 	 * less-memory usage than tube version (above)
+	 * @return 
 	 * 
 	 */
-	public void PlotTimeColorCodedLine(int timestart, int timeend, ArrayList<TrajectoryObj> tList){
+	public ArrayList<Content> PlotTimeColorCodedLine(int timestart, int timeend, ArrayList<TrajectoryObj> tList){
 		int i, j, k;
 		ArrayList<CustomMultiMesh> multiMeshA = new ArrayList<CustomMultiMesh>();
 		for (i = timestart; i < timeend-1; i++)
@@ -268,14 +277,16 @@ public class Plot4d {
 			//univ.addContentLater(ccs);
 		}
 		univ.addContentLater(meshcontents);
+		return meshcontents;
 	}
 
 	/** track plotting using lines, only the last frame. 
 	 * time points are color-coded
 	 * no timeseries. 
+	 * @return 
 	 * 
 	 */
-	public void PlotTimeColorCodedLineOnlyFinalFrame(int timestart, int timeend, ArrayList<TrajectoryObj> tList){
+	public Content PlotTimeColorCodedLineOnlyFinalFrame(int timestart, int timeend, ArrayList<TrajectoryObj> tList){
 		int i, j, k;
 		CustomMultiMesh LineMultiMesh = new CustomMultiMesh();
 		//CustomMultiMesh clmmProLine = new CustomMultiMesh();
@@ -292,37 +303,51 @@ public class Plot4d {
 //					IJ.log("index"+j + " frame" + i);
 				}
 			}
-			//adding progressive tracks to custommultimesh
+			//adding prog progressive tracks to custommultimesh
 			for (k = 0; k < tubes.size(); k++){
 				CustomLineMesh clm = new CustomLineMesh(tubes.get(k), CustomLineMesh.CONTINUOUS, new Color3f(cR, 0.6f, cB), 0.4f);
 				LineMultiMesh.add(clm);
+				IJ.log("added time point "+ Integer.toString(k));
 			}
 
 		}
 		Content ccs = ContentCreator.createContent(LineMultiMesh, "color_coded_Tracks", (int) 0);
-		univ.addContent(ccs);		
+		univ.addContent(ccs);
+		return ccs;
+		
 	}
 	
 	//spheres from trajectories 20111216
-	public void plotTrajectorySpheres(int timestart, int timeend, ArrayList<TrajectoryObj> tList){
+	public ArrayList<Content> plotTrajectorySpheres(int timestart, int timeend, ArrayList<TrajectoryObj> tList, boolean switch3d){
 		int i, j;
+		ArrayList<Content> contentsList = new ArrayList<Content>();
+		int nodesnum;
 		for (i = timestart; i < timeend; i++){
-			ArrayList spheres = new ArrayList();
+			nodesnum = 0;
+			ArrayList<Point3f> spheres = new ArrayList<Point3f>();
 			for (j = 0; j < tList.size(); j++) {
 				TrajectoryObj curtraj = tList.get(j);
 				if (CheckTimePointExists(i, curtraj.timepoints)){
-					IJ.log(Double.toString(curtraj.id));
+					//IJ.log("...add "+ Double.toString(curtraj.id));
 					int ind = curtraj.timepoints.indexOf(i);
 					Point3f p3f = curtraj.dotList.get(ind);
 					double curtime = curtraj.timepoints.get(ind);
-					List<Point3f> sphere = Mesh_Maker.createSphere(p3f.x, p3f.y, p3f.z, 2.0, 24, 24);
+					List<Point3f> sphere = Mesh_Maker.createSphere(p3f.x, p3f.y, p3f.z, 0.5, 24, 24);
 					spheres.addAll(sphere);
+					nodesnum++;
 				}
 			}
 			CustomTriangleMesh csp = new CustomTriangleMesh(spheres, new Color3f(1.0f, 1.0f, 1.0f), 0.0f);
-			Content ccs = ContentCreator.createContent(csp, "dotstime" + Integer.toString(i), i-timestart);
-			univ.addContent(ccs);
+			Content ccs;
+			if (switch3d)
+				ccs = ContentCreator.createContent(csp, "TrajectoryNodes" + Integer.toString(i), 0);
+			else
+				ccs = ContentCreator.createContent(csp, "TrajectoryNodes" + Integer.toString(i), i-timestart);
+			contentsList.add(ccs);
+			IJ.log("timepoint "+ Integer.toString(i) + "..." + Integer.toString(nodesnum));
 		}
+		univ.addContentLater(contentsList);
+		return contentsList;
 	}
 
 	//spheres from dotlists 20111216
@@ -458,7 +483,7 @@ public class Plot4d {
 	}
 	
 	// plots net displacement vector towards a reference point 
-	public void plotTrackNetDisplacements(int timestart, int timeend, ArrayList<TrajectoryObj> tList, double rx, double ry, double rz){
+	public ArrayList plotTrackNetDisplacements(int timestart, int timeend, ArrayList<TrajectoryObj> tList, double rx, double ry, double rz){
 		int i, j;
 		ArrayList<Double> dispA = new ArrayList<Double>(); //displacements array
 		ArrayList vecs = new ArrayList();
@@ -566,6 +591,12 @@ public class Plot4d {
 		CustomTriangleMesh refmesh = new CustomTriangleMesh(referencepoint, new Color3f(1,0,0), 0.0f);
 		Content refcont = ContentCreator.createContent(refmesh, "referencePoint", 0);
 		univ.addContent(refcont);
+		
+		ArrayList packedcontents = new ArrayList(); //for packaging contents
+		packedcontents.add(cc2);
+		packedcontents.add(ccs);
+		packedcontents.add(refcont);
+		return packedcontents;
 		
 	}
 	
