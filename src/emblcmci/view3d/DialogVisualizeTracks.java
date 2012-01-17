@@ -36,6 +36,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 
 /**
@@ -244,8 +246,14 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	}
 	
 	public static void main(String[] args) {
-		DialogVisualizeTracks dv = new DialogVisualizeTracks();
-		dv.showDialog();
+		SwingUtilities.invokeLater(new Runnable() {
+			 
+            @Override
+            public void run() {
+        		DialogVisualizeTracks dv = new DialogVisualizeTracks(); //original line
+        		dv.showDialog();//original line
+            }
+        });
 	}
 
 	@Override
@@ -319,7 +327,9 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				ry  = Integer.valueOf(fieldRY.getText());
 				rz  = Integer.valueOf(fieldRZ.getText());
 				plotinfo.setText(plotinfohead + this.datapath);
-				doPlotting();
+				//doPlotting();
+				DoPlot dp = new DoPlot(this.univ);
+				dp.execute();
 				
 			} else {
 				plotinfo.setText(plotinfohead + " need to set the frame range");
@@ -350,6 +360,8 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 //			if ((this.univ != null) && (!univwin.isShowing()))
 //					univ.show();
 //			univ.addContent(listColorcofdedTracks);
+			AddPlot ap = new AddPlot();
+			ap.execute();
 		}
 	}
 	
@@ -447,6 +459,127 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		}		
 		
 	}
+	
+    // class for asynchronous processing
+	//@TODO for being really thread safe, returned values should be
+	//using returned List of values and captured using get() method inside done(). 
+	//in this case, type should be specified as List<Object> or so. 
+	// see http://itpro.nikkeibp.co.jp/article/COLUMN/20070413/268205/
+    class DoPlot extends SwingWorker<Object, Object> {
+		private Image3DUniverse univ;
+
+        public DoPlot() {
+        }
+        
+        public DoPlot(Image3DUniverse parentuniv) {
+        	this.univ = parentuniv;
+        }
+        
+         
+        //asynchronous processing
+        @Override
+        public Object doInBackground() {
+            // processing that takes long time
+            //try {
+            //    TimeUnit.SECONDS.sleep(10L);
+            //} catch (InterruptedException ex) {}
+    		Image3DUniverse univ = null;
+    		if (this.univ != null)
+    			this.univ.close();
+    		univ = new Image3DUniverse();
+    		this.univ = univ;		
+    		p4d = new Plot4d(univ);
+    		tList = p4d.loadFileVolocity(datapath);
+    		IJ.log("File loaded...");
+
+    		if ((framestart != null) && (frameend != null)){
+    			if (flagColorCodedTracks) {
+    					listColorcofdedTracks = p4d.PlotTimeColorCodedLineOnlyFinalFrame(framestart, frameend, tList);
+    					IJ.log("3D track plotted");
+    			}
+    			if (flagTrackNodes){
+    				listStaticNodes = p4d.plotTrajectorySpheres(framestart, frameend, tList, true);
+    				IJ.log("Dynamic nodes plotted");			
+    			}
+    			if (flagDynamicColorCodedTracks) {
+    				listDynamicTracks = p4d.PlotTimeColorCodedLine(framestart, frameend, tList);
+    				IJ.log("3D dynamic track plotting done");
+    			}
+    			if (flagDynamicTrackNodes){
+    				listDynamicNodes = p4d.plotTrajectorySpheres(framestart, frameend, tList, false);
+    				IJ.log("Dynamic nodes plotted");
+    			}
+    			if (flagNetDisplacement)
+    				listNetDisplacements = p4d.plotTrackNetDisplacements(framestart, frameend, tList, rx, ry, rz);			
+    				IJ.log("Net Displaement vectors plotted");
+    		}
+    		univ.show();
+    		univwin = univ.getWindow();	
+    		univwin.addWindowListener(DialogVisualizeTracks.this);   
+            return null;
+        }
+         
+        // processing to be done after the above process
+        @Override
+        protected void done() {
+            //plotbut.setText("execute");
+            //plotbut.setEnabled(true);
+        }
+        
+    }
+    // class for asynchronous processing
+    class AddPlot extends SwingWorker<Object, Object> {
+    	Image3DUniverse univ = null;
+    	AddPlot(){
+    		if (DialogVisualizeTracks.this.univ == null)
+    			return;
+    		if (DialogVisualizeTracks.this.p4d == null)
+    			return;
+    		if (DialogVisualizeTracks.this.tList == null)
+    			return;		
+    		univ = DialogVisualizeTracks.this.univ;
+    	}
+
+        //asynchronous processing
+        @Override
+        public Object doInBackground() {
+        	int i;
+        	if ((framestart != null) && (frameend != null)){
+
+        		if ((flagColorCodedTracks) && (!listColorcofdedTracks.isVisible())) {
+        			listColorcofdedTracks = p4d.PlotTimeColorCodedLineOnlyFinalFrame(framestart, frameend, tList);
+        			IJ.log("3D track added");
+        		}
+        		if (flagTrackNodes){
+        			for (i = 0; i < frameend-framestart +1; i++)
+        				if (listStaticNodes.get(i).isVisibleAt(i))
+        					return null;
+        			listStaticNodes = p4d.plotTrajectorySpheres(framestart, frameend, tList, true);
+        			IJ.log("Dynamic nodes addded");			
+        		}
+        		if (flagDynamicColorCodedTracks) {
+        			for (i = 0; i < frameend-framestart +1; i++)
+        				if (listDynamicTracks.get(i).isVisibleAt(i))
+        					return null;
+        			listDynamicTracks = p4d.PlotTimeColorCodedLine(framestart, frameend, tList);
+        			IJ.log("3D dynamic track plotting added");
+        		}
+        		if (flagDynamicTrackNodes){
+        			for (i = 0; i < frameend-framestart +1; i++)
+        				if (listDynamicNodes.get(i).isVisibleAt(i))
+        					return null;
+        			listDynamicNodes = p4d.plotTrajectorySpheres(framestart, frameend, tList, false);
+        			IJ.log("Dynamic nodes added");
+        		}
+        		if (flagNetDisplacement){
+        			listNetDisplacements = p4d.plotTrackNetDisplacements(framestart, frameend, tList, rx, ry, rz);			
+        			IJ.log("Net Displaement vectors plotted");
+        		}
+        	}
+        	return null; 
+        }	
+    }
+	
 	@Override
 	public void windowActivated(WindowEvent arg0) {
 		// TODO Auto-generated method stub
