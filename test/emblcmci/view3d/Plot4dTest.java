@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import javax.media.j3d.VirtualUniverse;
+import javax.vecmath.Point3d;
+import javax.vecmath.Point3f;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +24,7 @@ public class Plot4dTest {
 	private int rx;
 	private int ry;
 	private int rz;
+	ArrayList<Point3f> refline;
 	@Before
 	public void setUp() throws Exception {
 		Image3DUniverse univ = new Image3DUniverse();
@@ -32,10 +35,21 @@ public class Plot4dTest {
 		rx = 117;
 		ry = 95;
 		rz = 88;
-		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
+//		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
+		String path = "/Users/miura/Dropbox/Mette/23h_/23hdatacut0_1_6_6.csv";
 		ArrayList<TrajectoryObj> trajlist = p4d.loadFileVolocity(path);
 		this.p4d = p4d;
 		this.trajlist = trajlist;
+		this.refline = new ArrayList<Point3f>();
+		refline.add(new Point3f());
+		refline.add(new Point3f());		
+		refline.get(0).x = 117;
+		refline.get(0).y = 32;
+		refline.get(0).z = 63;
+		refline.get(1).x = 121;
+		refline.get(1).y = 184;
+		refline.get(1).z = 63;
+		
 	}
 
 	@Test
@@ -65,7 +79,7 @@ public class Plot4dTest {
 		System.out.println("Java3D remderer: " + vuMap.get("j3d.renderer"));
 		p4d.PlotTimeColorCodedLineOnlyFinalFrame(timestart, timeend, this.trajlist);
 	}
-	@Test
+	//@Test
 	public void PlotTimeColorCodedLine(){
 		//univ.show();
 		p4d.PlotTimeColorCodedLine(timestart, timeend, this.trajlist);
@@ -77,6 +91,10 @@ public class Plot4dTest {
 	public void plotTrackNetDisplacements(){
 		p4d.plotTrackNetDisplacements(timestart, timeend, this.trajlist, rx, ry, rz);
 	}
-
+	@Test
+	public void plotNetDisp(){
+		p4d.plotTrackNetDisplacements(timestart, timeend, this.trajlist, refline);
+		//univ.show();
+	}
 
 }

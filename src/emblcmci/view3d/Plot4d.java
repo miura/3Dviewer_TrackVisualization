@@ -18,6 +18,8 @@ import javax.vecmath.Color3f;
 import javax.vecmath.Point3f;
 import javax.vecmath.Tuple3f;
 
+import math3d.Line;
+
 import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
 
 import util.opencsv.CSVReader;
@@ -482,8 +484,17 @@ public class Plot4d {
 		
 	}
 	
-	// plots net displacement vector towards a reference point 
-	public ArrayList plotTrackNetDisplacements(int timestart, int timeend, ArrayList<TrajectoryObj> tList, double rx, double ry, double rz){
+	/** plots net displacement vector towards a reference point 
+	 * 
+	 * @param timestart
+	 * @param timeend
+	 * @param tList
+	 * @param rx  coordinate of reference point
+	 * @param ry  coordinate of reference point
+	 * @param rz  coordinate of reference point
+	 * @return
+	 */
+	public ArrayList<Content> plotTrackNetDisplacements(int timestart, int timeend, ArrayList<TrajectoryObj> tList, double rx, double ry, double rz){
 		int i, j;
 		ArrayList<Double> dispA = new ArrayList<Double>(); //displacements array
 		ArrayList vecs = new ArrayList();
@@ -592,7 +603,7 @@ public class Plot4d {
 		Content refcont = ContentCreator.createContent(refmesh, "referencePoint", 0);
 		univ.addContent(refcont);
 		
-		ArrayList packedcontents = new ArrayList(); //for packaging contents
+		ArrayList<Content> packedcontents = new ArrayList<Content>(); //for packaging contents
 		packedcontents.add(cc2);
 		packedcontents.add(ccs);
 		packedcontents.add(refcont);
@@ -600,6 +611,154 @@ public class Plot4d {
 		
 	}
 	
+	/**
+	 * 
+	 * @param timestart
+	 * @param timeend
+	 * @param tList
+	 * @param ref List of doubles, representing reference line [r0x, r0y, r0z, r1x, r1y, r1z]
+	 * @return
+	 */
+	public ArrayList<Content> plotTrackNetDisplacements(int timestart, int timeend, ArrayList<TrajectoryObj> tList, ArrayList<Point3f> ref){
+		int i, j;
+		ArrayList<Double> dispA = new ArrayList<Double>(); //displacements array
+		ArrayList vecs = new ArrayList();
+		ArrayList dispvecs = new ArrayList();
+		ArrayList<Point3f> startPoints = new ArrayList<Point3f>();
+		ArrayList<Integer> awaytowardsA = new ArrayList<Integer>();		
+		for (j = 0; j < tList.size(); j++) 	{
+			ArrayList cvec =  new ArrayList();
+			ArrayList dvec =  new ArrayList();
+			TrajectoryObj curtraj = tList.get(j);
+			//dt = curtraj.dotList;
+
+			Point3f spoint = curtraj.dotList.get(0);
+			Point3f epoint = curtraj.dotList.get(curtraj.dotList.size()-1);
+			
+			//Vector3D srv = new Vector3D(rx - spoint.x, ry - spoint.y, rz - spoint.z); //startpoint to reference point vector
+			Vector3D rv = new Vector3D(ref.get(1).x - ref.get(0).x, ref.get(1).y - ref.get(0).y, ref.get(1).z - ref.get(0).z); //reference line vector
+			Vector3D sev = new Vector3D(epoint.x - spoint.x, epoint.y - spoint.y, epoint.z - spoint.z); //startpoint to reference point vector
+			Vector3D pv = new Vector3D(spoint.x - ref.get(0).x, spoint.y - ref.get(0).y, spoint.z - ref.get(0).z); //ref start point to track start point
+			double pvproj = rv.dotProduct(pv) / Math.pow(rv.getNorm(), 2);
+			Vector3D refdash = rv.scalarMultiply(pvproj);
+			Vector3D dv = refdash.subtract(pv);
+			double sevproj = dv.dotProduct(sev) / Math.pow(dv.getNorm(), 2);
+			Vector3D dvdash = dv.scalarMultiply(sevproj);
+			double theta, displacement;
+			if ((dv.getNorm() != 0) && (sev.getNorm() != 0)){
+				theta = Vector3D.angle(dv, sev);
+				displacement = dvdash.getNorm();
+			} else {
+				theta = 0;
+				displacement = 0;
+				IJ.log("... 0 norm vector found");
+			}
+			
+			//double theta = Vector3D.angle(srv, sev);
+			//Vector3D srvDispv = srv.normalize().scalarMultiply(Math.cos(theta)* sev.getNorm());
+//			double displacement = srvDispv.getNorm();
+
+			if (Math.cos(theta) < 0) {
+				displacement *= -1;
+				awaytowardsA.add(-1); //away 
+			} else
+				awaytowardsA.add(1); //towards 		
+			dispA.add(displacement);
+			if (j == 0) IJ.log("id\t" + "theta\t" + "CosTheta\t" + "displacement");
+			IJ.log("" +j + "\t" + theta + "\t" + Math.cos(theta) + "\t" + displacement);
+			cvec.add(spoint);
+			cvec.add(epoint);
+			vecs.add(cvec);
+			startPoints.add(spoint);
+
+			//displacement vector along reference axis
+			dvec.add(spoint);
+			dvec.add(new Point3f(
+					((float) (spoint.x + dvdash.getX())), 
+					((float) (spoint.y + dvdash.getY())), 
+					((float) (spoint.z + dvdash.getZ())))
+			);
+			dispvecs.add(dvec);
+						
+		}
+//		var minval = Math.min.apply(Math, dispA);
+		Object minvalobj = Collections.min(dispA);
+//		maxval = Math.max.apply(Math, dispA);
+		Object maxvalobj = Collections.max(dispA);
+		IJ.log("Max displacement" + maxvalobj);
+		IJ.log("Min displacement" + minvalobj);
+//		double minval = Double.valueOf((String) minvalobj);
+		double minval =  (Double) minvalobj;
+//		double maxval = Double.valueOf((String) maxvalobj);		
+		double maxval = (Double) maxvalobj;		
+		double maxdisp = maxval;
+		if (Math.abs(maxval) < Math.abs(minval))  
+			maxdisp = minval;
+		else
+			maxdisp = maxval;
+		float cR = 0;
+		float cG = 0;
+		float cB = 0;
+		CustomMultiMesh clmmProLine = new CustomMultiMesh();
+		CustomMultiMesh clmmDispLine = new CustomMultiMesh();
+		ArrayList spheres = new ArrayList();
+		for (j = 0; j < vecs.size(); j++){	
+			cR =0; cG = 0.6f; cB = 0;
+			if (dispA.get(j) > 0)
+				cR = (float) (dispA.get(j)/maxdisp);
+			else
+				cB = (float) (Math.abs(dispA.get(j))/maxdisp);
+				
+			CustomLineMesh clm = new CustomLineMesh((List<Point3f>) vecs.get(j), CustomLineMesh.CONTINUOUS, new Color3f(cR, cG, cB), 0);
+			clmmProLine.add(clm);
+			clm.setLineWidth(2);
+
+			Color3f dispcol;
+			if (awaytowardsA.get(j)>0)
+				 dispcol = new Color3f(1,0,0);
+			else			
+				 dispcol = new Color3f(0,0,1);
+			CustomLineMesh clmdisp = new CustomLineMesh((List<Point3f>) dispvecs.get(j), CustomLineMesh.CONTINUOUS, dispcol, 0);
+			clmmDispLine.add(clmdisp);
+			
+			List sphere = Mesh_Maker.createSphere(
+					startPoints.get(j).x, 
+					startPoints.get(j).y, 
+					startPoints.get(j).z, 
+					0.7, 12, 12);
+			spheres.addAll(sphere);		
+		}
+		//cc = ContentCreator.createContent(clmmProLine, "displacements" + Integer.toString(i), i-timestart);
+		
+		//folowing two lines works, but comment out. 20110112
+		//Content cc = ContentCreator.createContent(clmmProLine, "displacements", 0);	
+		//univ.addContent(cc);
+
+		Content cc2 = ContentCreator.createContent(clmmDispLine, "displacementsAxis", 0);	
+		univ.addContent(cc2);
+			
+		CustomTriangleMesh csp = new CustomTriangleMesh(spheres, new Color3f(1.0f,1.0f,1.0f), 0.0f);
+		Content ccs = ContentCreator.createContent(csp, "startpoints", 0);
+		univ.addContent(ccs);
+		
+		//List referencepoint = Mesh_Maker.createSphere(rx, ry, rz, 2, 12, 12);
+		List referenceline = Mesh_Maker.createTube(
+				new double[]{ref.get(0).x, ref.get(1).x},
+				new double[]{ref.get(0).y, ref.get(1).y},
+				new double[]{ref.get(0).z, ref.get(1).z},
+				new double[]{1, 1},
+				12, false); //true makes cones
+		CustomTriangleMesh refmesh = new CustomTriangleMesh(referenceline, new Color3f(1,0,0), 0.0f);
+		Content refcont = ContentCreator.createContent(refmesh, "referencePoint", 0);
+		univ.addContent(refcont);
+		
+		ArrayList<Content> packedcontents = new ArrayList<Content>(); //for packaging contents
+		packedcontents.add(cc2);
+		packedcontents.add(ccs);
+		packedcontents.add(refcont);
+		return packedcontents;
+		
+	}
 	
 	
 }

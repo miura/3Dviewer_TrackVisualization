@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
+import emblcmci.view3d.DialogVisualizeTracks.DoPlot;
+
 public class DialogVisualizeTracksTest {
 
 	private Image3DUniverse univ;
@@ -38,6 +40,7 @@ public class DialogVisualizeTracksTest {
 		dg.flagNetDisplacement = true;
 		dg.framestart = 0;
 		dg.frameend = 23;
-		dg.doPlotting();
+		DoPlot dp =  dg.new DoPlot(this.univ);
+		dp.execute();
 	}
 }
