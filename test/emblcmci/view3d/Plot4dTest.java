@@ -25,6 +25,7 @@ public class Plot4dTest {
 	private int ry;
 	private int rz;
 	ArrayList<Point3f> refline;
+	String path;
 	@Before
 	public void setUp() throws Exception {
 		Image3DUniverse univ = new Image3DUniverse();
@@ -35,8 +36,9 @@ public class Plot4dTest {
 		rx = 117;
 		ry = 95;
 		rz = 88;
-//		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
-		String path = "/Users/miura/Dropbox/Mette/23h_/23hdatacut0_1_6_6.csv";
+		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
+//		String path = "/Users/miura/Dropbox/Mette/23h_/23hdatacut0_1_6_6.csv";
+		this.path = path;
 		ArrayList<TrajectoryObj> trajlist = p4d.loadFileVolocity(path);
 		this.p4d = p4d;
 		this.trajlist = trajlist;
@@ -96,5 +98,6 @@ public class Plot4dTest {
 		p4d.plotTrackNetDisplacements(timestart, timeend, this.trajlist, refline);
 		//univ.show();
 	}
+
 
 }

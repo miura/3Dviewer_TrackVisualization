@@ -22,7 +22,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
@@ -44,6 +51,8 @@ import javax.swing.border.EmptyBorder;
 import javax.vecmath.Point3f;
 
 import org.hamcrest.core.IsInstanceOf;
+
+import util.opencsv.CSVReader;
 
 /**
  * @author miura
@@ -162,8 +171,8 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		
 		JFrame mainFrame = new JFrame("Visualize Tracks");
 		this.mainFrame = mainFrame;
-		//mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//mainFrame.setSize(480, 640);
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setFont(font3);
@@ -274,6 +283,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			doclosebutton.addActionListener(this);
 			panelBottom2.add(doAddbutton);
 			doAddbutton.addActionListener(this);
+			doAddbutton.setEnabled(false); //implement this in futre
 			panelBottom3 = new JPanel();
 			panelBottom3.setLayout(new BoxLayout(panelBottom3, BoxLayout.X_AXIS));
 			String testtext = "<html><p>" +
@@ -341,8 +351,14 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			label.setText("clicked");
 		}
 		if(arg0.getSource() == filechoosebutton){
+			ArrayList<Integer> minmax;
 			this.datapath = fileChooseDialog();
 			filepathtext.setText(datapath);
+			minmax = getMinMaxFrame(datapath);
+			if (minmax.get(1) != null){
+				fieldStartframe.setText(minmax.get(0).toString());
+				fieldEndframe.setText(minmax.get(1).toString());
+			}
 		}		
 		if(arg0.getSource() == resultsTableImportSwitch){
 			if (resultsTableImportSwitch.isSelected()){
@@ -762,6 +778,49 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
         	return null; 
         }	
     }
+    
+    public ArrayList<Integer> getMinMaxFrame(String datapath){
+
+		File testaccess = new File(datapath);
+		if (!testaccess.exists()){
+			IJ.log("The file does not exists");
+			return null;
+		}
+		testaccess = null;
+		
+		CSVReader reader = null;
+		try {
+			reader = new CSVReader(new FileReader(datapath), ',');
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			IJ.log("file access failed");
+			e.printStackTrace();
+		}
+		List<String[]> ls = null;
+		try {
+			ls = reader.readAll();
+		} catch (IOException e) {
+			IJ.log("file reading failed");
+			e.printStackTrace();
+		}
+		Iterator<String[]> it = ls.iterator();
+		int counter = 0;
+		ArrayList<Integer> timepoints = new ArrayList<Integer>();
+		ArrayList<Integer> startendframeList = new ArrayList<Integer>();
+		while (it.hasNext()){
+			String[] cA = it.next();
+			if (counter != 0){
+	 			timepoints.add((int) (Double.valueOf(cA[2]).intValue()));  
+			}
+			counter++;
+		}
+	    Object objmax = Collections.max(timepoints);
+	    Object objmin = Collections.min(timepoints);
+	    startendframeList.add(Integer.valueOf(objmin.toString()));
+	    startendframeList.add(Integer.valueOf(objmax.toString()));
+	    IJ.log("min:" + objmin + " max:" + objmax);
+		return startendframeList;
+	}
 	
 	@Override
 	public void windowActivated(WindowEvent arg0) {

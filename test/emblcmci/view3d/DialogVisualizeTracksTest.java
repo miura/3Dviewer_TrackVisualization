@@ -20,10 +20,11 @@ public class DialogVisualizeTracksTest {
 	private int rz;
 	private Plot4d p4d;
 	private ArrayList<TrajectoryObj> trajlist;
+	private String datapath;
 
 	@Before
 	public void setUp() throws Exception {
-	
+		datapath = "/Users/miura/Dropbox/Mette/Tracks.csv";
 	}
 	
 	//@Test
@@ -32,7 +33,7 @@ public class DialogVisualizeTracksTest {
 		dg.showDialog();
 	}
 
-	@Test
+	//@Test
 	public void doPlotting(){
 		DialogVisualizeTracks dg = new DialogVisualizeTracks();
 		dg.datapath = "/Users/miura/Dropbox/Mette/Tracks.csv";
@@ -42,5 +43,10 @@ public class DialogVisualizeTracksTest {
 		dg.frameend = 23;
 		DoPlot dp =  dg.new DoPlot(this.univ);
 		dp.execute();
+	}
+	@Test
+	public void testminmaxframe(){
+		DialogVisualizeTracks dg = new DialogVisualizeTracks();
+		dg.getMinMaxFrame(datapath);
 	}
 }
