@@ -34,10 +34,12 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -76,10 +78,10 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	Integer rz = 88;
 	Integer r0x = 117;
 	Integer r0y = 32;
-	Integer r0z = 63;	
+	Integer r0z = 20;	
 	Integer r1x = 121;
 	Integer r1y = 184;
-	Integer r1z = 63;	
+	Integer r1z = 20;	
 	Image3DUniverse univ;
 	ArrayList<TrajectoryObj> tList;
 	
@@ -158,6 +160,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 
 	private JPanel panelTrack3d;
 	private JPanel panelNode3d;
+	private JPanel panelCenterRight;
+	private JList list;
+	private JButton highlightOnTrackButton;
+	private JButton highlightOffTrackButton;
+	private DefaultListModel trackList;
 
 	
 	
@@ -265,9 +272,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			panelCenter.add(panelCenterLeft);
 			toggleRefLineField(false);
 		
-		textArea = new JTextArea();
-		scrollPane = new JScrollPane(textArea);
-		panelCenter.add(scrollPane);
+
+		panelCenterRight = new JPanel();
+		trackList = constructTrackList(panelCenterRight);
+		panelCenter.add(panelCenterRight);
+		
 		
 		// bottom buttons and infos
 		panelBottom = new JPanel();
@@ -329,6 +338,36 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		fieldR1X.setEnabled(enabled);
 		fieldR1Y.setEnabled(enabled);
 		fieldR1Z.setEnabled(enabled);
+	}
+	
+	//trackListing in the center-right 
+	DefaultListModel constructTrackList(JPanel trackListPanel){
+		//textArea = new JTextArea();
+		DefaultListModel listModel = new DefaultListModel();
+		list = new JList(listModel);
+		scrollPane = new JScrollPane();
+		scrollPane.getViewport().setView(list);
+		trackListPanel.setLayout(new BorderLayout());
+		trackListPanel.add(scrollPane, BorderLayout.CENTER);
+		JPanel listSouth = new JPanel();
+		highlightOnTrackButton = new JButton("Highlight");
+		highlightOffTrackButton = new JButton("off");
+		listSouth.add(highlightOffTrackButton, BoxLayout.X_AXIS);
+		listSouth.add(highlightOnTrackButton, BoxLayout.X_AXIS);
+		highlightOnTrackButton.addActionListener(this);
+		highlightOffTrackButton.addActionListener(this);
+		trackListPanel.add(listSouth, BorderLayout.SOUTH);
+		return listModel;
+	}
+	void fillTrackList(DefaultListModel listModel, ArrayList<TrajectoryObj> tList){
+		Iterator<TrajectoryObj> it = tList.iterator();
+		TrajectoryObj atrack;
+		String trackname;
+		while (it.hasNext()){
+			 atrack = it.next();
+			 trackname = "track " + Integer.toString( (int) atrack.id);
+			 listModel.addElement(trackname);
+		}
 	}
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -718,6 +757,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
        		DialogVisualizeTracks.this.univ.show();
     		univwin = DialogVisualizeTracks.this.univ.getWindow();	
     		univwin.addWindowListener(DialogVisualizeTracks.this);
+    		DialogVisualizeTracks.this.fillTrackList( DialogVisualizeTracks.this.trackList, DialogVisualizeTracks.this.tList);
         }
         private void showErrorDialog(String message) {
             JOptionPane.showMessageDialog(frame, message, "failed...", JOptionPane.ERROR_MESSAGE);
