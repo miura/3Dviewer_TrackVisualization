@@ -282,18 +282,18 @@ public class Plot4d {
 		return meshcontents;
 	}
 
-	/** track plotting using lines, only the last frame. 
-	 * time points are color-coded
-	 * no timeseries. 
-	 * @return 
+	/** Plots tracks in static way (track in a single frame) 
+	 * ... uses lineMesh for speed. 
+	 * time points are color-coded.
+	 *  
+	 * @return track contents.  
 	 * 
 	 */
 	public Content PlotTimeColorCodedLineOnlyFinalFrame(int timestart, int timeend, ArrayList<TrajectoryObj> tList){
-		int i, j, k;
+		int i, j;
 		CustomMultiMesh LineMultiMesh = new CustomMultiMesh();
 		//CustomMultiMesh clmmProLine = new CustomMultiMesh();
 		for (i = timestart; i < timeend-1; i++){
-			ArrayList<List> tubes = new ArrayList<List>();
 			float cR = ((float) (i))/((float)(timeend -1 - timestart));
 			float cB = 1.0f - cR;				
 			for (j = 0; j < tList.size(); j++) {
@@ -301,22 +301,29 @@ public class Plot4d {
 				if (CheckTimePointExists(i, curtraj.timepoints) && CheckTimePointExists(i+1, curtraj.timepoints)){
 					int ind = curtraj.timepoints.indexOf(i);
 //					IJ.log("i" + i + " index" + ind + " timepoint:" + i);
-					tubes.add(curtraj.dotList.subList(ind, ind+2));
+					//tubes.add(curtraj.dotList.subList(ind, ind+1));
 //					IJ.log("index"+j + " frame" + i);
+					CustomLineMesh clm = new CustomLineMesh(curtraj.dotList.subList(ind, ind+2), CustomLineMesh.CONTINUOUS, new Color3f(cR, 0.6f, cB), 0.4f);
+					LineMultiMesh.add(clm);
 				}
 			}
-			//adding prog progressive tracks to custommultimesh
-			for (k = 0; k < tubes.size(); k++){
-				CustomLineMesh clm = new CustomLineMesh(tubes.get(k), CustomLineMesh.CONTINUOUS, new Color3f(cR, 0.6f, cB), 0.4f);
-				LineMultiMesh.add(clm);
-				IJ.log("added time point "+ Integer.toString(k));
-			}
-
+			IJ.log("frame " + i + " plotted");
 		}
 		Content ccs = ContentCreator.createContent(LineMultiMesh, "color_coded_Tracks", (int) 0);
 		univ.addContent(ccs);
 		return ccs;
 		
+	}
+	public Content HighlightSelectedSingleTrack(ArrayList<TrajectoryObj> tList, int index){
+		CustomMultiMesh LineMultiMesh = new CustomMultiMesh();
+		//ArrayList<List> tubes = new ArrayList<List>();
+		TrajectoryObj curtraj = tList.get(index);
+		//tubes.add(curtraj.dotList);
+		CustomLineMesh clm = new CustomLineMesh(curtraj.dotList, CustomLineMesh.CONTINUOUS, new Color3f(1, 1, 1), 0.4f);
+		clm.setLineWidth(3f);
+		Content ccs = ContentCreator.createContent(clm, "highlightedTrack"+Integer.toString(index), (int) 0);
+		univ.addContent(ccs);
+		return ccs;
 	}
 	
 	//spheres from trajectories 20111216

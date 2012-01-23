@@ -50,6 +50,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.vecmath.Point3f;
 
 import org.hamcrest.core.IsInstanceOf;
@@ -165,6 +167,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private JButton highlightOnTrackButton;
 	private JButton highlightOffTrackButton;
 	private DefaultListModel trackList;
+	private ArrayList<Content> highlightedList;
 
 	
 	
@@ -322,7 +325,10 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		//contentPane.add(button, BorderLayout.NORTH);
 		//contentPane.add(scrollPane, BorderLayout.SOUTH);
 		mainFrame.pack();
-		mainFrame.setVisible(true); 
+		mainFrame.setVisible(true);
+		
+		//for track highlights instances
+		highlightedList = new ArrayList<Content>();
 	}
 	
 	void toggleRefPointField(boolean enabled){
@@ -349,6 +355,8 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		scrollPane.getViewport().setView(list);
 		trackListPanel.setLayout(new BorderLayout());
 		trackListPanel.add(scrollPane, BorderLayout.CENTER);
+		list.addListSelectionListener
+        (new ToDoListSelectionHandler());
 		JPanel listSouth = new JPanel();
 		highlightOnTrackButton = new JButton("Highlight");
 		highlightOffTrackButton = new JButton("off");
@@ -360,11 +368,8 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		return listModel;
 	}
 	void fillTrackList(DefaultListModel listModel, ArrayList<TrajectoryObj> tList){
-		Iterator<TrajectoryObj> it = tList.iterator();
-		TrajectoryObj atrack;
 		String trackname;
-		while (it.hasNext()){
-			 atrack = it.next();
+		for (TrajectoryObj atrack : tList){
 			 trackname = "track " + Integer.toString( (int) atrack.id);
 			 listModel.addElement(trackname);
 		}
@@ -503,6 +508,20 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			else
 				listColorcofdedTracks.setVisible(true);
 		}
+		if (arg0.getSource() == highlightOnTrackButton){
+			if (!list.isSelectionEmpty()) {
+				int index = list.getSelectedIndex();
+				Content httrack = p4d.HighlightSelectedSingleTrack(tList, index);
+				highlightedList.add(httrack);
+				plotinfo.setText(trackinfotext(tList, index, plotinfohead));
+			} else {
+				plotinfo.setText(plotinfohead + " ...track not selected");
+			}
+		}
+		if (arg0.getSource() == highlightOffTrackButton){
+			for(Content trackcontent:highlightedList)
+				univ.removeContent(trackcontent.getName());
+		}		
 	}
 	
 	private void retrieveParameters(){
@@ -523,6 +542,33 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		r1x  = Integer.valueOf(fieldR1X.getText());
 		r1y  = Integer.valueOf(fieldR1Y.getText());
 		r1z  = Integer.valueOf(fieldR1Z.getText());
+	}
+	private class ToDoListSelectionHandler 
+    implements ListSelectionListener {
+
+		@Override
+		public void valueChanged(ListSelectionEvent arg0) {
+			// TODO Auto-generated method stub
+			if (list.getSelectedIndices().length!=1){
+                                return;
+            }
+			int index = DialogVisualizeTracks.this.list.getSelectedIndex();
+            plotinfo.setText(trackinfotext(tList, index, plotinfohead));
+		}
+		
+	}
+	
+	public static String trackinfotext(ArrayList<TrajectoryObj> tList, int index, String plotinfohead){
+		TrajectoryObj atrack = tList.get(
+				index);
+		String infotext = plotinfohead +
+		"Track"+ atrack.id + 
+		"...length:" + atrack.dotList.size() +
+		"...start:" + 
+		Math.round(atrack.dotList.get(0).x) + ", " +
+		Math.round(atrack.dotList.get(0).y) + ", " + 
+		Math.round(atrack.dotList.get(0).z);
+		return infotext;
 	}
 	
 	String fileChooseDialog(){
