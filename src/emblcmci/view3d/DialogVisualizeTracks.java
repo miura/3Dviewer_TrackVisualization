@@ -812,7 +812,13 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
           
         
     }
-    // class for asynchronous processing
+    /** to add more plot to current Image3DUniverse.
+     * not finished yet. 
+     * a class for asynchronous processing, 
+     * @author miura
+     *
+     */
+    
     class AddPlot extends SwingWorker<Object, Object> {
     	Image3DUniverse univ = null;
     	AddPlot(){

@@ -16,16 +16,9 @@ import java.util.List;
 
 import javax.vecmath.Color3f;
 import javax.vecmath.Point3f;
-import javax.vecmath.Tuple3f;
-
-import math3d.Line;
 
 import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
-
 import util.opencsv.CSVReader;
-
-//import util.opencsv.CSVReader;
-
 import customnode.CustomLineMesh;
 import customnode.CustomMultiMesh;
 import customnode.CustomTriangleMesh;
@@ -316,9 +309,7 @@ public class Plot4d {
 	}
 	public Content HighlightSelectedSingleTrack(ArrayList<TrajectoryObj> tList, int index){
 		CustomMultiMesh LineMultiMesh = new CustomMultiMesh();
-		//ArrayList<List> tubes = new ArrayList<List>();
 		TrajectoryObj curtraj = tList.get(index);
-		//tubes.add(curtraj.dotList);
 		CustomLineMesh clm = new CustomLineMesh(curtraj.dotList, CustomLineMesh.CONTINUOUS, new Color3f(1, 1, 1), 0.4f);
 		clm.setLineWidth(3f);
 		Content ccs = ContentCreator.createContent(clm, "highlightedTrack"+Integer.toString(index), (int) 0);
@@ -618,7 +609,7 @@ public class Plot4d {
 		
 	}
 	
-	/**
+	/** Net displacement towards a reference bar. 
 	 * 
 	 * @param timestart
 	 * @param timeend
