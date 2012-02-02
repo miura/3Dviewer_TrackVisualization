@@ -54,7 +54,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.vecmath.Point3f;
 
-import org.hamcrest.core.IsInstanceOf;
+//import org.hamcrest.core.IsInstanceOf;
 
 import util.opencsv.CSVReader;
 
@@ -743,7 +743,9 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
     				UnivContents.set(6, LlistDynamicNodes);
     			}
     			if (flagNetDisplacement){
-    				ArrayList<Content> LlistNetDisplacements = Lp4d.plotTrackNetDisplacements(framestart, frameend, LtList, rx, ry, rz);			
+    				ArrayList<Point3f> refpoint = new ArrayList<Point3f>();
+    				refpoint.add(new Point3f(rx, ry, rz));
+    				ArrayList<Content> LlistNetDisplacements = Lp4d.plotTrackNetDisplacements(framestart, frameend, LtList, refpoint);			
     				IJ.log("Net Displacement vectors plotted");
     				UnivContents.set(7, LlistNetDisplacements);
     			}
@@ -863,7 +865,9 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
         			IJ.log("Dynamic nodes added");
         		}
         		if (flagNetDisplacement){
-        			listNetDisplacements = p4d.plotTrackNetDisplacements(framestart, frameend, tList, rx, ry, rz);			
+        			ArrayList<Point3f> refpoint = new ArrayList<Point3f>();
+    				refpoint.add(new Point3f(rx, ry, rz));
+    				ArrayList<Content> LlistNetDisplacements = p4d.plotTrackNetDisplacements(framestart, frameend, tList, refpoint);			
         			IJ.log("Net Displaement vectors plotted");
         		}
         	}

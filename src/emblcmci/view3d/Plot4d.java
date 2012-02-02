@@ -283,20 +283,20 @@ public class Plot4d {
 	 * 
 	 */
 	public Content PlotTimeColorCodedLineOnlyFinalFrame(int timestart, int timeend, ArrayList<TrajectoryObj> tList){
-		int i, j;
+		int i, ind;
+		Color3f colornow;
+		float cR, cB;
 		CustomMultiMesh LineMultiMesh = new CustomMultiMesh();
 		//CustomMultiMesh clmmProLine = new CustomMultiMesh();
 		for (i = timestart; i < timeend-1; i++){
-			float cR = ((float) (i))/((float)(timeend -1 - timestart));
-			float cB = 1.0f - cR;				
-			for (j = 0; j < tList.size(); j++) {
-				TrajectoryObj curtraj = tList.get(j);
+			cR = ((float) (i))/((float)(timeend -1 - timestart));
+			cB = 1.0f - cR;
+			colornow = new Color3f(cR, 0.6f, cB);
+			for (TrajectoryObj curtraj : tList) {
+				//TrajectoryObj curtraj = tList.get(j);
 				if (CheckTimePointExists(i, curtraj.timepoints) && CheckTimePointExists(i+1, curtraj.timepoints)){
-					int ind = curtraj.timepoints.indexOf(i);
-//					IJ.log("i" + i + " index" + ind + " timepoint:" + i);
-					//tubes.add(curtraj.dotList.subList(ind, ind+1));
-//					IJ.log("index"+j + " frame" + i);
-					CustomLineMesh clm = new CustomLineMesh(curtraj.dotList.subList(ind, ind+2), CustomLineMesh.CONTINUOUS, new Color3f(cR, 0.6f, cB), 0.4f);
+					ind = curtraj.timepoints.indexOf(i);
+					CustomLineMesh clm = new CustomLineMesh(curtraj.dotList.subList(ind, ind+2), CustomLineMesh.CONTINUOUS, colornow, 0.4f);
 					LineMultiMesh.add(clm);
 				}
 			}
@@ -308,7 +308,7 @@ public class Plot4d {
 		
 	}
 	public Content HighlightSelectedSingleTrack(ArrayList<TrajectoryObj> tList, int index){
-		CustomMultiMesh LineMultiMesh = new CustomMultiMesh();
+		//CustomMultiMesh LineMultiMesh = new CustomMultiMesh();
 		TrajectoryObj curtraj = tList.get(index);
 		CustomLineMesh clm = new CustomLineMesh(curtraj.dotList, CustomLineMesh.CONTINUOUS, new Color3f(1, 1, 1), 0.4f);
 		clm.setLineWidth(3f);
@@ -372,188 +372,16 @@ public class Plot4d {
 	    univ.addContent(ccs);
 	  }
 	}
-
-//	// plots net displacement vector towards a reference point 
-//	public void plotTrackDisplacements(int timestart, int timeend, ArrayList<TrajectoryObj> tList, double rx, double ry, double rz){
-//		int i, j;
-//		ArrayList<Double> dispA = new ArrayList<Double>(); //displacements array
-//		ArrayList<ArrayList<Point3f>> vecs = new ArrayList<ArrayList<Point3f>>();
-//		ArrayList<ArrayList<Point3f>> dispvecs = new ArrayList<ArrayList<Point3f>>();
-//		ArrayList<Point3f> startPoints = new ArrayList<Point3f>();
-//		ArrayList<Integer> awaytowardsA = new ArrayList<Integer>();
-//		for (j = 0; j < tList.size(); j++) {
-//			ArrayList<Point3f> cvec =  new ArrayList<Point3f>();
-//			ArrayList<Point3f> dvec =  new ArrayList<Point3f>();
-//			TrajectoryObj curtraj = tList.get(j);
-//
-//			Point3f spoint = curtraj.dotList.get(0);
-//			Point3f epoint = curtraj.dotList.get(curtraj.dotList.size()-1);
-//			Vector3D srv = new Vector3D(rx - spoint.x, ry - spoint.y, rz - spoint.z); //startpoint to reference point vector
-//			Vector3D sev = new Vector3D(epoint.x - spoint.x, epoint.y - spoint.y, epoint.z - spoint.z); //startpoint to reference point vector
-//			double theta = Vector3D.angle(srv, sev);
-//			Vector3D srvDispv = srv.normalize().scalarMultiply(Math.cos(theta)* sev.getNorm());
-//			double displacement = srvDispv.getNorm();
-//			if (Math.cos(theta) < 0) {
-//				displacement *= -1;
-//				awaytowardsA.add(-1); //away 
-//			} else
-//				awaytowardsA.add(1); //towards 		
-//			dispA.add(displacement);
-//			if (j == 0) IJ.log("id\t" + "theta\t" + "CosTheta\t" + "displacement");
-//			IJ.log("" +j + "\t" + theta + "\t" + Math.cos(theta) + "\t" + displacement);
-//			cvec.add(spoint);
-//			cvec.add(epoint);
-//			vecs.add(cvec);
-//			startPoints.add(spoint);
-//
-//			//displacement vector along reference axis
-//			dvec.add(spoint);
-//			dvec.add(new Point3f(
-//					((float) (spoint.x + srvDispv.getX())), 
-//					((float) (spoint.y + srvDispv.getY())), 
-//					((float) (spoint.z + srvDispv.getZ())))
-//			);
-//			dispvecs.add(dvec);
-//			
-//		}
-////		var minval = Math.min.apply(Math, dispA);
-//		Object minvalobj = Collections.min(dispA);
-////		maxval = Math.max.apply(Math, dispA);
-//		Object maxvalobj = Collections.max(dispA);
-//		IJ.log("Max displacement" + maxvalobj);
-//		IJ.log("Min displacement" + minvalobj);
-////		double minval = Double.valueOf((String) minvalobj);
-//		double minval =  (Double) minvalobj;
-////		double maxval = Double.valueOf((String) maxvalobj);		
-//		double maxval = (Double) maxvalobj;		
-//		double maxdisp = maxval;
-//		if (Math.abs(maxval) < Math.abs(minval))  
-//			maxdisp = minval;
-//		else
-//			maxdisp = maxval;
-//		float cR = 0;
-//		float cG = 0;
-//		float cB = 0;
-//		CustomMultiMesh clmmProLine = new CustomMultiMesh();
-//		CustomMultiMesh clmmDispLine = new CustomMultiMesh();
-//		ArrayList spheres = new ArrayList();
-//		for (j = 0; j < vecs.size(); j++){	
-//			cR =0; cG = 0.6f; cB = 0;
-//			if (dispA.get(j) > 0)
-//				cR = (float) (dispA.get(j)/maxdisp);
-//			else
-//				cB = (float) (Math.abs(dispA.get(j))/maxdisp);
-//				
-//			CustomLineMesh clm = new CustomLineMesh(vecs.get(j), CustomLineMesh.CONTINUOUS, new Color3f(cR, cG, cB), 0);
-//			clmmProLine.add(clm);
-//			clm.setLineWidth(2);
-//			
-//			Color3f dispcol;
-//			if (awaytowardsA.get(j) > 0.0f)
-//				dispcol = new Color3f(1f,0f,0f);
-//			else			
-//				dispcol = new Color3f(0f,0f,1f);
-//			CustomLineMesh clmdisp = new CustomLineMesh(dispvecs.get(j), CustomLineMesh.CONTINUOUS, dispcol, 0);
-//			clmmDispLine.add(clmdisp);
-//			
-//		}
-//		//cc = ContentCreator.createContent(clmmProLine, "displacements" + Integer.toString(i), i-timestart);
-//		Content cc = ContentCreator.createContent(clmmProLine, "displacements", 0);	
-//		univ.addContent(cc);
-//
-//		Content cc2 = ContentCreator.createContent(clmmDispLine, "displacementsAxis", 0);	
-//		univ.addContent(cc2);
-//			
-//		Content startpoint_spheres = createStartPointSphereContent(timestart, tList);
-//		univ.addContent(startpoint_spheres);
-//		
-//		//create reference point
-//		List<Point3f>  referencepoint = Mesh_Maker.createSphere(rx, ry, rz, 2, 12, 12);
-//		CustomTriangleMesh refmesh = new CustomTriangleMesh(referencepoint, new Color3f(1,0,0), 0.0f);
-//		Content refcont = ContentCreator.createContent(refmesh, "referencePoint", 0);
-//		univ.addContent(refcont);
-//		
-//	}
 	
-	/** plots net displacement vector towards a reference point 
+	
+	/** Net displacement towards a reference point or bar.
+	 * if ref arraylist containes only one, then point. if two, a line (reference bar)
+	 * eventually, this could also be a surface.  
 	 * 
 	 * @param timestart
 	 * @param timeend
 	 * @param tList
-	 * @param rx  coordinate of reference point
-	 * @param ry  coordinate of reference point
-	 * @param rz  coordinate of reference point
-	 * @return
-	 */
-	public ArrayList<Content> plotTrackNetDisplacements(int timestart, int timeend, ArrayList<TrajectoryObj> tList, double rx, double ry, double rz){
-		int j = 0;
-		ArrayList<Double> dispA = new ArrayList<Double>(); //displacements array
-		ArrayList<ArrayList<Point3f>> dispvecs = new ArrayList<ArrayList<Point3f>>();
-		ArrayList<Integer> awaytowardsA = new ArrayList<Integer>();		
-		for (TrajectoryObj curtraj : tList) 	{
-			ArrayList<Point3f> dvec =  new ArrayList<Point3f>();
-			Point3f spoint = curtraj.dotList.get(0);
-			Point3f epoint = curtraj.dotList.get(curtraj.dotList.size()-1);
-
-			ArrayList para = calcDisplacementVector(spoint, epoint, rx, ry, rz);
-			double theta = (Double) para.get(0);
-			double displacement = (Double) para.get(1);
-			Vector3D srvDispv = (Vector3D) para.get(2);
-			
-			if (Math.cos(theta) < 0) {
-				displacement *= -1;
-				awaytowardsA.add(-1); //away 
-			} else
-				awaytowardsA.add(1); //towards 		
-			dispA.add(displacement);
-			if (j == 0) IJ.log("id\t" + "theta\t" + "CosTheta\t" + "displacement");
-			IJ.log("" +j + "\t" + theta + "\t" + Math.cos(theta) + "\t" + displacement);
-
-			//displacement vector along reference axis
-			dvec.add(spoint);
-			dvec.add(new Point3f(
-					((float) (spoint.x + srvDispv.getX())), 
-					((float) (spoint.y + srvDispv.getY())), 
-					((float) (spoint.z + srvDispv.getZ())))
-			);
-			dispvecs.add(dvec);
-			j++;
-						
-		}
-		CustomMultiMesh clmmDispLine = new CustomMultiMesh();
-		for (j = 0; j < dispvecs.size(); j++){	
-
-			CustomLineMesh clmdisp = 
-				new CustomLineMesh(dispvecs.get(j), CustomLineMesh.CONTINUOUS, colorCodeAwayTowards(awaytowardsA.get(j)), 0);
-			clmmDispLine.add(clmdisp);
-			
-		}
-
-		Content cc2 = ContentCreator.createContent(clmmDispLine, "displacementsAxis", 0);	
-		univ.addContent(cc2);
-			
-		Content startpoint_spheres = createStartPointSphereContent(timestart, tList);
-		univ.addContent(startpoint_spheres);
-		
-		List<Point3f> referencepoint = Mesh_Maker.createSphere(rx, ry, rz, 2, 12, 12);
-		CustomTriangleMesh refmesh = new CustomTriangleMesh(referencepoint, new Color3f(1,0,0), 0.0f);
-		Content refcont = ContentCreator.createContent(refmesh, "referencePoint", 0);
-		univ.addContent(refcont);
-		
-		ArrayList<Content> packedcontents = new ArrayList<Content>(); //for packaging contents
-		packedcontents.add(cc2);
-		packedcontents.add(startpoint_spheres);
-		packedcontents.add(refcont);
-		return packedcontents;
-		
-	}
-	
-	/** Net displacement towards a reference bar. 
-	 * 
-	 * @param timestart
-	 * @param timeend
-	 * @param tList
-	 * @param ref List of doubles, representing reference line [r0x, r0y, r0z, r1x, r1y, r1z]
+	 * @param ref List of doubles, in case of reference line [r0x, r0y, r0z, r1x, r1y, r1z]
 	 * @return
 	 */
 	public ArrayList<Content> plotTrackNetDisplacements(int timestart, int timeend, ArrayList<TrajectoryObj> tList, ArrayList<Point3f> ref){
@@ -566,10 +394,11 @@ public class Plot4d {
 			Point3f spoint = curtraj.dotList.get(0);
 			Point3f epoint = curtraj.dotList.get(curtraj.dotList.size()-1);
 			
-			ArrayList<?> vecpara = calcDisplacementVector(spoint, epoint, ref);
+			//ArrayList<?> vecpara = calcDisplacementVector(spoint, epoint, ref);
+			ArrayList<?> vecpara =calcNetDisp2Ref(spoint, epoint, ref);
 			double theta = (Double) vecpara.get(0);
 			double displacement = (Double) vecpara.get(1);
-			Vector3D dvdash = (Vector3D) vecpara.get(2); 
+			Vector3D dispV = (Vector3D) vecpara.get(2); 
 			
 			if (Math.cos(theta) < 0) {
 				displacement *= -1;
@@ -583,9 +412,9 @@ public class Plot4d {
 			//displacement vector along reference axis
 			dvec.add(spoint);
 			dvec.add(new Point3f(
-					((float) (spoint.x + dvdash.getX())), 
-					((float) (spoint.y + dvdash.getY())), 
-					((float) (spoint.z + dvdash.getZ())))
+					((float) (spoint.x + dispV.getX())), 
+					((float) (spoint.y + dispV.getY())), 
+					((float) (spoint.z + dispV.getZ())))
 			);
 			dispvecs.add(dvec);
 			j++;			
@@ -598,17 +427,17 @@ public class Plot4d {
 			clmmDispLine.add(clmdisp);
 		}
 
-		Content cc2 = ContentCreator.createContent(clmmDispLine, "displacementsAxis", 0);	
-		univ.addContent(cc2);
+		Content netDV = ContentCreator.createContent(clmmDispLine, "NetDisplacementVecs", 0);	
+		univ.addContent(netDV);
 			
 		Content startpoint_spheres = createStartPointSphereContent(timestart, tList);
 		univ.addContent(startpoint_spheres);
 		
-		Content refcont = createLineReferenceContent(timestart, ref);
+		Content refcont = createReferenceContent(timestart, ref);
 		univ.addContent(refcont);
 		
 		ArrayList<Content> packedcontents = new ArrayList<Content>(); //for packaging contents
-		packedcontents.add(cc2);
+		packedcontents.add(netDV);
 		packedcontents.add(startpoint_spheres);
 		packedcontents.add(refcont);
 		return packedcontents;
@@ -667,6 +496,16 @@ public class Plot4d {
 		
 	}
 
+	/** Calculates displacement vector towards a reference point.
+	 * returned value is an ArrayList containing 0: theta, 1: length(displacement), 2, Vector3D instance 
+	 * 
+	 * @param spoint
+	 * @param epoint
+	 * @param rx
+	 * @param ry
+	 * @param rz
+	 * @return
+	 */
 	public ArrayList<?> calcDisplacementVector(Point3f spoint, Point3f epoint, double rx, double ry, double rz){
 		Vector3D srv;		//trackstart point to the reference point
 		Vector3D sev;		//track start to the end point
@@ -685,7 +524,10 @@ public class Plot4d {
 		para.add(srvDispv);
 		return para;	
 	}
-	
+	/** Calculates displacement vector towards a reference bar.
+	 * returned value is an ArrayList containing 0: theta, 1: length(displacement), 2, Vector3D instance
+	 * 
+	 */
 	public ArrayList<?> calcDisplacementVector(Point3f spoint, Point3f epoint, ArrayList<Point3f> ref){
 		Vector3D rv;			// reference bar
 		Vector3D sev;			// start-endpoint of track
@@ -695,7 +537,7 @@ public class Plot4d {
 		Vector3D dv;			// vector from track start point to the endpoint of refdash
 		double sevproj;			// length of a projection vector of sev to dv
 		Vector3D dvdash;		// a net displacement vector against reference point (the answer) 
-		
+
 		rv = new Vector3D(ref.get(1).x - ref.get(0).x, ref.get(1).y - ref.get(0).y, ref.get(1).z - ref.get(0).z); 
 		sev = new Vector3D(epoint.x - spoint.x, epoint.y - spoint.y, epoint.z - spoint.z); 
 		pv = new Vector3D(spoint.x - ref.get(0).x, spoint.y - ref.get(0).y, spoint.z - ref.get(0).z); 
@@ -721,6 +563,15 @@ public class Plot4d {
 		return para;				
 	}
 	
+	public ArrayList<?> calcNetDisp2Ref(Point3f spoint, Point3f epoint, ArrayList<Point3f> ref){
+		ArrayList para;
+		if (ref.size() == 1)
+			para = calcDisplacementVector(spoint, epoint, ref.get(0).x, ref.get(0).y, ref.get(0).z);
+		else
+			para = calcDisplacementVector(spoint, epoint, ref);
+		return para;
+	}
+	
 	/** Create 3D sphere contents to show starting points of tracks. 
 	 * Plot only in the first frame.
 	 * 
@@ -744,7 +595,16 @@ public class Plot4d {
 		Content ccs = ContentCreator.createContent(csp, "startpoints", 0);
 		return ccs; 
 	}
-	/** Create 3D reference bar content. 
+	/** Creates 3D reference point content
+	 * 
+	 */
+	public Content createPointReferenceContent(int timestart, ArrayList<Point3f> ref){
+		List<Point3f> referencepoint = Mesh_Maker.createSphere(ref.get(0).x, ref.get(0).y, ref.get(0).z, 2, 12, 12);
+		CustomTriangleMesh refmesh = new CustomTriangleMesh(referencepoint, new Color3f(1,0,0), 0.0f);
+		Content refcont = ContentCreator.createContent(refmesh, "referencePoint", 0);
+		return refcont;
+	}
+	/** Creates 3D reference bar content. 
 	 * 
 	 * @param timestart
 	 * @param ref an ArrayList consisting of two Point3f objects, startpoint and end point of the reference bar. 
@@ -758,7 +618,15 @@ public class Plot4d {
 				new double[]{1, 1},
 				12, false); //true makes cones
 		CustomTriangleMesh refmesh = new CustomTriangleMesh(referenceline, new Color3f(1,0,0), 0.0f);
-		Content refcont = ContentCreator.createContent(refmesh, "referencePoint", timestart);
+		Content refcont = ContentCreator.createContent(refmesh, "referenceLine", timestart);
+		return refcont;
+	}
+	public Content createReferenceContent(int timestart, ArrayList<Point3f> ref){
+		Content refcont;
+		if (ref.size() == 1)
+			refcont = createPointReferenceContent(timestart, ref);
+		else
+			refcont = createLineReferenceContent(timestart, ref);
 		return refcont;
 	}
 	/** Calculates maximum absolute value of dispA<Double>

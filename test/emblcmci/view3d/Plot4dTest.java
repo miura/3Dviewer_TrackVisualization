@@ -92,7 +92,11 @@ public class Plot4dTest {
 //	}
 	@Test
 	public void plotTrackNetDisplacementsPoint(){
-		p4d.plotTrackNetDisplacements(timestart, timeend, this.trajlist, rx, ry, rz);
+		Point3f refp = new Point3f(rx, ry, rz);
+		ArrayList<Point3f> ref = new ArrayList<Point3f>();
+		ref.add(refp);
+//		p4d.plotTrackNetDisplacements(timestart, timeend, this.trajlist, rx, ry, rz);
+		p4d.plotTrackNetDisplacements(timestart, timeend, this.trajlist, ref);
 	}
 	@Test
 	public void plotTrackNetDispacementBar(){
