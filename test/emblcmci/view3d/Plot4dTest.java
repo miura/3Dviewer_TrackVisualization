@@ -36,8 +36,9 @@ public class Plot4dTest {
 		rx = 117;
 		ry = 95;
 		rz = 88;
-		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
+//		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
 //		String path = "/Users/miura/Dropbox/Mette/23h_/23hdatacut0_1_6_6.csv";
+		String path = "C:\\dropbox\\My Dropbox\\Mette\\Tracks.csv";
 		this.path = path;
 		ArrayList<TrajectoryObj> trajlist = p4d.loadFileVolocity(path);
 		this.p4d = p4d;
@@ -90,13 +91,22 @@ public class Plot4dTest {
 		p4d.plotTrackDisplacements(timestart, timeend, this.trajlist, rx, ry, rz);
 	}
 	//@Test
-	public void plotTrackNetDisplacements(){
+	public void plotTrackNetDisplacementsPoint(){
 		p4d.plotTrackNetDisplacements(timestart, timeend, this.trajlist, rx, ry, rz);
 	}
 	@Test
-	public void plotNetDisp(){
+	public void plotTrackNetDispacementBar(){
 		p4d.plotTrackNetDisplacements(timestart, timeend, this.trajlist, refline);
 		//univ.show();
+	}
+	//@Test
+	public void plotTrackNetTravelBarTest(){
+		p4d.plotTrackNetTravel(timestart, timeend, this.trajlist, refline);
+		//univ.show();
+	}	
+	@Test
+	public void startpointCreatertest(){
+		p4d.createStartPointSphereContent(timestart, this.trajlist);
 	}
 
 
