@@ -87,10 +87,10 @@ public class Plot4dTest {
 		//univ.show();
 		p4d.PlotTimeColorCodedLine(timestart, timeend, this.trajlist);
 	}
-	public void plotTrackDisplacements(){
-		p4d.plotTrackDisplacements(timestart, timeend, this.trajlist, rx, ry, rz);
-	}
-	//@Test
+//	public void plotTrackDisplacements(){
+//		p4d.plotTrackDisplacements(timestart, timeend, this.trajlist, rx, ry, rz);
+//	}
+	@Test
 	public void plotTrackNetDisplacementsPoint(){
 		p4d.plotTrackNetDisplacements(timestart, timeend, this.trajlist, rx, ry, rz);
 	}
