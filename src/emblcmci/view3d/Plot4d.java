@@ -460,9 +460,10 @@ public class Plot4d {
 		Point3f spoint, epoint;
 		double theta, displacement;
 		ArrayList<?> vecpara;
-		for (TrajectoryObj curtraj : tList)	{
-			ArrayList<Point3f> dvec =  new ArrayList<Point3f>();	
+		ArrayList<Point3f> dvec;
+		for (TrajectoryObj curtraj : tList)	{	
 			for (i = 0; i < curtraj.dotList.size()-2; i++){
+				dvec =  new ArrayList<Point3f>();
 				spoint = curtraj.dotList.get(i);
 				epoint = curtraj.dotList.get(i+1);
 				if (spoint.distance(epoint) > 0){
@@ -738,12 +739,17 @@ public class Plot4d {
 			cB = (float) (Math.abs(disp)/maxdisp);
 		return new Color3f(cR, cG, cB);
 	}
+	/** Color assignments for net displacement vectors (towards reference point or a line)
+	 * 
+	 * @param awaytowards
+	 * @return
+	 */
 	Color3f colorCodeAwayTowards(int awaytowards){
 		Color3f dispcol;
 		if (awaytowards > 0)
 			 dispcol = new Color3f(1,0,0);
 		else			
-			 dispcol = new Color3f(0,0,1);
+			 dispcol = new Color3f(0,1,1);
 		return dispcol;
 	}	
 	

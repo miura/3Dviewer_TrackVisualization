@@ -172,6 +172,8 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private DefaultListModel trackList;
 	private ArrayList<Content> highlightedList;
 	private JPanel panelSwitchDispResolution;
+	private boolean flagNetDispFull;
+	private boolean flagFullIncrem;
 
 	
 	
@@ -561,7 +563,9 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		flagDynamicColorCodedTracks = ColorCodedDyamicTracks.isSelected();
 		flagDynamicTrackNodes = DynamicTrackNodes.isSelected();
 		flagNetDisplacement = NetDisplacements.isSelected();
-		flagNetDisplacementLineref = NetDisplacementsLineRef.isSelected();				
+		flagNetDisplacementLineref = NetDisplacementsLineRef.isSelected();
+		flagNetDispFull = switchDispFullTrack.isSelected();
+		flagFullIncrem = switchDispIncrement.isSelected();
 		rx  = Integer.valueOf(fieldRX.getText());
 		ry  = Integer.valueOf(fieldRY.getText());
 		rz  = Integer.valueOf(fieldRZ.getText());
@@ -774,7 +778,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
     			if (flagNetDisplacement){
     				ArrayList<Point3f> refpoint = new ArrayList<Point3f>();
     				refpoint.add(new Point3f(rx, ry, rz));
-    				ArrayList<Content> LlistNetDisplacements = Lp4d.plotTrackNetDisplacements(framestart, frameend, LtList, refpoint);			
+    				ArrayList<Content> LlistNetDisplacements;
+    				if (flagNetDispFull)
+    					LlistNetDisplacements = Lp4d.plotTrackNetDisplacements(framestart, frameend, LtList, refpoint);			
+    				else
+    					LlistNetDisplacements = Lp4d.plotTrackNetDispIncremental(framestart, frameend, LtList, refpoint);			
     				IJ.log("Net Displacement vectors plotted");
     				UnivContents.set(7, LlistNetDisplacements);
     			}
@@ -782,8 +790,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
     				ArrayList<Point3f> refline = new ArrayList<Point3f>();
     				refline.add(new Point3f(r0x, r0y, r0z));
     				refline.add(new Point3f(r1x, r1y, r1z));
-    				//listNetDisplacements = p4d.plotTrackNetDisplacements(framestart, frameend, tList, refline);			
-    				ArrayList<Content> LlistNetDisplacementsLineRef = Lp4d.plotTrackNetDisplacements(framestart, frameend, LtList, refline);			
+    				ArrayList<Content> LlistNetDisplacementsLineRef;
+    				if (flagNetDispFull)
+    					LlistNetDisplacementsLineRef = Lp4d.plotTrackNetDisplacements(framestart, frameend, LtList, refline);			
+    				else
+    					LlistNetDisplacementsLineRef = Lp4d.plotTrackNetDispIncremental(framestart, frameend, LtList, refline);			
     				IJ.log("Net Displacement vectors (LineRef) plotted");
     				UnivContents.set(8, LlistNetDisplacementsLineRef);
     			}
