@@ -14,6 +14,8 @@ import javax.vecmath.Point3f;
 import org.junit.Before;
 import org.junit.Test;
 
+import emblcmci.view3d.Plot4d;
+
 public class Plot4dTest {
 
 	Plot4d p4d;
@@ -36,9 +38,9 @@ public class Plot4dTest {
 		rx = 117;
 		ry = 95;
 		rz = 88;
-//		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
+		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
 //		String path = "/Users/miura/Dropbox/Mette/23h_/23hdatacut0_1_6_6.csv";
-		String path = "C:\\dropbox\\My Dropbox\\Mette\\Tracks.csv";
+//		String path = "C:\\dropbox\\My Dropbox\\Mette\\Tracks.csv";
 		this.path = path;
 		ArrayList<TrajectoryObj> trajlist = p4d.loadFileVolocity(path);
 		this.p4d = p4d;
@@ -112,6 +114,9 @@ public class Plot4dTest {
 	public void startpointCreatertest(){
 		p4d.createStartPointSphereContent(timestart, this.trajlist);
 	}
-
+	@Test
+	public void plotTrackNetDispIncremental(){
+		p4d.plotTrackNetDispIncremental(timestart, timeend, this.trajlist, refline);
+	}
 
 }

@@ -131,6 +131,9 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private JTextField fieldR1Y = new JTextField(Integer.toString(r1y));
 	private JTextField fieldR1Z = new JTextField(Integer.toString(r1z));
 	
+	JRadioButton switchDispFullTrack = new JRadioButton();
+	JRadioButton switchDispIncrement = new JRadioButton();
+	
 	JScrollPane scrollPane;
 	JTextArea textArea;
 	
@@ -168,6 +171,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private JButton highlightOffTrackButton;
 	private DefaultListModel trackList;
 	private ArrayList<Content> highlightedList;
+	private JPanel panelSwitchDispResolution;
 
 	
 	
@@ -214,7 +218,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		panelCenter.setLayout(new GridLayout(1, 2));
 
 			panelCenterLeft = new JPanel();
-			panelCenterLeft.setLayout(new GridLayout(10, 1));
+			panelCenterLeft.setLayout(new GridLayout(12, 1));
 			panelCenterLeft.setBorder(BorderFactory.createTitledBorder("Parameters"));
 			//panelBottomLeft.add(new JLabel("Frame:"));
 				panelFrames = new JPanel();
@@ -271,7 +275,19 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				panelRef1Points.add(fieldR1X);
 				panelRef1Points.add(fieldR1Y);
 				panelRef1Points.add(fieldR1Z);
-			panelCenterLeft.add(panelRef1Points);			
+			panelCenterLeft.add(panelRef1Points);
+				panelSwitchDispResolution = new JPanel();
+				panelSwitchDispResolution.setLayout(new BoxLayout(panelSwitchDispResolution, BoxLayout.X_AXIS));
+				panelSwitchDispResolution.add(switchDispFullTrack);
+				switchDispFullTrack.setText("FullTrack");
+				switchDispFullTrack.addActionListener(this);
+				switchDispFullTrack.setEnabled(false);
+				switchDispFullTrack.setSelected(true);
+				panelSwitchDispResolution.add(switchDispIncrement);
+				switchDispIncrement.setText("Incremental");
+				switchDispIncrement.addActionListener(this);
+				switchDispIncrement.setEnabled(false);
+			panelCenterLeft.add(panelSwitchDispResolution);
 			panelCenter.add(panelCenterLeft);
 			toggleRefLineField(false);
 		
@@ -456,18 +472,31 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				ColorCodedDyamicTracks.setSelected(false);
 				DynamicTrackNodes.setSelected(false);				
 				toggleRefPointField(true);
+				NetDisplacementsLineRef.setSelected(!NetDisplacements.isSelected());
 			} else
 				toggleRefPointField(false);
-		}if (arg0.getSource() == NetDisplacementsLineRef){
+			switchDispFullTrack.setEnabled(NetDisplacements.isSelected());
+			switchDispIncrement.setEnabled(NetDisplacements.isSelected());
+		}
+		if (arg0.getSource() == NetDisplacementsLineRef){
 			if (NetDisplacementsLineRef.isSelected()){
 				//panelRefPoints.setVisible(true);
 				toggleRefLineField(true);
 				ColorCodedDyamicTracks.setSelected(false);
-				DynamicTrackNodes.setSelected(false);				
+				DynamicTrackNodes.setSelected(false);
+				NetDisplacements.setSelected(!NetDisplacementsLineRef.isSelected());
 			} else 
 				toggleRefLineField(false);
-				//panelRefPoints.setVisible(false);				
+				//panelRefPoints.setVisible(false);	
+			switchDispFullTrack.setEnabled(NetDisplacementsLineRef.isSelected());
+			switchDispIncrement.setEnabled(NetDisplacementsLineRef.isSelected());
 		}
+		if (arg0.getSource() == switchDispFullTrack){
+			switchDispIncrement.setSelected(!switchDispFullTrack.isSelected());
+		}
+		if (arg0.getSource() == switchDispIncrement){
+			switchDispFullTrack.setSelected(!switchDispIncrement.isSelected());
+		}		
 		
 		if (arg0.getSource() == doplotbutton){
 			if ((fieldStartframe.getText() != null) && (fieldEndframe.getText() != null)){

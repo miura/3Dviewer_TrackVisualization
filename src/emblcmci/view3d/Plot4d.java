@@ -443,7 +443,14 @@ public class Plot4d {
 		return packedcontents;
 		
 	}
-	
+	/** Calculates incremental (every displacement per time point) net displacement towards reference point or line
+	 * 
+	 * @param timestart
+	 * @param timeend
+	 * @param tList
+	 * @param ref
+	 * @return
+	 */
 	public ArrayList<Content> plotTrackNetDispIncremental(int timestart, int timeend, ArrayList<TrajectoryObj> tList, ArrayList<Point3f> ref){
 		int j = 0;
 		int i;
@@ -457,29 +464,31 @@ public class Plot4d {
 			ArrayList<Point3f> dvec =  new ArrayList<Point3f>();	
 			for (i = 0; i < curtraj.dotList.size()-2; i++){
 				spoint = curtraj.dotList.get(i);
-				epoint = curtraj.dotList.get(i+1);		
-				vecpara =calcNetDisp2Ref(spoint, epoint, ref);
-				theta = (Double) vecpara.get(0);
-				displacement = (Double) vecpara.get(1);
-				Vector3D dispV = (Vector3D) vecpara.get(2); 
-				if (Math.cos(theta) < 0) {
-					displacement *= -1;
-					awaytowardsA.add(-1); //away 
-				} else
-					awaytowardsA.add(1); //towards 		
-				dispA.add(displacement);
-				if (j == 0) IJ.log("id\t" + "theta\t" + "CosTheta\t" + "displacement");
-				IJ.log("" +j + "\t" + theta + "\t" + Math.cos(theta) + "\t" + displacement);
+				epoint = curtraj.dotList.get(i+1);
+				if (spoint.distance(epoint) > 0){
+					vecpara =calcNetDisp2Ref(spoint, epoint, ref);
+					theta = (Double) vecpara.get(0);
+					displacement = (Double) vecpara.get(1);
+					Vector3D dispV = (Vector3D) vecpara.get(2); 
+					if (Math.cos(theta) < 0) {
+						displacement *= -1;
+						awaytowardsA.add(-1); //away 
+					} else
+						awaytowardsA.add(1); //towards 		
+					dispA.add(displacement);
+					if (j == 0) IJ.log("id\t" + "theta\t" + "CosTheta\t" + "displacement");
+					IJ.log("" +j + "\t" + theta + "\t" + Math.cos(theta) + "\t" + displacement);
 
-				//displacement vector along reference axis
-				dvec.add(spoint);
-				dvec.add(new Point3f(
-						((float) (spoint.x + dispV.getX())), 
-						((float) (spoint.y + dispV.getY())), 
-						((float) (spoint.z + dispV.getZ())))
-				);
-				dispvecs.add(dvec);
-				j++;
+					//displacement vector along reference axis
+					dvec.add(spoint);
+					dvec.add(new Point3f(
+							((float) (spoint.x + dispV.getX())), 
+							((float) (spoint.y + dispV.getY())), 
+							((float) (spoint.z + dispV.getZ())))
+					);
+					dispvecs.add(dvec);
+					j++;
+				}
 			}
 		}
 
