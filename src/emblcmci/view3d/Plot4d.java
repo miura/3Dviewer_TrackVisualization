@@ -443,6 +443,70 @@ public class Plot4d {
 		return packedcontents;
 		
 	}
+	
+	public ArrayList<Content> plotTrackNetDispIncremental(int timestart, int timeend, ArrayList<TrajectoryObj> tList, ArrayList<Point3f> ref){
+		int j = 0;
+		int i;
+		ArrayList<Double> dispA = new ArrayList<Double>(); //displacements array
+		ArrayList<ArrayList<Point3f>> dispvecs = new ArrayList<ArrayList<Point3f>>();
+		ArrayList<Integer> awaytowardsA = new ArrayList<Integer>();
+		Point3f spoint, epoint;
+		double theta, displacement;
+		ArrayList<?> vecpara;
+		for (TrajectoryObj curtraj : tList)	{
+			ArrayList<Point3f> dvec =  new ArrayList<Point3f>();	
+			for (i = 0; i < curtraj.dotList.size()-2; i++){
+				spoint = curtraj.dotList.get(i);
+				epoint = curtraj.dotList.get(i+1);		
+				vecpara =calcNetDisp2Ref(spoint, epoint, ref);
+				theta = (Double) vecpara.get(0);
+				displacement = (Double) vecpara.get(1);
+				Vector3D dispV = (Vector3D) vecpara.get(2); 
+				if (Math.cos(theta) < 0) {
+					displacement *= -1;
+					awaytowardsA.add(-1); //away 
+				} else
+					awaytowardsA.add(1); //towards 		
+				dispA.add(displacement);
+				if (j == 0) IJ.log("id\t" + "theta\t" + "CosTheta\t" + "displacement");
+				IJ.log("" +j + "\t" + theta + "\t" + Math.cos(theta) + "\t" + displacement);
+
+				//displacement vector along reference axis
+				dvec.add(spoint);
+				dvec.add(new Point3f(
+						((float) (spoint.x + dispV.getX())), 
+						((float) (spoint.y + dispV.getY())), 
+						((float) (spoint.z + dispV.getZ())))
+				);
+				dispvecs.add(dvec);
+				j++;
+			}
+		}
+
+		CustomMultiMesh clmmDispLine = new CustomMultiMesh();
+		for (j = 0; j < dispvecs.size(); j++){				
+			CustomLineMesh clmdisp = 
+				new CustomLineMesh(dispvecs.get(j), CustomLineMesh.CONTINUOUS, colorCodeAwayTowards(awaytowardsA.get(j)), 0);
+			clmmDispLine.add(clmdisp);
+		}
+
+		Content netDV = ContentCreator.createContent(clmmDispLine, "NetDisplacementVecs", 0);	
+		univ.addContent(netDV);
+			
+		Content startpoint_spheres = createStartPointSphereContent(timestart, tList);
+		univ.addContent(startpoint_spheres);
+		
+		Content refcont = createReferenceContent(timestart, ref);
+		univ.addContent(refcont);
+		
+		ArrayList<Content> packedcontents = new ArrayList<Content>(); //for packaging contents
+		packedcontents.add(netDV);
+		packedcontents.add(startpoint_spheres);
+		packedcontents.add(refcont);
+		return packedcontents;
+		
+	}
+	
 	/** plots a straight line for each track connecting starting point and end point. 
 	 * as of 20120202 not appearing in the GUI interface since it seems to be not helpful to the analysis 
 	 * 
@@ -452,7 +516,6 @@ public class Plot4d {
 	 * @param ref
 	 * @return
 	 */
-	
 	public ArrayList<Content> plotTrackNetTravel(int timestart, int timeend, ArrayList<TrajectoryObj> tList, ArrayList<Point3f> ref){
 		int j = 0;
 		ArrayList<Double> 				dispA = new ArrayList<Double>(); //displacements array
@@ -621,11 +684,20 @@ public class Plot4d {
 		Content refcont = ContentCreator.createContent(refmesh, "referenceLine", timestart);
 		return refcont;
 	}
+	/** Creates Reference contnent depeending on the size of the ArrayList ref.
+	 * This method was made to unify two different methods. 
+	 * 
+	 * @param timestart
+	 * @param ref
+	 * @return
+	 */
 	public Content createReferenceContent(int timestart, ArrayList<Point3f> ref){
 		Content refcont;
 		if (ref.size() == 1)
+			// reference: single point
 			refcont = createPointReferenceContent(timestart, ref);
 		else
+			//reference: a bar
 			refcont = createLineReferenceContent(timestart, ref);
 		return refcont;
 	}
