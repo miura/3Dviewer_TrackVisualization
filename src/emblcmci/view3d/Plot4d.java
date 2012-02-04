@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -272,6 +273,8 @@ public class Plot4d {
 			//univ.addContentLater(ccs);
 		}
 		univ.addContentLater(meshcontents);
+		for (Content item : meshcontents)
+			item.setLocked(true);
 		return meshcontents;
 	}
 
@@ -304,6 +307,7 @@ public class Plot4d {
 		}
 		Content ccs = ContentCreator.createContent(LineMultiMesh, "color_coded_Tracks", (int) 0);
 		univ.addContent(ccs);
+		ccs.setLocked(true);
 		return ccs;
 		
 	}
@@ -347,6 +351,8 @@ public class Plot4d {
 			IJ.log("timepoint "+ Integer.toString(i) + "..." + Integer.toString(nodesnum));
 		}
 		univ.addContentLater(contentsList);
+		for (Content item : contentsList)
+			item.setLocked(true);
 		return contentsList;
 	}
 
@@ -355,22 +361,23 @@ public class Plot4d {
 	public void plotSpheresFromDotLists(int timestart, int timeend, ArrayList<DotObj> pList){
 		int i, j;
 		for (i = timestart; i < timeend; i++){
-	    ArrayList<Point3f> spheres = new ArrayList<Point3f>();
-	    for (j = 0; j < pList.size(); j++) {
-	    	DotObj curdot = pList.get(j);
-	      if (curdot.getFrame() -1  == i){
-	        double factor = Math.round(curdot.getMeanint()/200 * 24);
-	        //var sphere = Mesh_Maker.createSphere(curdot.sx, curdot.sy, curdot.sz, 0.7, factor, factor);
-	        List<Point3f>  sphere = Mesh_Maker.createSphere(curdot.sx, curdot.sy, curdot.sz, 0.7, 12, 12);
+			ArrayList<Point3f> spheres = new ArrayList<Point3f>();
+			for (j = 0; j < pList.size(); j++) {
+				DotObj curdot = pList.get(j);
+				if (curdot.getFrame() -1  == i){
+					double factor = Math.round(curdot.getMeanint()/200 * 24);
+					//var sphere = Mesh_Maker.createSphere(curdot.sx, curdot.sy, curdot.sz, 0.7, factor, factor);
+					List<Point3f>  sphere = Mesh_Maker.createSphere(curdot.sx, curdot.sy, curdot.sz, 0.7, 12, 12);
 
-	        spheres.addAll(sphere);
-	        IJ.log("index"+j + " frame" + i + " intfactor:"+factor);
-	      }
-	    }
-	    CustomTriangleMesh csp = new CustomTriangleMesh(spheres, new Color3f(1.0f, 1.0f, 1.0f), 0.0f);
-	    Content ccs = ContentCreator.createContent(csp, "dotstime" + Integer.toString(i), i-timestart);
-	    univ.addContent(ccs);
-	  }
+					spheres.addAll(sphere);
+					IJ.log("index"+j + " frame" + i + " intfactor:"+factor);
+				}
+			}
+			CustomTriangleMesh csp = new CustomTriangleMesh(spheres, new Color3f(1.0f, 1.0f, 1.0f), 0.0f);
+			Content ccs = ContentCreator.createContent(csp, "dotstime" + Integer.toString(i), i-timestart);
+			univ.addContent(ccs);
+		}
+		lockCurrentContents(univ);
 	}
 	
 	
@@ -435,6 +442,8 @@ public class Plot4d {
 		
 		Content refcont = createReferenceContent(timestart, ref);
 		univ.addContent(refcont);
+
+		lockCurrentContents(univ);
 		
 		ArrayList<Content> packedcontents = new ArrayList<Content>(); //for packaging contents
 		packedcontents.add(netDV);
@@ -508,6 +517,8 @@ public class Plot4d {
 		
 		Content refcont = createReferenceContent(timestart, ref);
 		univ.addContent(refcont);
+
+		lockCurrentContents(univ);
 		
 		ArrayList<Content> packedcontents = new ArrayList<Content>(); //for packaging contents
 		packedcontents.add(netDV);
@@ -561,6 +572,7 @@ public class Plot4d {
 		}
 		Content cc = ContentCreator.createContent(clmmProLine, "NetTravelss", 0);	
 		Content startpoint_spheres = createStartPointSphereContent(timestart, tList);
+		lockCurrentContents(univ);
 		
 		ArrayList<Content> packedcontents = new ArrayList<Content>(); //for packaging contents
 		packedcontents.add(cc);
@@ -751,7 +763,12 @@ public class Plot4d {
 		else			
 			 dispcol = new Color3f(0,1,1);
 		return dispcol;
-	}	
+	}
+	void lockCurrentContents(Image3DUniverse univ){
+		Collection<Content> ccs = (Collection<Content>) univ.getContents();
+		for (Content item : ccs)
+			item.setLocked(true);
+	}
 	
 	
 	
