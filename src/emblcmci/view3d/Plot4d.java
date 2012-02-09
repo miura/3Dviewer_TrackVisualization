@@ -8,6 +8,7 @@ import ij3d.Image3DUniverse;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +21,7 @@ import javax.vecmath.Point3f;
 
 import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
 import util.opencsv.CSVReader;
+import util.opencsv.CSVWriter;
 import customnode.CustomLineMesh;
 import customnode.CustomMultiMesh;
 import customnode.CustomTriangleMesh;
@@ -32,13 +34,24 @@ public class Plot4d {
 	private ArrayList<TrajectoryObj> trajlist; //trajectory coordinates
 	private ArrayList<DotObj> coords;	//coordinates of segmented dots. "framewise" 
 
+	public static final int DATATYPE_VOLOCITY = 0;
+	
 	public Plot4d(){
 	}
 	
 	public Plot4d(Image3DUniverse univ){
 		this.univ = univ;
 	}
-
+	/** No visualization, for access from scripts directly
+	 * 
+	 * @param datapath
+	 */
+	public Plot4d(String datapath, int datatype){
+		if (datatype == 0){
+			this.trajlist = loadFileVolocity(datapath);
+		}
+	}
+			
 	public ArrayList<TrajectoryObj> loadFileVolocity(String datapath){
 
 		File testaccess = new File(datapath);
@@ -787,8 +800,9 @@ public class Plot4d {
 			item.setLocked(true);
 	}
 	
-	public void saveNetDisplacementData(int timestart, int timeend, 
-			ArrayList<TrajectoryObj> tList, ArrayList<Point3f> ref, String path){
+	public ArrayList<String[]> calcNetDisplacementData(int timestart, int timeend, 
+			ArrayList<TrajectoryObj> tList, ArrayList<Point3f> ref) {
+		int i;
 		NetDisplacementResults results = netDisplacements(timestart, timeend, tList, ref);
 		/* then in the follwoing, save results in CSV
 		 * 
@@ -796,7 +810,63 @@ public class Plot4d {
 		 * displacements
 		 *  
 		 */
+		Point3f sp, ep;
+		double dd;
+		ArrayList<String[]> data = new ArrayList<String[]>();
+
+		for (i = 0; i < results.dispVecs.size(); i++){
+			String[] aline = new String[8];
+			sp = results.dispVecs.get(i).get(0);
+			ep = results.dispVecs.get(i).get(1);
+			dd = results.displacements.get(i);
+			aline[0] = Integer.toString(i);
+			aline[1] = Float.toString(sp.x);
+			aline[2] = Float.toString(sp.y);
+			aline[3] = Float.toString(sp.z);
+			aline[4] = Float.toString(ep.x);
+			aline[5] = Float.toString(ep.y);
+			aline[6] = Float.toString(ep.z);
+			aline[7] = Double.toString(dd);
+			data.add(aline);
+		}
+		return data;
 	}
+    public ArrayList<Integer> getMinMaxFrame(ArrayList<TrajectoryObj> tList){
+
+    	ArrayList<Integer> alltimepoints = new ArrayList<Integer>();
+    	for (TrajectoryObj item : tList){
+    		alltimepoints.addAll(item.timepoints);
+		}
+	    Object objmax = Collections.max(alltimepoints);
+	    Object objmin = Collections.min(alltimepoints);
+	    ArrayList<Integer> startendframeList = new ArrayList<Integer>();
+	    startendframeList.add(Integer.valueOf(objmin.toString()));
+	    startendframeList.add(Integer.valueOf(objmax.toString()));
+	    IJ.log("min:" + objmin + " max:" + objmax);
+		return startendframeList;
+	}
+	public void saveNetDisplacementData(ArrayList<Point3f> ref, String savepath) throws IOException {
+		if (this.trajlist == null)
+			return;
+		ArrayList<Integer> startendframeList = getMinMaxFrame(this.trajlist);
+		ArrayList<String[]> data = null;
+		data = calcNetDisplacementData(
+					startendframeList.get(0), 
+					startendframeList.get(1), 
+					this.trajlist, ref);
+		//String fullpath = savepath + File.separator + "netdisp.csv";
+		String fullpath = savepath + "netdisp.csv";
+		IJ.log("datafile: " + fullpath);
+		CSVWriter writer = null;
+		try {
+			writer = new CSVWriter(new FileWriter(fullpath), ',', CSVWriter.NO_QUOTE_CHARACTER);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		writer.writeAll(data);		
+	}
+
 	
 	
 }

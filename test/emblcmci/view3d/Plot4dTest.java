@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import ij.IJ;
 import ij3d.Image3DUniverse;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -100,7 +101,7 @@ public class Plot4dTest {
 //		p4d.plotTrackNetDisplacements(timestart, timeend, this.trajlist, rx, ry, rz);
 		p4d.plotTrackNetDisplacements(timestart, timeend, this.trajlist, ref);
 	}
-	@Test
+	//@Test
 	public void plotTrackNetDispacementBar(){
 		p4d.plotTrackNetDisplacements(timestart, timeend, this.trajlist, refline);
 		//univ.show();
@@ -110,13 +111,18 @@ public class Plot4dTest {
 		p4d.plotTrackNetTravel(timestart, timeend, this.trajlist, refline);
 		//univ.show();
 	}	
-	@Test
+	//@Test
 	public void startpointCreatertest(){
 		p4d.createStartPointSphereContent(timestart, this.trajlist);
 	}
-	@Test
+	//@Test
 	public void plotTrackNetDispIncremental(){
 		p4d.plotTrackNetDispIncremental(timestart, timeend, this.trajlist, refline);
+	}
+	@Test
+	public void datawriteTest() throws IOException{
+		String path = "/Users/miura/tmp";
+		p4d.saveNetDisplacementData(refline, path);
 	}
 
 }

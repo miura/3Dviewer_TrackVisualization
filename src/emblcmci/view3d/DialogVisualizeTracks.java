@@ -6,6 +6,7 @@
 package emblcmci.view3d;
 
 import ij.IJ;
+import ij.io.DirectoryChooser;
 import ij.io.OpenDialog;
 import ij3d.Content;
 import ij3d.Image3DUniverse;
@@ -133,6 +134,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	
 	JRadioButton switchDispFullTrack = new JRadioButton();
 	JRadioButton switchDispIncrement = new JRadioButton();
+	private JButton exportNetDispbutton = new JButton("Export NetDisp Data");
 	
 	JScrollPane scrollPane;
 	JTextArea textArea;
@@ -174,6 +176,8 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private JPanel panelSwitchDispResolution;
 	private boolean flagNetDispFull;
 	private boolean flagFullIncrem;
+	private JPanel panelExport;
+
 
 	
 	
@@ -290,6 +294,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				switchDispIncrement.addActionListener(this);
 				switchDispIncrement.setEnabled(false);
 			panelCenterLeft.add(panelSwitchDispResolution);
+			panelExport = new JPanel();	//button for "plot" and "close"
+				panelExport.setLayout(new BoxLayout(panelExport, BoxLayout.X_AXIS));
+				panelExport.add(exportNetDispbutton);
+				exportNetDispbutton.addActionListener(this);
+			panelCenterLeft.add(panelExport);	
 			panelCenter.add(panelCenterLeft);
 			toggleRefLineField(false);
 		
@@ -498,7 +507,27 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		}
 		if (arg0.getSource() == switchDispIncrement){
 			switchDispFullTrack.setSelected(!switchDispIncrement.isSelected());
-		}		
+		}
+
+		if (arg0.getSource() == exportNetDispbutton){
+			if (this.datapath == null){
+				IJ.log("no data path provided for calculation");
+				return;
+			}
+			retrieveParameters();
+			if (this.p4d == null){
+				this.p4d = new Plot4d(this.datapath, Plot4d.DATATYPE_VOLOCITY);
+			}
+			ArrayList<Point3f> ref = new ArrayList<Point3f>();
+			if (flagNetDisplacement) {
+				ref.add(new Point3f(rx, ry, rz));				
+			} else {
+				ref.add(new Point3f(r0x, r0y, r0z));
+				ref.add(new Point3f(r1x, r1y, r1z));
+			}
+			SaveNetDispData exporter = new SaveNetDispData(this.p4d, ref);
+			exporter.execute();
+		}
 		
 		if (arg0.getSource() == doplotbutton){
 			if ((fieldStartframe.getText() != null) && (fieldEndframe.getText() != null)){
@@ -860,7 +889,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
      * @author miura
      *
      */
-    
+ /*   
     class AddPlot extends SwingWorker<Object, Object> {
     	Image3DUniverse univ = null;
     	AddPlot(){
@@ -914,7 +943,29 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
         	return null; 
         }	
     }
+*/ 
+    class SaveNetDispData extends SwingWorker<ArrayList<Object>, Object> {
+    	Plot4d pt4d;
+    	String savepath;
+		private ArrayList<Point3f> ref;
+    	public SaveNetDispData(Plot4d pt4d, ArrayList<Point3f> ref){
+    		this.pt4d = pt4d;
+    		this.ref = ref;
+    	} 
+		@Override
+		protected ArrayList<Object> doInBackground() throws Exception {
+			DirectoryChooser dc = new DirectoryChooser("choose save detination");
+			savepath = dc.getDirectory();
+			IJ.log("target folder: " + savepath);
+			this.pt4d.saveNetDisplacementData(ref, savepath);
+			return null;
+		}
+//		@Override
+//        protected void done() {
+//			// get()
+//		}
     
+    }
     public ArrayList<Integer> getMinMaxFrame(String datapath){
 
 		File testaccess = new File(datapath);
