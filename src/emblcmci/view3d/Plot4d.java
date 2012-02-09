@@ -422,16 +422,16 @@ public class Plot4d {
 			Point3f spoint = curtraj.dotList.get(0);
 			Point3f epoint = curtraj.dotList.get(curtraj.dotList.size()-1);
 			
-			Vector3D dispV =calcNetDisp2Ref(spoint, epoint, ref);
-			sev = new Vector3D(epoint.x - spoint.x, epoint.y - spoint.y, epoint.z - spoint.z); 
-			displacement = calcDisplacement(sev, dispV);			
+			DispVec dispV =calcNetDisp2Ref(spoint, epoint, ref);
+			//sev = new Vector3D(epoint.x - spoint.x, epoint.y - spoint.y, epoint.z - spoint.z); 
+			displacement = calcDisplacement(dispV);			
 
 			//displacement vector along reference axis
 			dvec.add(spoint);
 			dvec.add(new Point3f(
-					((float) (spoint.x + dispV.getX())), 
-					((float) (spoint.y + dispV.getY())), 
-					((float) (spoint.z + dispV.getZ())))
+					((float) (spoint.x + dispV.dv.getX())), 
+					((float) (spoint.y + dispV.dv.getY())), 
+					((float) (spoint.z + dispV.dv.getZ())))
 			);
 			awaytowards = 1;
 			if (displacement < 0)
@@ -512,17 +512,17 @@ public class Plot4d {
 				spoint = curtraj.dotList.get(i);
 				epoint = curtraj.dotList.get(i+1);
 				if (spoint.distance(epoint) > 0){
-					Vector3D dispV = calcNetDisp2Ref(spoint, epoint, ref);
-					sev = new Vector3D(epoint.x - spoint.x, epoint.y - spoint.y, epoint.z - spoint.z); 
-					displacement = calcDisplacement(sev, dispV);
+					DispVec dispV = calcNetDisp2Ref(spoint, epoint, ref);
+					//sev = new Vector3D(epoint.x - spoint.x, epoint.y - spoint.y, epoint.z - spoint.z); 
+					displacement = calcDisplacement(dispV);
 					dispA.add(displacement);
 
 					//displacement vector along reference axis
 					dvec.add(spoint);
 					dvec.add(new Point3f(
-							((float) (spoint.x + dispV.getX())), 
-							((float) (spoint.y + dispV.getY())), 
-							((float) (spoint.z + dispV.getZ())))
+							((float) (spoint.x + dispV.dv.getX())), 
+							((float) (spoint.y + dispV.dv.getY())), 
+							((float) (spoint.z + dispV.dv.getZ())))
 					);
 					dispvecs.add(dvec);
 					j++;
@@ -568,9 +568,10 @@ public class Plot4d {
 			spoint = curtraj.dotList.get(0);
 			epoint = curtraj.dotList.get(curtraj.dotList.size()-1);
 			
-			Vector3D dispV = calcNetDisp2Ref(spoint, epoint, ref);
-			sev = new Vector3D(epoint.x - spoint.x, epoint.y - spoint.y, epoint.z - spoint.z); 
-			displacement = calcDisplacement(sev, dispV);
+			DispVec dispV = calcNetDisp2Ref(spoint, epoint, ref);
+			//this should be replaced with srv or dv
+			//sev = new Vector3D(epoint.x - spoint.x, epoint.y - spoint.y, epoint.z - spoint.z); 
+			displacement = calcDisplacement(dispV);
 			dispA.add(displacement);
 			//if (j == 0) IJ.log("id\t" + "theta\t" + "CosTheta\t" + "displacement");
 			//IJ.log("" +j + "\t" + theta + "\t" + Math.cos(theta) + "\t" + displacement);
@@ -605,12 +606,13 @@ public class Plot4d {
 	 * @param srv trackstart point to the reference point
 	 * @return Vector3D, the net displacement vector towards a point 
 	 */
-	public Vector3D calcDisplacementVector(Vector3D sev, Vector3D srv){
+	public DispVec calcDisplacementVector(Vector3D sev, Vector3D srv){
 		double theta;		//angle made beteen srv and sev
 		Vector3D srvDispv;	// projection vector of sev to the srv axis
 		theta = Vector3D.angle(srv, sev);
 		srvDispv = srv.normalize().scalarMultiply(Math.cos(theta)* sev.getNorm());
-		return srvDispv;
+		DispVec dispvec = new DispVec(srvDispv, (int) (srv.dotProduct(srvDispv) / srv.getNorm()/srvDispv.getNorm()));
+		return dispvec;
 	}
 	/** Calculates displacement vector towards a reference bar.
 	 * returned value is an ArrayList containing 0: theta, 1: length(displacement), 2, Vector3D instance
@@ -619,7 +621,7 @@ public class Plot4d {
 	 * rv			reference bar
 	 * pv			// one end of reference bar - track start point
 	 */
-	public Vector3D calcDisplacementVector(Vector3D sev, Vector3D rv, Vector3D pv){
+	public DispVec calcDisplacementVector(Vector3D sev, Vector3D rv, Vector3D pv){
 		double pvproj;			// length of a projection vector of pv to rv. 
 		Vector3D refdash;		// a projection vector of pv to rv.
 		Vector3D dv;			// vector from track start point to the endpoint of refdash
@@ -640,7 +642,26 @@ public class Plot4d {
 		dv = refdash.subtract(pv);
 		sevproj = dv.dotProduct(sev) / Math.pow(dv.getNorm(), 2);
 		dvdash = dv.scalarMultiply(sevproj);
-		return dvdash;
+		//IJ.log("dvddash length:\t" + Double.toString(sevproj)) ; //use sevproj for orientation
+		//test
+		IJ.log(Double.toString(dv.dotProduct(dvdash)) + "\t" 
+				+ Double.toString(dv.getNorm())+"\t"
+				+ Double.toString(dvdash.getNorm()));
+		double direc = dv.dotProduct(dvdash) / dv.getNorm()/dvdash.getNorm();
+		IJ.log(Double.toString(direc));
+		direc = Math.round(direc);
+		IJ.log("dv dot dvdash:\t" + Integer.toString((int) direc)) ; //use sevproj for orientation		
+		DispVec dispvec = new DispVec(dvdash, (int) direc);
+		return dispvec;
+
+	}
+	public class DispVec {
+		public final Vector3D dv;
+		public final int direc;
+		public DispVec(Vector3D dv, int direc){
+			this.dv = dv;
+			this.direc = direc;
+		}
 	}
 	/** taking track net displacement vector and net displacement vector, returns displacement scalar values
 	 * with adding signs depending on towards/away from the reference.  
@@ -649,18 +670,20 @@ public class Plot4d {
 	 * @param dv	displacement vector towards refernce point
 	 * @return displacement length, signed. 
 	 */
-	public double calcDisplacement(Vector3D sev, Vector3D dv){
+	public double calcDisplacement(DispVec dispvec){
 		/*
 		 * theta: angle made between track sev and dv
 		 * displacement: length of dv, multiplied by -1 if direction is away from reference
 		 */		
-		double displacement, theta;
-		displacement = dv.getNorm();
+		//double displacement, theta;
+		double displacement;
+		displacement = dispvec.dv.getNorm();
+		displacement *= dispvec.direc;
 		//Vector3D sev = Vector3D(spoint, epoint)
-		theta = Vector3D.angle(dv, sev);
-		if (Math.cos(theta) < 0) 
-			displacement *= -1;
-		IJ.log("theta\t" + theta + "\t" + displacement);
+//		theta = Vector3D.angle(dv, sev);
+//		if (Math.cos(theta) < 0) 
+//			displacement *= -1;
+//		IJ.log("theta\t" + theta + "\t" + displacement);
 		return displacement;
 	}
 	/** method for recieving reequest and depending on the length of given reference, 
@@ -671,11 +694,11 @@ public class Plot4d {
 	 * @param ref
 	 * @return
 	 */
-	public Vector3D calcNetDisp2Ref(Point3f spoint, Point3f epoint, ArrayList<Point3f> ref){
+	public DispVec calcNetDisp2Ref(Point3f spoint, Point3f epoint, ArrayList<Point3f> ref){
 		//ArrayList para;
 		Vector3D sev = new Vector3D(epoint.x - spoint.x, epoint.y - spoint.y, epoint.z - spoint.z); 
 		Vector3D rv, srv, pv;
-		Vector3D dv;
+		DispVec dv;
 		if (ref.size() == 1) {
 			srv = new Vector3D(ref.get(0).x - spoint.x, ref.get(0).y - spoint.y, ref.get(0).z - spoint.z); //startpoint to reference point vector
 			dv = calcDisplacementVector(sev, srv);
@@ -864,7 +887,8 @@ public class Plot4d {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		writer.writeAll(data);		
+		writer.writeAll(data);
+		writer.close();
 	}
 
 	
