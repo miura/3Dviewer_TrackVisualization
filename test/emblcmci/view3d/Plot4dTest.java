@@ -76,10 +76,7 @@ public class Plot4dTest {
 	public void PlotTimeColorCodedLineOnlyFinalFrame(){
 		//univ.show();
 		VirtualUniverse vu = new VirtualUniverse();
-		if (vu == null){
-			System.out.println("failed getting VirtualUniverse");
-		}
-		Map vuMap = vu.getProperties();
+		Map<?, ?> vuMap = vu.getProperties();
 		System.out.println("Java3D version: " + vuMap.get("j3d.version"));
 		System.out.println("Java3D vender: " + vuMap.get("j3d.vender"));
 		System.out.println("Java3D remderer: " + vuMap.get("j3d.renderer"));

@@ -298,6 +298,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				panelExport.setLayout(new BoxLayout(panelExport, BoxLayout.X_AXIS));
 				panelExport.add(exportNetDispbutton);
 				exportNetDispbutton.addActionListener(this);
+				exportNetDispbutton.setEnabled(false);
 			panelCenterLeft.add(panelExport);	
 			panelCenter.add(panelCenterLeft);
 			toggleRefLineField(false);
@@ -484,8 +485,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				DynamicTrackNodes.setSelected(false);				
 				toggleRefPointField(true);
 				NetDisplacementsLineRef.setSelected(!NetDisplacements.isSelected());
-			} else
+				exportNetDispbutton.setEnabled(switchDispIncrement.isSelected());
+			} else {
 				toggleRefPointField(false);
+				exportNetDispbutton.setEnabled(false);
+			}
 			switchDispFullTrack.setEnabled(NetDisplacements.isSelected());
 			switchDispIncrement.setEnabled(NetDisplacements.isSelected());
 		}
@@ -496,17 +500,22 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				ColorCodedDyamicTracks.setSelected(false);
 				DynamicTrackNodes.setSelected(false);
 				NetDisplacements.setSelected(!NetDisplacementsLineRef.isSelected());
-			} else 
+				exportNetDispbutton.setEnabled(switchDispIncrement.isSelected());
+			} else {
 				toggleRefLineField(false);
-				//panelRefPoints.setVisible(false);	
+				//panelRefPoints.setVisible(false);
+				exportNetDispbutton.setEnabled(false);
+			}
 			switchDispFullTrack.setEnabled(NetDisplacementsLineRef.isSelected());
 			switchDispIncrement.setEnabled(NetDisplacementsLineRef.isSelected());
 		}
 		if (arg0.getSource() == switchDispFullTrack){
 			switchDispIncrement.setSelected(!switchDispFullTrack.isSelected());
+			exportNetDispbutton.setEnabled(false);
 		}
 		if (arg0.getSource() == switchDispIncrement){
 			switchDispFullTrack.setSelected(!switchDispIncrement.isSelected());
+			exportNetDispbutton.setEnabled(true);
 		}
 
 		if (arg0.getSource() == exportNetDispbutton){
@@ -520,10 +529,12 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			}
 			ArrayList<Point3f> ref = new ArrayList<Point3f>();
 			if (flagNetDisplacement) {
-				ref.add(new Point3f(rx, ry, rz));				
+				ref.add(new Point3f(rx, ry, rz));
+				IJ.log("... exporting point reference net displacement vectors");
 			} else {
 				ref.add(new Point3f(r0x, r0y, r0z));
 				ref.add(new Point3f(r1x, r1y, r1z));
+				IJ.log("... exporting line reference net displacement vectors");
 			}
 			SaveNetDispData exporter = new SaveNetDispData(this.p4d, ref);
 			exporter.execute();
