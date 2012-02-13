@@ -648,6 +648,7 @@ public class Plot4d {
 	 * @param sev track vector, between start and end
 	 * @param rv reference vector
 	 * @param pv track start point to reference start point
+	 * @param qv track start point to reference end point
 	 * @return DispVec instance, holding a Vector3D, the net displacement vector towards a point and its direction
 	 * <br>
 	 * <br>
@@ -657,7 +658,7 @@ public class Plot4d {
 	 * 		dv vector --- starting at track start point, perpendicular to rv. (ends at the tip of refdash)<br>
 	 * 		dvdash --- sev projected onto dv. the displacement vector towards reference<br>
 	 */
-	public DispVec calcDisplacementVector(Vector3D sev, Vector3D rv, Vector3D pv){
+	public DispVec calcDisplacementVector(Vector3D sev, Vector3D rv, Vector3D pv, Vector3D qv){
 		double pvproj;			// length of a projection vector of pv to rv. 
 		Vector3D refdash;		// a projection vector of pv to rv.
 		Vector3D dv;			// vector from track start point to the endpoint of refdash
@@ -666,7 +667,13 @@ public class Plot4d {
 		
 		pvproj = rv.dotProduct(pv) / Math.pow(rv.getNorm(), 2);
 		refdash = rv.scalarMultiply(pvproj);
-		dv = refdash.subtract(pv);
+		if (pvproj > 1)
+			dv = qv;
+		else if (pvproj < 0)
+			dv = pv;
+		else
+			dv = refdash.subtract(pv);	
+		
 		sevproj = dv.dotProduct(sev) / Math.pow(dv.getNorm(), 2);
 		dvdash = dv.scalarMultiply(sevproj);
 //		IJ.log(Double.toString(dv.dotProduct(dvdash)) + "\t" 
@@ -710,7 +717,7 @@ public class Plot4d {
 	public DispVec calcNetDisp2Ref(Point3f spoint, Point3f epoint, ArrayList<Point3f> ref){
 		//ArrayList para;
 		Vector3D sev = new Vector3D(epoint.x - spoint.x, epoint.y - spoint.y, epoint.z - spoint.z); 
-		Vector3D rv, srv, pv;
+		Vector3D rv, srv, pv, qv;
 		DispVec dv;
 		if (ref.size() == 1) {
 			srv = new Vector3D(ref.get(0).x - spoint.x, ref.get(0).y - spoint.y, ref.get(0).z - spoint.z); //startpoint to reference point vector
@@ -718,7 +725,9 @@ public class Plot4d {
 		} else {
 			rv = new Vector3D(ref.get(1).x - ref.get(0).x, ref.get(1).y - ref.get(0).y, ref.get(1).z - ref.get(0).z);
 			pv = new Vector3D(spoint.x - ref.get(0).x, spoint.y - ref.get(0).y, spoint.z - ref.get(0).z); 
-			dv = calcDisplacementVector(sev, rv, pv);
+			qv = new Vector3D(spoint.x - ref.get(1).x, spoint.y - ref.get(1).y, spoint.z - ref.get(1).z); 
+
+			dv = calcDisplacementVector(sev, rv, pv, qv);
 		}
 		return dv;
 	}
