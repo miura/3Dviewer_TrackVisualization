@@ -23,4 +23,12 @@ public class TrajectoryObj {
 		this.timepoints = timepoints; //a vector with time points of the trajectory. 
 
 	}
+
+	public ArrayList<Point3f> getDotList() {
+		return dotList;
+	}
+
+	public ArrayList<Integer> getTimepoints() {
+		return timepoints;
+	}
 }

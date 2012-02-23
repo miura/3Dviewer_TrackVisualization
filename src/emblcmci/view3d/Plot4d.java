@@ -315,6 +315,32 @@ public class Plot4d {
 		return ccs;
 		
 	}
+	/** creates line-track content from single track. 
+	 * 
+	 * @param tList
+	 * @param trackid
+	 * @return
+	 */
+	public Content containSingleTrack(ArrayList<TrajectoryObj> tList, int trackid, int timepoint){
+		CustomMultiMesh LineMultiMesh =createSingleTrackMesh(tList, trackid);
+		Content ccs = ContentCreator.createContent(LineMultiMesh, "color_coded_Tracks", timepoint);
+		//univ.addContent(ccs);
+		ccs.setLocked(true);
+		return ccs;		
+	}
+	public CustomMultiMesh createSingleTrackMesh(ArrayList<TrajectoryObj> tList, int trackid){
+		int i;
+		Color3f colornow;
+		CustomMultiMesh LineMultiMesh = new CustomMultiMesh();
+		TrajectoryObj curtraj = tList.get(trackid);
+		colornow = new Color3f(1.0f, 0.6f, 1.0f);
+		for (i = 0; i < curtraj.dotList.size()-1; i++){
+			CustomLineMesh clm = new CustomLineMesh(curtraj.dotList.subList(i, i+2), CustomLineMesh.CONTINUOUS, colornow, 0.4f);			
+			LineMultiMesh.add(clm);
+		}
+		return LineMultiMesh;
+	}
+	
 	public Content HighlightSelectedSingleTrack(ArrayList<TrajectoryObj> tList, int index){
 		TrajectoryObj curtraj = tList.get(index);
 		CustomLineMesh clm = new CustomLineMesh(curtraj.dotList, CustomLineMesh.CONTINUOUS, new Color3f(1, 1, 1), 0.4f);
@@ -916,6 +942,29 @@ public class Plot4d {
 		writer.close();
 	}
 
+	/**
+	 * 
+	 * @param atrack
+	 * @return
+	 */
+	static public ArrayList<Float> getBoudingBox(ArrayList<Point3f> atrack){
+		ArrayList<Float> bnd = new ArrayList<Float>(6);
+		bnd.add(atrack.get(0).x);
+		bnd.add(atrack.get(0).y);
+		bnd.add(atrack.get(0).z);
+		bnd.add(atrack.get(0).x);
+		bnd.add(atrack.get(0).y);
+		bnd.add(atrack.get(0).z);
+		for (Point3f item : atrack){
+			if (bnd.get(0) > item.x) bnd.set(0, item.x);
+			if (bnd.get(1) > item.y) bnd.set(1, item.y);
+			if (bnd.get(2) > item.z) bnd.set(2, item.z);
+			if (bnd.get(3) < item.x) bnd.set(3, item.x);
+			if (bnd.get(4) < item.y) bnd.set(4, item.y);
+			if (bnd.get(5) < item.z) bnd.set(5, item.z);
+		}
+		return bnd;		
+	}
 	/**
 	 * @return the trajlist
 	 */
