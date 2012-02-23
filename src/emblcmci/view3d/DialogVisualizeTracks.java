@@ -6,6 +6,7 @@
 package emblcmci.view3d;
 
 import ij.IJ;
+import ij.WindowManager;
 import ij.io.DirectoryChooser;
 import ij.io.OpenDialog;
 import ij3d.Content;
@@ -353,6 +354,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		//contentPane.add(button, BorderLayout.NORTH);
 		//contentPane.add(scrollPane, BorderLayout.SOUTH);
 		mainFrame.pack();
+		WindowManager.addWindow(mainFrame);
 		mainFrame.setVisible(true);
 		
 		//for track highlights instances
