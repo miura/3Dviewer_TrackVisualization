@@ -977,7 +977,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 //		}
     
     }
-    public ArrayList<Integer> getMinMaxFrame(String datapath){
+    static public ArrayList<Integer> getMinMaxFrame(String datapath){
 
 		File testaccess = new File(datapath);
 		if (!testaccess.exists()){

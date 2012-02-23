@@ -916,6 +916,13 @@ public class Plot4d {
 		writer.close();
 	}
 
+	/**
+	 * @return the trajlist
+	 */
+	public ArrayList<TrajectoryObj> getTrajlist() {
+		return trajlist;
+	}
+
 	
 	
 }
