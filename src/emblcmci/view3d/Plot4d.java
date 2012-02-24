@@ -340,6 +340,24 @@ public class Plot4d {
 		}
 		return LineMultiMesh;
 	}
+	public CustomMultiMesh createSingleTrackMeshShifted(ArrayList<TrajectoryObj> tList, int trackid, float dx, float dy, float dz){
+		int i;
+		Color3f colornow;
+		CustomMultiMesh LineMultiMesh = new CustomMultiMesh();
+		TrajectoryObj curtraj = tList.get(trackid);
+		colornow = new Color3f(1.0f, 0.6f, 1.0f);
+		for (i = 0; i < curtraj.dotList.size()-1; i++){
+			List<Point3f> frag = curtraj.dotList.subList(i, i+2);
+			for (Point3f item : frag){
+				item.x -=dx;
+				item.y -=dy;
+				item.z -=dz;
+			}
+			CustomLineMesh clm = new CustomLineMesh(frag, CustomLineMesh.CONTINUOUS, colornow, 0.4f);			
+			LineMultiMesh.add(clm);
+		}
+		return LineMultiMesh;
+	}
 	
 	public Content HighlightSelectedSingleTrack(ArrayList<TrajectoryObj> tList, int index){
 		TrajectoryObj curtraj = tList.get(index);
