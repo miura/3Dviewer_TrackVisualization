@@ -14,12 +14,9 @@ import ij3d.Image3DUniverse;
 import ij3d.ImageWindow3D;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -66,6 +63,12 @@ import util.opencsv.CSVReader;
  */
 public class DialogVisualizeTracks implements ActionListener, WindowListener {
 
+	private PlotNetDisplacement p4d;
+	//private PlotNetDisplacement p4dnet;
+	private ImageWindow3D univwin;
+	Image3DUniverse univ;
+	ArrayList<TrajectoryObj> tList;
+	
 	//parameters
 	String datapath = "not selected yet";
 		//flags for plotting
@@ -86,8 +89,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	Integer r1x = 121;
 	Integer r1y = 184;
 	Integer r1z = 20;	
-	Image3DUniverse univ;
-	ArrayList<TrajectoryObj> tList;
+
 	
 	JFrame mainFrame;
 	JPanel panelTop;
@@ -154,8 +156,6 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	
 	//added later, to be organized
 	private JPanel panelBottom3;
-	private Plot4d p4d;
-	private ImageWindow3D univwin;
 	private Content listColorcofdedTracks = null;
 	private ArrayList<Content> listStaticNodes;
 	private ArrayList<Content> listDynamicTracks;
@@ -176,8 +176,8 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private ArrayList<Content> highlightedList;
 	private JPanel panelSwitchDispResolution;
 	private boolean flagNetDispFull;
-	private boolean flagFullIncrem;
 	private JPanel panelExport;
+	private boolean flagFullIncrem;
 
 
 	
@@ -328,7 +328,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			panelBottom3 = new JPanel();
 			panelBottom3.setLayout(new BoxLayout(panelBottom3, BoxLayout.X_AXIS));
 			String testtext = "<html><p>" +
-					"Track 3D Visualization Plugin Ver 1.0beta<br>" +
+					"Track 3D Visualization Plugin Ver 1.1beta<br>" +
 					"Kota Miura (miura@embl.de)" +
 					"CMCI, EMBL Heidelberg" +
 					"</p></html>";
@@ -417,7 +417,6 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
 		if(arg0.getSource() == button){
 			//textArea.append(textField.getText() + "\n");
 			clicknum++;
@@ -527,7 +526,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			}
 			retrieveParameters();
 			if (this.p4d == null){
-				this.p4d = new Plot4d(this.datapath, Plot4d.DATATYPE_VOLOCITY);
+				this.p4d = new PlotNetDisplacement(this.datapath, Plot4d.DATATYPE_VOLOCITY);
 			}
 			ArrayList<Point3f> ref = new ArrayList<Point3f>();
 			if (flagNetDisplacement) {
@@ -623,7 +622,6 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
-			// TODO Auto-generated method stub
 			if (list.getSelectedIndices().length!=1){
                                 return;
             }
@@ -789,7 +787,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
     		Image3DUniverse univ = null;
     		univ = new Image3DUniverse();
     		this.univ = univ;		
-    		Plot4d Lp4d = new Plot4d(univ);
+    		PlotNetDisplacement Lp4d = new PlotNetDisplacement(univ);
     		ArrayList<TrajectoryObj> LtList = Lp4d.loadFileVolocity(datapath);
     		IJ.log("File loaded...");
     		UnivContents.set(0, univ);
@@ -860,7 +858,6 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				 showErrorDialog("timeout");
 				e.printStackTrace();
 			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
 //				IJ.log("failed processing");
 				 showErrorDialog("failed processing");
 				e.printStackTrace();
@@ -868,7 +865,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			//if (univcontents.get(0) != null)
 				DialogVisualizeTracks.this.univ = (Image3DUniverse) univcontents.get(0);
 			//if (univcontents.get(1) != null)
-				DialogVisualizeTracks.this.p4d = (Plot4d) univcontents.get(1);
+				DialogVisualizeTracks.this.p4d = (PlotNetDisplacement) univcontents.get(1);
 			//if (univcontents.get(2) != null)
 				DialogVisualizeTracks.this.tList = (ArrayList<TrajectoryObj>) univcontents.get(2);
 			if (univcontents.get(3) instanceof ij3d.Content)
@@ -958,10 +955,10 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
     }
 */ 
     class SaveNetDispData extends SwingWorker<ArrayList<Object>, Object> {
-    	Plot4d pt4d;
+    	PlotNetDisplacement pt4d;
     	String savepath;
 		private ArrayList<Point3f> ref;
-    	public SaveNetDispData(Plot4d pt4d, ArrayList<Point3f> ref){
+    	public SaveNetDispData(PlotNetDisplacement pt4d, ArrayList<Point3f> ref){
     		this.pt4d = pt4d;
     		this.ref = ref;
     	} 
@@ -1024,13 +1021,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	
 	@Override
 	public void windowActivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void windowClosed(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 		if (arg0.getSource() == univwin){
 			this.univ = null;
 			doplotbutton.setEnabled(true);
@@ -1040,19 +1035,16 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 
 	@Override
 	public void windowClosing(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void windowDeactivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void windowDeiconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -1061,13 +1053,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	 */
 	@Override
 	public void windowIconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void windowOpened(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 		
 	}
 }

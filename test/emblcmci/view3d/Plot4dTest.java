@@ -33,7 +33,7 @@ public class Plot4dTest {
 	public void setUp() throws Exception {
 		Image3DUniverse univ = new Image3DUniverse();
 		this.univ = univ;
-		Plot4d p4d = new Plot4d(univ);
+		PlotNetDisplacement p4d = new PlotNetDisplacement(univ);
 		timestart = 0;
 		timeend = 23;
 		rx = 117;
