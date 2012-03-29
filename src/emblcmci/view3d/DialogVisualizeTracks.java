@@ -1,5 +1,7 @@
 /**
  * Plot 3D tracking results in 3Dviewer
+ * Uses extended plotter, with net displacement studies. 
+ * 
  * 20110112 first version
  * @author miura (miura@embl.de)
  */
