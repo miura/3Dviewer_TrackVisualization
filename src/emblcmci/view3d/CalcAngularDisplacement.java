@@ -34,7 +34,7 @@ public class CalcAngularDisplacement {
 		Double n = ap/Math.pow(av.getNorm(), 2);
 		Double m = bp/Math.pow(bv.getNorm(), 2);
 		dv = new Vector3D(n, av, m, bv);
-		Double seangle = Vector3D.angle(osv, oev); 
+		Double seangle = Vector3D.angle(csv, cev); 
 		AngularDisp ad = new AngularDisp(dv, osv, 1, seangle);
 		return ad;
 	}
@@ -45,7 +45,6 @@ public class CalcAngularDisplacement {
 	 * @author Kota Miura
 	 *
 	 */
-	
 	public class AngularDisp {
 		public final Vector3D dv;
 		public final int direc;

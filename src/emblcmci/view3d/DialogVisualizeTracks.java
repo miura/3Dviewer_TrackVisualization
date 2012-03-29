@@ -302,7 +302,8 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				panelExport.add(exportNetDispbutton);
 				exportNetDispbutton.addActionListener(this);
 				exportNetDispbutton.setEnabled(false);
-			panelCenterLeft.add(panelExport);	
+			panelCenterLeft.add(panelExport);
+			
 			panelCenter.add(panelCenterLeft);
 			toggleRefLineField(false);
 		
@@ -330,7 +331,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			panelBottom3 = new JPanel();
 			panelBottom3.setLayout(new BoxLayout(panelBottom3, BoxLayout.X_AXIS));
 			String testtext = "<html><p>" +
-					"Track 3D Visualization Plugin Ver 1.1beta<br>" +
+					"Track 3D Visualization Plugin Ver 1.1beta, 2012<br>" +
 					"Kota Miura (miura@embl.de)" +
 					"CMCI, EMBL Heidelberg" +
 					"</p></html>";
