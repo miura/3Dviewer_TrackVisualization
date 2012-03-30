@@ -25,6 +25,7 @@ import customnode.CustomMultiMesh;
 import customnode.CustomTriangleMesh;
 import customnode.Mesh_Maker;
 
+import emblcmci.view3d.CalcAngularDisplacement.AngularDisp;
 import emblcmci.view3d.CalcNetDisplacement.DispVec;
 
 public class PlotNetDisplacement extends Plot4d{ 	
@@ -70,38 +71,19 @@ public class PlotNetDisplacement extends Plot4d{
 		Vector3D sev = new Vector3D(epoint.x - spoint.x, epoint.y - spoint.y, epoint.z - spoint.z); 
 		Vector3D rv, srv, pv, qv;
 		DispVec dv;
+		CalcNetDisplacement cnd = new CalcNetDisplacement();
 		if (ref.size() == 1) {
 			srv = new Vector3D(ref.get(0).x - spoint.x, ref.get(0).y - spoint.y, ref.get(0).z - spoint.z); //startpoint to reference point vector
-			dv = calcDisplacementVector(sev, srv);
+			dv = cnd.calcDisplacementVector(sev, srv);
 		} else {
 			rv = new Vector3D(ref.get(1).x - ref.get(0).x, ref.get(1).y - ref.get(0).y, ref.get(1).z - ref.get(0).z);
 			pv = new Vector3D(spoint.x - ref.get(0).x, spoint.y - ref.get(0).y, spoint.z - ref.get(0).z); 
 			qv = new Vector3D(spoint.x - ref.get(1).x, spoint.y - ref.get(1).y, spoint.z - ref.get(1).z); 
-
-			CalcNetDisplacement cnd = new CalcNetDisplacement();
 			dv = cnd.calcDisplacementVector(sev, rv, pv, qv);
 		}
 		return dv;
 	}
-	/** Calculates displacement vector towards a reference point.
-	 * returned value is a DispVec class holding containing displacement vector and direction (1 or -1)  
-	 * 
-	 * @param sev track start to the end point
-	 * @param srv trackstart point to the reference point
-	 * @return DispVec instance, holding a Vector3D, the net displacement vector towards a point and its direction  
-	 */
-	public DispVec calcDisplacementVector(Vector3D sev, Vector3D srv){
-		double theta;		//angle made beteen srv and sev
-		Vector3D srvDispv;	// projection vector of sev to the srv axis
-		theta = Vector3D.angle(srv, sev);
-		srvDispv = srv.normalize().scalarMultiply(Math.cos(theta)* sev.getNorm());
 
-		double direc = srv.dotProduct(srvDispv) / srv.getNorm()/srvDispv.getNorm();
-		direc = Math.round(direc);
-		CalcNetDisplacement cnd = new CalcNetDisplacement();
-		DispVec dispvec = cnd. new DispVec(srvDispv, (int) direc);
-		return dispvec;
-	}
 	void lockCurrentContents(Image3DUniverse univ){
 		Collection<Content> ccs = (Collection<Content>) univ.getContents();
 		for (Content item : ccs)
@@ -528,5 +510,122 @@ public class PlotNetDisplacement extends Plot4d{
 		CustomTriangleMesh csp = new CustomTriangleMesh(spheres, new Color3f(1.0f,1.0f,1.0f), 0.0f);
 		Content ccs = ContentCreator.createContent(csp, "startpoints", 0);
 		return ccs; 
+	}
+
+	//**************************** incremental, Angular *************************************
+
+	/** Plots incremental (every displacement per time point) angular displacement 
+	 * towards reference point or line
+	 * 
+	 * @param timestart
+	 * @param timeend
+	 * @param tList
+	 * @param ref
+	 * @return
+	 */
+	public ArrayList<Content> plotTrackAngularDispIncremental(int timestart, int timeend, ArrayList<TrajectoryObj> tList, ArrayList<Point3f> ref){
+		ArrayList<Content> packedcontents =containAngularDispIncremental(timestart, timeend, tList, ref);
+		for (Content item : packedcontents)
+			univ.addContent(item);
+		lockCurrentContents(univ);	
+		return packedcontents;
+	}
+	/** prepares Contents in arraylist to be plotted in the universe. 
+	 * Angular displacement is calculated incremental (for every time points).
+	 * reference could be a point or a line.   
+	 * 
+	 * @param timestart
+	 * @param timeend
+	 * @param tList
+	 * @param ref
+	 * @return
+	 */
+	public ArrayList<Content> containAngularDispIncremental(int timestart, int timeend, ArrayList<TrajectoryObj> tList, ArrayList<Point3f> ref){
+		AngularDisplacementResults results = angularDispIncrement(timestart, timeend, tList, ref);
+		ArrayList<AngularDisp> vecs = results.vecs;
+		ArrayList<ArrayList<Point3f>> dispvecs =  results.dispVecs;
+		CustomMultiMesh clmmDispLine = new CustomMultiMesh();
+		for (int i = 0; i < dispvecs.size(); i++){
+			CustomLineMesh clmdisp = 
+				new CustomLineMesh(dispvecs.get(i), CustomLineMesh.CONTINUOUS, colorCodeAwayTowards(vecs.get(i).direc), 0);
+			clmmDispLine.add(clmdisp);
+		}
+
+		Content netDV = ContentCreator.createContent(clmmDispLine, "AngularDisplacementVecs", 0);	
+		Content startpoint_spheres = createStartPointSphereContent(timestart, tList);
+		Content refcont = createReferenceContent(timestart, ref);
+		
+		ArrayList<Content> packedcontents = new ArrayList<Content>(); //for packaging contents
+		packedcontents.add(netDV);
+		packedcontents.add(startpoint_spheres);
+		packedcontents.add(refcont);
+		return packedcontents;
+		
+	} 
+
+	
+	public AngularDisplacementResults angularDispIncrement(int timestart, int timeend, ArrayList<TrajectoryObj> tList, ArrayList<Point3f> ref){
+		int i;
+		ArrayList<AngularDisp> vecs = new ArrayList<AngularDisp>();
+		ArrayList<ArrayList<Point3f>> dispvecs = new ArrayList<ArrayList<Point3f>>();
+		ArrayList<Double> dispA = new ArrayList<Double>(); //displacements array
+		ArrayList<Integer> timeA = new ArrayList<Integer>();
+		Point3f spoint, epoint, cpoint;
+		Vector3D osv, oev, ocv;
+		Integer tpoint;
+		ArrayList<Point3f> dvec;
+		for (TrajectoryObj curtraj : tList)	{	
+			for (i = 0; i < curtraj.dotList.size()-2; i++){
+				dvec =  new ArrayList<Point3f>();
+				spoint = curtraj.dotList.get(i);
+				epoint = curtraj.dotList.get(i+1);
+				cpoint = ref.get(0);
+				
+				osv = new Vector3D((double) spoint.x, (double) spoint.y, (double) spoint.z);
+				oev = new Vector3D((double) epoint.x, (double) epoint.y, (double) epoint.z);
+				ocv = new Vector3D((double) cpoint.x, (double) cpoint.y, (double) cpoint.z);
+				
+				if (spoint.distance(epoint) > 0){
+					tpoint = curtraj.timepoints.get(i);
+					CalcAngularDisplacement cad = new CalcAngularDisplacement();
+					//2 lines must be modified
+					//DispVec dispV = calcNetDisp2Ref(spoint, epoint, ref);
+					//displacement = calcDisplacement(dispV);
+					AngularDisp dispV = cad.calcAngularVector(osv, oev, ocv);
+					
+					vecs.add(dispV);
+					dispA.add(dispV.displacement);
+					timeA.add(tpoint);
+					//displacement vector along reference axis
+					dvec.add(spoint);
+					dvec.add(new Point3f(
+							((float) (spoint.x + dispV.dv.getX())), 
+							((float) (spoint.y + dispV.dv.getY())), 
+							((float) (spoint.z + dispV.dv.getZ())))
+					);
+					dispvecs.add(dvec);
+				}
+			}
+		}
+		AngularDisplacementResults results = new AngularDisplacementResults(dispvecs, dispA, timeA, vecs);
+		return results;
+	}
+	/** A class for containing Angular displacement calculation results
+	 * 
+	 * @author Kota Miura
+	 *
+	 */
+	class AngularDisplacementResults {
+		public final ArrayList<ArrayList<Point3f>> dispVecs;
+		public final ArrayList<Double> displacements;
+		public final ArrayList<Integer> timeA;
+		public final ArrayList<AngularDisp> vecs;
+		public AngularDisplacementResults(ArrayList<ArrayList<Point3f>> dispVecs, ArrayList<Double> displacements, ArrayList<Integer> timeA, ArrayList<AngularDisp> vecs){
+			this.dispVecs = dispVecs;
+			this.displacements = displacements;
+			this.timeA = timeA;
+			this.vecs = vecs;
+		}
+		
 	}
 }

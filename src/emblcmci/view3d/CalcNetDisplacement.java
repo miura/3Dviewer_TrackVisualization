@@ -3,6 +3,26 @@ package emblcmci.view3d;
 import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
 
 public class CalcNetDisplacement {
+
+	/** Calculates displacement vector towards a reference point.
+	 * returned value is a DispVec class holding containing displacement vector and direction (1 or -1)  
+	 * 
+	 * @param sev track start to the end point
+	 * @param srv trackstart point to the reference point
+	 * @return DispVec instance, holding a Vector3D, the net displacement vector towards a point and its direction  
+	 */
+	public DispVec calcDisplacementVector(Vector3D sev, Vector3D srv){
+		double theta;		//angle made beteen srv and sev
+		Vector3D srvDispv;	// projection vector of sev to the srv axis
+		theta = Vector3D.angle(srv, sev);
+		srvDispv = srv.normalize().scalarMultiply(Math.cos(theta)* sev.getNorm());
+
+		double direc = srv.dotProduct(srvDispv) / srv.getNorm()/srvDispv.getNorm();
+		direc = Math.round(direc);
+		CalcNetDisplacement cnd = new CalcNetDisplacement();
+		DispVec dispvec = cnd. new DispVec(srvDispv, (int) direc);
+		return dispvec;
+	}
 	
 	/** Calculates displacement vector towards a reference bar.
 	 * returned value is an DispVec class holding containing displacement vector and direction (1 or -1) 

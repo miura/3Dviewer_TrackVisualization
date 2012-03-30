@@ -80,6 +80,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	boolean flagDynamicTrackNodes = false;
 	boolean flagNetDisplacement = false;
 	boolean flagNetDisplacementLineref = false;
+	private boolean flagAngularDisplacement = false;	
 	Integer framestart = 0;
 	Integer frameend = 23;
 	Integer rx = 117;
@@ -91,7 +92,9 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	Integer r1x = 121;
 	Integer r1y = 184;
 	Integer r1z = 20;	
-
+	Integer srx = 117;
+	Integer sry = 95;
+	Integer srz = 88;
 	
 	JFrame mainFrame;
 	JPanel panelTop;
@@ -186,6 +189,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private JPanel panelExport;
 	private boolean flagFullIncrem;
 	private JPanel panelSphereCenter;
+
 
 
 
@@ -439,6 +443,8 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			 listModel.addElement(trackname);
 		}
 	}
+	
+	// for debugging, stand-alone
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			 
@@ -452,12 +458,12 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		if(arg0.getSource() == button){
-			//textArea.append(textField.getText() + "\n");
-			clicknum++;
-			textArea.append("Clicked! (" + Integer.toString(clicknum) + ")\n");
-			label.setText("clicked");
-		}
+//		if(arg0.getSource() == button){
+//			//textArea.append(textField.getText() + "\n");
+//			clicknum++;
+//			textArea.append("Clicked! (" + Integer.toString(clicknum) + ")\n");
+//			label.setText("clicked");
+//		}
 		if(arg0.getSource() == filechoosebutton){
 			ArrayList<Integer> minmax;
 			this.datapath = fileChooseDialog();
@@ -575,7 +581,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			SaveNetDispData exporter = new SaveNetDispData(this.p4d, ref);
 			exporter.execute();
 		}
+		if (arg0.getSource() == NetAngular){
+			toggleSphereCenterField(NetAngular.isSelected());
+		}
 		
+		//*********** from here, bottom of the panel
 		if (arg0.getSource() == doplotbutton){
 			if ((fieldStartframe.getText() != null) && (fieldEndframe.getText() != null)){
 				doplotbutton.setEnabled(false);
@@ -651,6 +661,8 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		r1x  = Integer.valueOf(fieldR1X.getText());
 		r1y  = Integer.valueOf(fieldR1Y.getText());
 		r1z  = Integer.valueOf(fieldR1Z.getText());
+		flagAngularDisplacement = NetAngular.isSelected();
+		
 	}
 	private class ToDoListSelectionHandler 
     implements ListSelectionListener {
@@ -872,6 +884,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
     					LlistNetDisplacementsLineRef = Lp4d.plotTrackNetDispIncremental(framestart, frameend, LtList, refline);			
     				IJ.log("Net Displacement vectors (LineRef) plotted");
     				UnivContents.set(8, LlistNetDisplacementsLineRef);
+    			}
+    			if (flagAngularDisplacement){
+    				ArrayList<Point3f> refpoint = new ArrayList<Point3f>();
+    				refpoint.add(new Point3f(srx, sry, srz));    				
+    				Lp4d.plotTrackAngularDispIncremental(framestart, frameend, LtList, refpoint);	
     			}
     		}
  
