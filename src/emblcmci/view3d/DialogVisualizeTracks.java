@@ -107,7 +107,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private JPanel panelBottom1;
 	private JPanel panelBottom2;
 	private JPanel panelRefPoints;
-
+	private JPanel panelAngular;
 	
 	JButton filechoosebutton = new JButton("Choose Track File...");
 	JRadioButton resultsTableImportSwitch = new JRadioButton();
@@ -140,6 +140,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	JRadioButton switchDispFullTrack = new JRadioButton();
 	JRadioButton switchDispIncrement = new JRadioButton();
 	private JButton exportNetDispbutton = new JButton("Export NetDisp Data");
+	
+	JCheckBox NetAngular = new JCheckBox("Angular Displacements");
+	private JTextField AngfieldRX = new JTextField(Integer.toString(rx));
+	private JTextField AngfieldRY = new JTextField(Integer.toString(ry));
+	private JTextField AngfieldRZ = new JTextField(Integer.toString(rz));
 	
 	JScrollPane scrollPane;
 	JTextArea textArea;
@@ -180,6 +185,8 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private boolean flagNetDispFull;
 	private JPanel panelExport;
 	private boolean flagFullIncrem;
+	private JPanel panelSphereCenter;
+
 
 
 	
@@ -222,12 +229,13 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		panelTop.add(panelToprow3);
 		
 		
-		// center, parameter choosing and track lists in the right
+		// center, parameter choosing in the left and track lists in the right
 		panelCenter = new JPanel();
 		panelCenter.setLayout(new GridLayout(1, 2));
-
+			
+			//left side
 			panelCenterLeft = new JPanel();
-			panelCenterLeft.setLayout(new GridLayout(12, 1));
+			panelCenterLeft.setLayout(new GridLayout(14, 1));
 			panelCenterLeft.setBorder(BorderFactory.createTitledBorder("Parameters"));
 			//panelBottomLeft.add(new JLabel("Frame:"));
 				panelFrames = new JPanel();
@@ -257,6 +265,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				ColorCodedDyamicTracks.addActionListener(this);
 			panelCenterLeft.add(DynamicTrackNodes);
 				DynamicTrackNodes.addActionListener(this);
+				
 			panelCenterLeft.add(NetDisplacements);
 				NetDisplacements.addActionListener(this);
 				panelRefPoints = new JPanel();
@@ -297,15 +306,32 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				switchDispIncrement.addActionListener(this);
 				switchDispIncrement.setEnabled(false);
 			panelCenterLeft.add(panelSwitchDispResolution);
+			toggleRefLineField(false);
+			
 			panelExport = new JPanel();	//button for "plot" and "close"
 				panelExport.setLayout(new BoxLayout(panelExport, BoxLayout.X_AXIS));
 				panelExport.add(exportNetDispbutton);
 				exportNetDispbutton.addActionListener(this);
 				exportNetDispbutton.setEnabled(false);
 			panelCenterLeft.add(panelExport);
+			panelAngular = new JPanel();	//button for "plot" and "close"
+				panelAngular.setLayout(new BoxLayout(panelAngular, BoxLayout.X_AXIS));
+				panelAngular.add(NetAngular);			
+				NetAngular.addActionListener(this);
+			panelCenterLeft.add(panelAngular);
+
+			panelSphereCenter = new JPanel();
+			panelSphereCenter.setLayout(new BoxLayout(panelSphereCenter, BoxLayout.X_AXIS));
+				panelSphereCenter.add(new JLabel("   Sphere Center XYZ:"));
+				panelSphereCenter.add(AngfieldRX);
+				panelSphereCenter.add(AngfieldRY);
+				panelSphereCenter.add(AngfieldRZ);
+			panelCenterLeft.add(panelSphereCenter);
+//		panelRefPoints.setVisible(false);//toggle this depend on the selection of relative meovements
+			toggleSphereCenterField(false);
 			
 			panelCenter.add(panelCenterLeft);
-			toggleRefLineField(false);
+			
 		
 
 		panelCenterRight = new JPanel();
@@ -377,6 +403,12 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		fieldR1X.setEnabled(enabled);
 		fieldR1Y.setEnabled(enabled);
 		fieldR1Z.setEnabled(enabled);
+	}
+
+	void toggleSphereCenterField(boolean enabled){
+		AngfieldRX.setEnabled(enabled);
+		AngfieldRY.setEnabled(enabled);
+		AngfieldRZ.setEnabled(enabled);
 	}
 	
 	//trackListing in the center-right 
