@@ -77,24 +77,9 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	boolean flagColorCodedTracks = false;
 	boolean flagTrackNodes = false;
 	boolean flagDynamicColorCodedTracks = false;
-	boolean flagDynamicTrackNodes = false;
-	boolean flagNetDisplacement = false;
-	boolean flagNetDisplacementLineref = false;
-	private boolean flagAngularDisplacement = false;	
+	boolean flagDynamicTrackNodes = false;	
 	Integer framestart = 0;
 	Integer frameend = 23;
-	Integer rx = 117;
-	Integer ry = 95;
-	Integer rz = 88;
-	Integer r0x = 117;
-	Integer r0y = 32;
-	Integer r0z = 20;	
-	Integer r1x = 121;
-	Integer r1y = 184;
-	Integer r1z = 20;	
-	Integer srx = 117;
-	Integer sry = 95;
-	Integer srz = 88;
 	
 	JFrame mainFrame;
 	JPanel panelTop;
@@ -109,8 +94,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private JPanel panelBottom;
 	private JPanel panelBottom1;
 	private JPanel panelBottom2;
-	private JPanel panelRefPoints;
-	private JPanel panelAngular;
+
 	
 	JButton filechoosebutton = new JButton("Choose Track File...");
 	JRadioButton resultsTableImportSwitch = new JRadioButton();
@@ -125,29 +109,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	JRadioButton switchTrackNodes = new JRadioButton();
 	JCheckBox ColorCodedDyamicTracks = new JCheckBox("Dynamic Tracks");
 	JCheckBox DynamicTrackNodes = new JCheckBox("Dynamic Nodes");
-	JCheckBox NetDisplacements = new JCheckBox("Net Displacement (point ref)");
-	JRadioButton switchNetDisplacements = new JRadioButton();
-	private JTextField fieldRX = new JTextField(Integer.toString(rx));
-	private JTextField fieldRY = new JTextField(Integer.toString(ry));
-	private JTextField fieldRZ = new JTextField(Integer.toString(rz));
-
-	JCheckBox NetDisplacementsLineRef = new JCheckBox("Net Displacement (line ref)");
-	JRadioButton switchNetDisplacementsLineRef = new JRadioButton();
-	private JTextField fieldR0X = new JTextField(Integer.toString(r0x));
-	private JTextField fieldR0Y = new JTextField(Integer.toString(r0y));
-	private JTextField fieldR0Z = new JTextField(Integer.toString(r0z));
-	private JTextField fieldR1X = new JTextField(Integer.toString(r1x));
-	private JTextField fieldR1Y = new JTextField(Integer.toString(r1y));
-	private JTextField fieldR1Z = new JTextField(Integer.toString(r1z));
 	
 	JRadioButton switchDispFullTrack = new JRadioButton();
 	JRadioButton switchDispIncrement = new JRadioButton();
 	private JButton exportNetDispbutton = new JButton("Export NetDisp Data");
 	
-	JCheckBox NetAngular = new JCheckBox("Angular Displacements");
-	private JTextField AngfieldRX = new JTextField(Integer.toString(rx));
-	private JTextField AngfieldRY = new JTextField(Integer.toString(ry));
-	private JTextField AngfieldRZ = new JTextField(Integer.toString(rz));
 	
 	JScrollPane scrollPane;
 	JTextArea textArea;
@@ -170,10 +136,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private ArrayList<Content> listStaticNodes;
 	private ArrayList<Content> listDynamicTracks;
 	private ArrayList<Content> listDynamicNodes;
-	private ArrayList<Content> listNetDisplacements;
-	private ArrayList<Content> listNetDisplacementsLineRef;
-	private JPanel panelRef0Points;
-	private JPanel panelRef1Points;
+
 	static int clicknum = 0;
 
 	private JPanel panelTrack3d;
@@ -184,17 +147,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private JButton highlightOffTrackButton;
 	private DefaultListModel trackList;
 	private ArrayList<Content> highlightedList;
-	private JPanel panelSwitchDispResolution;
 	private boolean flagNetDispFull;
-	private JPanel panelExport;
-	private boolean flagFullIncrem;
-	private JPanel panelSphereCenter;
-
-
-
-
-	
-	
 
 	public void showDialog(){
 		Font font1 = new Font("Default", Font.PLAIN, 12);
@@ -239,7 +192,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			
 			//left side
 			panelCenterLeft = new JPanel();
-			panelCenterLeft.setLayout(new GridLayout(14, 1));
+			panelCenterLeft.setLayout(new GridLayout(6, 1));
 			panelCenterLeft.setBorder(BorderFactory.createTitledBorder("Parameters"));
 			//panelBottomLeft.add(new JLabel("Frame:"));
 				panelFrames = new JPanel();
@@ -269,71 +222,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				ColorCodedDyamicTracks.addActionListener(this);
 			panelCenterLeft.add(DynamicTrackNodes);
 				DynamicTrackNodes.addActionListener(this);
-				
-			panelCenterLeft.add(NetDisplacements);
-				NetDisplacements.addActionListener(this);
-				panelRefPoints = new JPanel();
-				panelRefPoints.setLayout(new BoxLayout(panelRefPoints, BoxLayout.X_AXIS));
-				panelRefPoints.add(new JLabel("   Reference XYZ:"));
-				panelRefPoints.add(fieldRX);
-				panelRefPoints.add(fieldRY);
-				panelRefPoints.add(fieldRZ);
-			panelCenterLeft.add(panelRefPoints);
-//			panelRefPoints.setVisible(false);//toggle this depend on the selection of relative meovements
-			toggleRefPointField(false);
-
-			panelCenterLeft.add(NetDisplacementsLineRef);
-			NetDisplacementsLineRef.addActionListener(this);
-				panelRef0Points = new JPanel();
-				panelRef0Points.setLayout(new BoxLayout(panelRef0Points, BoxLayout.X_AXIS));
-				panelRef0Points.add(new JLabel("   Reference XYZ p0:"));
-				panelRef0Points.add(fieldR0X);
-				panelRef0Points.add(fieldR0Y);
-				panelRef0Points.add(fieldR0Z);
-			panelCenterLeft.add(panelRef0Points);
-				panelRef1Points = new JPanel();
-				panelRef1Points.setLayout(new BoxLayout(panelRef1Points, BoxLayout.X_AXIS));
-				panelRef1Points.add(new JLabel("   Reference XYZ p1:"));
-				panelRef1Points.add(fieldR1X);
-				panelRef1Points.add(fieldR1Y);
-				panelRef1Points.add(fieldR1Z);
-			panelCenterLeft.add(panelRef1Points);
-				panelSwitchDispResolution = new JPanel();
-				panelSwitchDispResolution.setLayout(new BoxLayout(panelSwitchDispResolution, BoxLayout.X_AXIS));
-				panelSwitchDispResolution.add(switchDispFullTrack);
-				switchDispFullTrack.setText("FullTrack");
-				switchDispFullTrack.addActionListener(this);
-				switchDispFullTrack.setEnabled(false);
-				switchDispFullTrack.setSelected(true);
-				panelSwitchDispResolution.add(switchDispIncrement);
-				switchDispIncrement.setText("Incremental");
-				switchDispIncrement.addActionListener(this);
-				switchDispIncrement.setEnabled(false);
-			panelCenterLeft.add(panelSwitchDispResolution);
-			toggleRefLineField(false);
-			
-			panelExport = new JPanel();	//button for "plot" and "close"
-				panelExport.setLayout(new BoxLayout(panelExport, BoxLayout.X_AXIS));
-				panelExport.add(exportNetDispbutton);
-				exportNetDispbutton.addActionListener(this);
-				exportNetDispbutton.setEnabled(false);
-			panelCenterLeft.add(panelExport);
-			panelAngular = new JPanel();	//button for "plot" and "close"
-				panelAngular.setLayout(new BoxLayout(panelAngular, BoxLayout.X_AXIS));
-				panelAngular.add(NetAngular);			
-				NetAngular.addActionListener(this);
-			panelCenterLeft.add(panelAngular);
-
-			panelSphereCenter = new JPanel();
-			panelSphereCenter.setLayout(new BoxLayout(panelSphereCenter, BoxLayout.X_AXIS));
-				panelSphereCenter.add(new JLabel("   Sphere Center XYZ:"));
-				panelSphereCenter.add(AngfieldRX);
-				panelSphereCenter.add(AngfieldRY);
-				panelSphereCenter.add(AngfieldRZ);
-			panelCenterLeft.add(panelSphereCenter);
-//		panelRefPoints.setVisible(false);//toggle this depend on the selection of relative meovements
-			toggleSphereCenterField(false);
-			
+		
 			panelCenter.add(panelCenterLeft);
 			
 		
@@ -394,27 +283,6 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		highlightedList = new ArrayList<Content>();
 	}
 	
-	void toggleRefPointField(boolean enabled){
-		fieldRX.setEnabled(enabled);
-		fieldRY.setEnabled(enabled);
-		fieldRZ.setEnabled(enabled);
-	}
-	
-	void toggleRefLineField(boolean enabled){
-		fieldR0X.setEnabled(enabled);
-		fieldR0Y.setEnabled(enabled);
-		fieldR0Z.setEnabled(enabled);
-		fieldR1X.setEnabled(enabled);
-		fieldR1Y.setEnabled(enabled);
-		fieldR1Z.setEnabled(enabled);
-	}
-
-	void toggleSphereCenterField(boolean enabled){
-		AngfieldRX.setEnabled(enabled);
-		AngfieldRY.setEnabled(enabled);
-		AngfieldRZ.setEnabled(enabled);
-	}
-	
 	//trackListing in the center-right 
 	DefaultListModel constructTrackList(JPanel trackListPanel){
 		//textArea = new JTextArea();
@@ -458,12 +326,6 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-//		if(arg0.getSource() == button){
-//			//textArea.append(textField.getText() + "\n");
-//			clicknum++;
-//			textArea.append("Clicked! (" + Integer.toString(clicknum) + ")\n");
-//			label.setText("clicked");
-//		}
 		if(arg0.getSource() == filechoosebutton){
 			ArrayList<Integer> minmax;
 			this.datapath = fileChooseDialog();
@@ -511,46 +373,15 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			if (ColorCodedDyamicTracks.isSelected()){
 				ColorCodedTracks.setSelected(false);
 				TrackNodes.setSelected(false);
-				NetDisplacements.setSelected(false);
 			}
 		}
 		if (arg0.getSource() == DynamicTrackNodes){
 			if (DynamicTrackNodes.isSelected()){
 				ColorCodedTracks.setSelected(false);
 				TrackNodes.setSelected(false);
-				NetDisplacements.setSelected(false);				
 			}
 		}		
-		if (arg0.getSource() == NetDisplacements){
-			if (NetDisplacements.isSelected()){
-				ColorCodedDyamicTracks.setSelected(false);
-				DynamicTrackNodes.setSelected(false);				
-				toggleRefPointField(true);
-				NetDisplacementsLineRef.setSelected(!NetDisplacements.isSelected());
-				exportNetDispbutton.setEnabled(switchDispIncrement.isSelected());
-			} else {
-				toggleRefPointField(false);
-				exportNetDispbutton.setEnabled(false);
-			}
-			switchDispFullTrack.setEnabled(NetDisplacements.isSelected());
-			switchDispIncrement.setEnabled(NetDisplacements.isSelected());
-		}
-		if (arg0.getSource() == NetDisplacementsLineRef){
-			if (NetDisplacementsLineRef.isSelected()){
-				//panelRefPoints.setVisible(true);
-				toggleRefLineField(true);
-				ColorCodedDyamicTracks.setSelected(false);
-				DynamicTrackNodes.setSelected(false);
-				NetDisplacements.setSelected(!NetDisplacementsLineRef.isSelected());
-				exportNetDispbutton.setEnabled(switchDispIncrement.isSelected());
-			} else {
-				toggleRefLineField(false);
-				//panelRefPoints.setVisible(false);
-				exportNetDispbutton.setEnabled(false);
-			}
-			switchDispFullTrack.setEnabled(NetDisplacementsLineRef.isSelected());
-			switchDispIncrement.setEnabled(NetDisplacementsLineRef.isSelected());
-		}
+
 		if (arg0.getSource() == switchDispFullTrack){
 			switchDispIncrement.setSelected(!switchDispFullTrack.isSelected());
 			exportNetDispbutton.setEnabled(false);
@@ -570,19 +401,8 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				this.p4d = new PlotNetDisplacement(this.datapath, Plot4d.DATATYPE_VOLOCITY);
 			}
 			ArrayList<Point3f> ref = new ArrayList<Point3f>();
-			if (flagNetDisplacement) {
-				ref.add(new Point3f(rx, ry, rz));
-				IJ.log("... exporting point reference net displacement vectors");
-			} else {
-				ref.add(new Point3f(r0x, r0y, r0z));
-				ref.add(new Point3f(r1x, r1y, r1z));
-				IJ.log("... exporting line reference net displacement vectors");
-			}
 			SaveNetDispData exporter = new SaveNetDispData(this.p4d, ref);
 			exporter.execute();
-		}
-		if (arg0.getSource() == NetAngular){
-			toggleSphereCenterField(NetAngular.isSelected());
 		}
 		
 		//*********** from here, bottom of the panel
@@ -648,20 +468,6 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		flagTrackNodes = TrackNodes.isSelected();
 		flagDynamicColorCodedTracks = ColorCodedDyamicTracks.isSelected();
 		flagDynamicTrackNodes = DynamicTrackNodes.isSelected();
-		flagNetDisplacement = NetDisplacements.isSelected();
-		flagNetDisplacementLineref = NetDisplacementsLineRef.isSelected();
-		flagNetDispFull = switchDispFullTrack.isSelected();
-		flagFullIncrem = switchDispIncrement.isSelected();
-		rx  = Integer.valueOf(fieldRX.getText());
-		ry  = Integer.valueOf(fieldRY.getText());
-		rz  = Integer.valueOf(fieldRZ.getText());
-		r0x  = Integer.valueOf(fieldR0X.getText());
-		r0y  = Integer.valueOf(fieldR0Y.getText());
-		r0z  = Integer.valueOf(fieldR0Z.getText());
-		r1x  = Integer.valueOf(fieldR1X.getText());
-		r1y  = Integer.valueOf(fieldR1Y.getText());
-		r1z  = Integer.valueOf(fieldR1Z.getText());
-		flagAngularDisplacement = NetAngular.isSelected();
 		
 	}
 	private class ToDoListSelectionHandler 
@@ -862,34 +668,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
     				IJ.log("Dynamic nodes plotted");
     				UnivContents.set(6, LlistDynamicNodes);
     			}
-    			if (flagNetDisplacement){
-    				ArrayList<Point3f> refpoint = new ArrayList<Point3f>();
-    				refpoint.add(new Point3f(rx, ry, rz));
-    				ArrayList<Content> LlistNetDisplacements;
-    				if (flagNetDispFull)
-    					LlistNetDisplacements = Lp4d.plotTrackNetDisplacements(framestart, frameend, LtList, refpoint);			
-    				else
-    					LlistNetDisplacements = Lp4d.plotTrackNetDispIncremental(framestart, frameend, LtList, refpoint);			
-    				IJ.log("Net Displacement vectors plotted");
-    				UnivContents.set(7, LlistNetDisplacements);
-    			}
-    			if (flagNetDisplacementLineref){
-    				ArrayList<Point3f> refline = new ArrayList<Point3f>();
-    				refline.add(new Point3f(r0x, r0y, r0z));
-    				refline.add(new Point3f(r1x, r1y, r1z));
-    				ArrayList<Content> LlistNetDisplacementsLineRef;
-    				if (flagNetDispFull)
-    					LlistNetDisplacementsLineRef = Lp4d.plotTrackNetDisplacements(framestart, frameend, LtList, refline);			
-    				else
-    					LlistNetDisplacementsLineRef = Lp4d.plotTrackNetDispIncremental(framestart, frameend, LtList, refline);			
-    				IJ.log("Net Displacement vectors (LineRef) plotted");
-    				UnivContents.set(8, LlistNetDisplacementsLineRef);
-    			}
-    			if (flagAngularDisplacement){
-    				ArrayList<Point3f> refpoint = new ArrayList<Point3f>();
-    				refpoint.add(new Point3f(srx, sry, srz));    				
-    				Lp4d.plotTrackAngularDispIncremental(framestart, frameend, LtList, refpoint);	
-    			}
+
     		}
  
             return UnivContents;
@@ -928,10 +707,6 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				DialogVisualizeTracks.this.listDynamicTracks = (ArrayList<Content>) univcontents.get(5);
 			if (univcontents.get(6)  instanceof ArrayList<?>)
 				DialogVisualizeTracks.this.listDynamicNodes = (ArrayList<Content>) univcontents.get(6);
-			if (univcontents.get(7)  instanceof ArrayList<?>)
-				DialogVisualizeTracks.this.listNetDisplacements = (ArrayList<Content>) univcontents.get(7);
-			if (univcontents.get(8)  instanceof ArrayList<?>)
-				DialogVisualizeTracks.this.listNetDisplacementsLineRef = (ArrayList<Content>) univcontents.get(8);
 			
        		DialogVisualizeTracks.this.univ.show();
     		univwin = DialogVisualizeTracks.this.univ.getWindow();	
