@@ -63,7 +63,7 @@ import util.opencsv.CSVReader;
  * @author miura
  *
  */
-public class DialogVisualizeTracks implements ActionListener, WindowListener {
+public class DialogVisualizeTrackBase implements ActionListener, WindowListener {
 
 	private PlotNetDisplacement p4d;
 	//private PlotNetDisplacement p4dnet;
@@ -318,7 +318,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			 
             @Override
             public void run() {
-        		DialogVisualizeTracks dv = new DialogVisualizeTracks(); //original line
+        		DialogVisualizeTrackBase dv = new DialogVisualizeTrackBase(); //original line
         		dv.showDialog();//original line
             }
         });
@@ -478,7 +478,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			if (list.getSelectedIndices().length!=1){
                                 return;
             }
-			int index = DialogVisualizeTracks.this.list.getSelectedIndex();
+			int index = DialogVisualizeTrackBase.this.list.getSelectedIndex();
             plotinfo.setText(trackinfotext(tList, index, plotinfohead));
 		}
 		
@@ -619,11 +619,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		private Image3DUniverse univ;
 		private JFrame frame;
         public DoPlot() {
-        	frame = DialogVisualizeTracks.this.mainFrame;
+        	frame = DialogVisualizeTrackBase.this.mainFrame;
         }
         
         public DoPlot(Image3DUniverse parentuniv) {
-        	frame = DialogVisualizeTracks.this.mainFrame;
+        	frame = DialogVisualizeTrackBase.this.mainFrame;
         	this.univ = parentuniv;
         }
         
@@ -694,24 +694,24 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				e.printStackTrace();
 			}
 			//if (univcontents.get(0) != null)
-				DialogVisualizeTracks.this.univ = (Image3DUniverse) univcontents.get(0);
+				DialogVisualizeTrackBase.this.univ = (Image3DUniverse) univcontents.get(0);
 			//if (univcontents.get(1) != null)
-				DialogVisualizeTracks.this.p4d = (PlotNetDisplacement) univcontents.get(1);
+				DialogVisualizeTrackBase.this.p4d = (PlotNetDisplacement) univcontents.get(1);
 			//if (univcontents.get(2) != null)
-				DialogVisualizeTracks.this.tList = (ArrayList<TrajectoryObj>) univcontents.get(2);
+				DialogVisualizeTrackBase.this.tList = (ArrayList<TrajectoryObj>) univcontents.get(2);
 			if (univcontents.get(3) instanceof ij3d.Content)
-				DialogVisualizeTracks.this.listColorcofdedTracks = (Content) univcontents.get(3);
+				DialogVisualizeTrackBase.this.listColorcofdedTracks = (Content) univcontents.get(3);
 			if (univcontents.get(4) instanceof ArrayList<?>)
-				DialogVisualizeTracks.this.listStaticNodes = (ArrayList<Content>) univcontents.get(4);
+				DialogVisualizeTrackBase.this.listStaticNodes = (ArrayList<Content>) univcontents.get(4);
 			if (univcontents.get(5)  instanceof ArrayList<?>)
-				DialogVisualizeTracks.this.listDynamicTracks = (ArrayList<Content>) univcontents.get(5);
+				DialogVisualizeTrackBase.this.listDynamicTracks = (ArrayList<Content>) univcontents.get(5);
 			if (univcontents.get(6)  instanceof ArrayList<?>)
-				DialogVisualizeTracks.this.listDynamicNodes = (ArrayList<Content>) univcontents.get(6);
+				DialogVisualizeTrackBase.this.listDynamicNodes = (ArrayList<Content>) univcontents.get(6);
 			
-       		DialogVisualizeTracks.this.univ.show();
-    		univwin = DialogVisualizeTracks.this.univ.getWindow();	
-    		univwin.addWindowListener(DialogVisualizeTracks.this);
-    		DialogVisualizeTracks.this.fillTrackList( DialogVisualizeTracks.this.trackList, DialogVisualizeTracks.this.tList);
+       		DialogVisualizeTrackBase.this.univ.show();
+    		univwin = DialogVisualizeTrackBase.this.univ.getWindow();	
+    		univwin.addWindowListener(DialogVisualizeTrackBase.this);
+    		DialogVisualizeTrackBase.this.fillTrackList( DialogVisualizeTrackBase.this.trackList, DialogVisualizeTrackBase.this.tList);
         }
         private void showErrorDialog(String message) {
             JOptionPane.showMessageDialog(frame, message, "failed...", JOptionPane.ERROR_MESSAGE);
