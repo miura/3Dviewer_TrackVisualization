@@ -7,7 +7,7 @@ public class plot4d_ implements PlugIn {
 		@Override
 		public void run(String arg) {
 			// TODO Auto-generated method stub
-			DialogVisualizeTracks dg = new DialogVisualizeTracks();
+			DialogVisualizeTrackBase dg = new DialogVisualizeTrackBase();
 			dg.showDialog();
 		}
 
