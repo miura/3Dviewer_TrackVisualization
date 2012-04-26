@@ -43,113 +43,22 @@ public class Plot4d {
 	public Plot4d(Image3DUniverse univ){
 		this.univ = univ;
 	}
+	public Plot4d(Image3DUniverse univ, ArrayList<TrajectoryObj> tList){
+		this.univ = univ;
+		this.trajlist = tList;
+	}	
 	/** No visualization, for access from scripts directly
 	 * 
 	 * @param datapath
 	 */
 	public Plot4d(String datapath, int datatype){
+		TrackDataLoader dataloader = new TrackDataLoader();
 		if (datatype == 0){
-			this.trajlist = loadFileVolocity(datapath);
-		}
-	}
 			
-	public ArrayList<TrajectoryObj> loadFileVolocity(String datapath){
+			this.trajlist = dataloader.loadFileVolocity(datapath);
+		}
+	}		
 
-		File testaccess = new File(datapath);
-		if (!testaccess.exists()){
-			IJ.log("The file does not exists");
-			return null;
-		}
-		testaccess = null;
-		
-		CSVReader reader = null;
-		try {
-			reader = new CSVReader(new FileReader(datapath), ',');
-		} catch (FileNotFoundException e) {
-			IJ.log("file access failed");
-			e.printStackTrace();
-		}
-		List<String[]> ls = null;
-		try {
-			ls = reader.readAll();
-		} catch (IOException e) {
-			IJ.log("file reading failed");
-			e.printStackTrace();
-		}
-		Iterator<String[]> it = ls.iterator();
-		int counter = 0;
-		double currentTrajID = 1;
-		ArrayList<Point3f> atraj = new ArrayList<Point3f>();
-		ArrayList<Integer> timepoints = new ArrayList<Integer>();
-		ArrayList<TrajectoryObj> trajlist = new ArrayList<TrajectoryObj>();
-		while (it.hasNext()){
-			String[] cA = it.next();
-			if (counter != 0){
-				if ((currentTrajID - Double.valueOf(cA[1]) != 0) && (atraj.size() > 0)){
-					//IJ.log(Double.toString(currentTrajID) + cA[1]);
-					TrajectoryObj atrajObj = new TrajectoryObj(currentTrajID, atraj, timepoints);
-					trajlist.add(atrajObj);
-					currentTrajID = Double.valueOf(cA[1]);
-					//cvec.clear();
-					atraj = new ArrayList<Point3f>();
-					timepoints = new ArrayList<Integer>();
-				}
-				// pixel positions
-	 			//cvec.add(Point3f(Double.valueOf(cA[3]),Double.valueOf(cA[4]),Double.valueOf(cA[5])));
-	 			// scaled positions
-	 			atraj.add(new Point3f(Float.valueOf(cA[6]),Float.valueOf(cA[7]),Float.valueOf(cA[8]))); 
-	 			timepoints.add((int) (Double.valueOf(cA[2]).intValue()));  
-			}
-			counter++;
-		}
-		this.trajlist = trajlist;
-		IJ.log("file loaded successfully");
-		return trajlist;
-	}
-	/** Loads coordinates of segmented particles.  
-	 * 
-	 * @param datapath full path to the csv file
-	 * 
-	 */
-	public ArrayList<DotObj> loadPointsFile(String datapath){
-
-		CSVReader reader = null;
-		try {
-			reader = new CSVReader(new FileReader(datapath), ',');
-		} catch (FileNotFoundException e) {
-			IJ.log("file access failed");
-			e.printStackTrace();
-		}
-		List<String[]> ls = null;
-		try {
-			ls = reader.readAll();
-		} catch (IOException e) {
-			IJ.log("file reading failed");
-			e.printStackTrace();
-		}
-		Iterator<String[]> it = ls.iterator();
-		int counter = 0;
-		double currentTrajID = 1.0;
-		ArrayList<DotObj> coords = new ArrayList<DotObj>();
-		while (it.hasNext()){
-			String[] cA = it.next();
-			if (counter != 0){
-				double pf = Double.valueOf(cA[2]);
-				double pmeanint = Double.valueOf(cA[7]);
-				double px = Double.valueOf(cA[10]);
-				double py = Double.valueOf(cA[11]);
-				double pz = Double.valueOf(cA[12]);
-				double sx = Double.valueOf(cA[13]);
-				double sy = Double.valueOf(cA[14]);
-				double sz = Double.valueOf(cA[15]);											
-				DotObj dotObj = new DotObj(pf, px, py, pz, sx, sy, sz, pmeanint);
-				coords.add(dotObj);
-			}
-			counter++;
-		}
-		this.coords = coords;
-		return coords;
-	}	
 	/**
 	 * check if a time point is included in the trajectory. 
 	 * @param timepoints

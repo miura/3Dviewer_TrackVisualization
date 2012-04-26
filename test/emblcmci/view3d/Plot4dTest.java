@@ -33,7 +33,7 @@ public class Plot4dTest {
 	public void setUp() throws Exception {
 		Image3DUniverse univ = new Image3DUniverse();
 		this.univ = univ;
-		PlotNetDisplacement p4d = new PlotNetDisplacement(univ);
+		
 		timestart = 0;
 		timeend = 23;
 		rx = 117;
@@ -43,7 +43,11 @@ public class Plot4dTest {
 //		String path = "/Users/miura/Dropbox/Mette/23h_/23hdatacut0_1_6_6.csv";
 		String path = "C:\\dropbox\\My Dropbox\\Mette\\Tracks.csv";
 		this.path = path;
-		ArrayList<TrajectoryObj> trajlist = p4d.loadFileVolocity(path);
+		TrackDataLoader tld = new TrackDataLoader();
+		ArrayList<TrajectoryObj> trajlist = tld.loadFileVolocity(path);
+		PlotNetDisplacement p4d = new PlotNetDisplacement(univ, trajlist);
+
+		
 		this.p4d = p4d;
 		this.trajlist = trajlist;
 		this.refline = new ArrayList<Point3f>();
@@ -60,16 +64,17 @@ public class Plot4dTest {
 
 	@Test
 	public void testLoadFileVolocity() {
-		Plot4d p4d = new Plot4d();
 		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
-		ArrayList<TrajectoryObj> trajlist = p4d.loadFileVolocity(path); 
+		TrackDataLoader tld = new TrackDataLoader();
+		ArrayList<TrajectoryObj> trajlist = tld.loadFileVolocity(path);
 		//fail("Not yet implemented");
 	}
 	@Test
 	public void loadPointsFile() {
 		Plot4d p4d = new Plot4d();
 		String path = "/Users/miura/Dropbox/Mette/segmentation_z21-47t2-24_3CONVERTED.csv";
-		ArrayList<TrajectoryObj> trajlist = p4d.loadFileVolocity(path); 
+		TrackDataLoader tld = new TrackDataLoader();
+		ArrayList<DotObj> trajlist = tld.loadPointsFile(path);
 		//fail("Not yet implemented");
 	}
 	//@Test	
