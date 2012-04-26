@@ -114,6 +114,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	
 	JButton filechoosebutton = new JButton("Choose Track File...");
 	JRadioButton resultsTableImportSwitch = new JRadioButton();
+	JButton columnsetButton = new JButton("set column order...");
 	JLabel filepathtext = new JLabel("---");
 
 	// central panel
@@ -222,10 +223,13 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 
 		panelToprow2 = new JPanel();
 		panelToprow2.setLayout(new GridLayout(1, 2));
-		panelToprow2.add(resultsTableImportSwitch);
-		resultsTableImportSwitch.setText("Use ResultsTable");
-		resultsTableImportSwitch.setFont(font1small);
-		resultsTableImportSwitch.addActionListener(this);
+			resultsTableImportSwitch.setText("Use ResultsTable");
+			resultsTableImportSwitch.setFont(font1small);
+			resultsTableImportSwitch.addActionListener(this);
+			panelToprow2.add(resultsTableImportSwitch);
+			panelToprow2.add(columnsetButton);
+			columnsetButton.setFont(font1small);
+			columnsetButton.addActionListener(this);
 		panelTop.add(panelToprow2);
 		panelToprow3 = new JPanel();
 		panelToprow3.add(filepathtext);
@@ -483,6 +487,10 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				filechoosebutton.setEnabled(true);
 				filepathtext.setText(datapath);
 			}
+		}
+		if (arg0.getSource() == columnsetButton){
+			TrackDataLoader tdl = new TrackDataLoader();
+			tdl.columnsetter();
 		}
 		if (arg0.getSource() == ColorCodedTracks){
 			if (ColorCodedTracks.isSelected()){
