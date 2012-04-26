@@ -468,7 +468,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			ArrayList<Integer> minmax;
 			this.datapath = fileChooseDialog();
 			filepathtext.setText(datapath);
-			minmax = getMinMaxFrame(datapath);
+			minmax = TrackDataLoader.getMinMaxFrame(datapath);
 			if (minmax.get(1) != null){
 				fieldStartframe.setText(minmax.get(0).toString());
 				fieldEndframe.setText(minmax.get(1).toString());
@@ -1029,48 +1029,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 //		}
     
     }
-    static public ArrayList<Integer> getMinMaxFrame(String datapath){
 
-		File testaccess = new File(datapath);
-		if (!testaccess.exists()){
-			IJ.log("The file does not exists");
-			return null;
-		}
-		testaccess = null;
-		
-		CSVReader reader = null;
-		try {
-			reader = new CSVReader(new FileReader(datapath), ',');
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			IJ.log("file access failed");
-			e.printStackTrace();
-		}
-		List<String[]> ls = null;
-		try {
-			ls = reader.readAll();
-		} catch (IOException e) {
-			IJ.log("file reading failed");
-			e.printStackTrace();
-		}
-		Iterator<String[]> it = ls.iterator();
-		int counter = 0;
-		ArrayList<Integer> timepoints = new ArrayList<Integer>();
-		ArrayList<Integer> startendframeList = new ArrayList<Integer>();
-		while (it.hasNext()){
-			String[] cA = it.next();
-			if (counter != 0){
-	 			timepoints.add((int) (Double.valueOf(cA[2]).intValue()));  
-			}
-			counter++;
-		}
-	    Object objmax = Collections.max(timepoints);
-	    Object objmin = Collections.min(timepoints);
-	    startendframeList.add(Integer.valueOf(objmin.toString()));
-	    startendframeList.add(Integer.valueOf(objmax.toString()));
-	    IJ.log("min:" + objmin + " max:" + objmax);
-		return startendframeList;
-	}
 	
 	@Override
 	public void windowActivated(WindowEvent arg0) {

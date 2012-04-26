@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -63,7 +64,48 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 		TrackDataLoader tld = new TrackDataLoader();
 		tld.columnsetter();
 	}
-	
+    static public ArrayList<Integer> getMinMaxFrame(String datapath){
+
+		File testaccess = new File(datapath);
+		if (!testaccess.exists()){
+			IJ.log("The file does not exists");
+			return null;
+		}
+		testaccess = null;
+		
+		CSVReader reader = null;
+		try {
+			reader = new CSVReader(new FileReader(datapath), ',');
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			IJ.log("file access failed");
+			e.printStackTrace();
+		}
+		List<String[]> ls = null;
+		try {
+			ls = reader.readAll();
+		} catch (IOException e) {
+			IJ.log("file reading failed");
+			e.printStackTrace();
+		}
+		Iterator<String[]> it = ls.iterator();
+		int counter = 0;
+		ArrayList<Integer> timepoints = new ArrayList<Integer>();
+		ArrayList<Integer> startendframeList = new ArrayList<Integer>();
+		while (it.hasNext()){
+			String[] cA = it.next();
+			if (counter != 0){
+	 			timepoints.add((int) (Double.valueOf(cA[p_frame]).intValue()));  
+			}
+			counter++;
+		}
+	    Object objmax = Collections.max(timepoints);
+	    Object objmin = Collections.min(timepoints);
+	    startendframeList.add(Integer.valueOf(objmin.toString()));
+	    startendframeList.add(Integer.valueOf(objmax.toString()));
+	    IJ.log("min:" + objmin + " max:" + objmax);
+		return startendframeList;
+	}
 	public ArrayList<TrajectoryObj> loadFileVolocity(String datapath){
 
 		File testaccess = new File(datapath);
@@ -93,23 +135,30 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 		ArrayList<Point3f> atraj = new ArrayList<Point3f>();
 		ArrayList<Integer> timepoints = new ArrayList<Integer>();
 		ArrayList<TrajectoryObj> trajlist = new ArrayList<TrajectoryObj>();
+		TrajectoryObj atrajObj;
 		while (it.hasNext()){
 			String[] cA = it.next();
 			if (counter != 0){
-				if ((currentTrajID - Double.valueOf(cA[p_trackid]) != 0) && (atraj.size() > 0)){
+//				if ((currentTrajID - Double.valueOf(cA[p_trackid]) != 0) && (atraj.size() > 0)){
+			if (!trajIDexists(trajlist, Double.valueOf(cA[p_trackid]))){
 					//IJ.log(Double.toString(currentTrajID) + cA[1]);
-					TrajectoryObj atrajObj = new TrajectoryObj(currentTrajID, atraj, timepoints);
-					trajlist.add(atrajObj);
-					currentTrajID = Double.valueOf(cA[p_trackid]);
+				atraj = new ArrayList<Point3f>();
+				timepoints = new ArrayList<Integer>();
+				atrajObj = new TrajectoryObj(Double.valueOf(cA[p_trackid]), atraj, timepoints);
+				trajlist.add(atrajObj);
+					//currentTrajID = Double.valueOf(cA[p_trackid]);
 					//cvec.clear();
-					atraj = new ArrayList<Point3f>();
-					timepoints = new ArrayList<Integer>();
-				}
+			} else {
+				atrajObj = getTrajObject(trajlist, Double.valueOf(cA[p_trackid]));
+				atraj = atrajObj.dotList;
+				timepoints = atrajObj.timepoints;
+				
+			}	
 				// pixel positions
 	 			//cvec.add(Point3f(Double.valueOf(cA[3]),Double.valueOf(cA[4]),Double.valueOf(cA[5])));
 	 			// scaled positions
-	 			atraj.add(new Point3f(Float.valueOf(cA[p_x]),Float.valueOf(cA[p_y]),Float.valueOf(cA[p_z]))); 
-	 			timepoints.add((int) (Double.valueOf(cA[p_frame]).intValue()));  
+	 		atraj.add(new Point3f(Float.valueOf(cA[p_x]),Float.valueOf(cA[p_y]),Float.valueOf(cA[p_z]))); 
+	 		timepoints.add((int) (Double.valueOf(cA[p_frame]).intValue()));  
 			}
 			counter++;
 		}
@@ -117,6 +166,24 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 		IJ.log("file loaded successfully");
 		return trajlist;
 	}
+	
+	public boolean trajIDexists(ArrayList<TrajectoryObj> trajlist, double trajid){
+		if (trajlist.size()>0){
+			for (TrajectoryObj t : trajlist){
+				if (t.id == trajid)
+					return true;
+			}
+		}
+		return false;
+	}
+	public TrajectoryObj getTrajObject(ArrayList<TrajectoryObj> trajlist, double trajid){
+		for (TrajectoryObj t : trajlist){
+			if (t.id == trajid)
+				return t;
+ 		}
+		return null;
+	}
+	
 		
 	public void columnsetter(){
 		
@@ -124,7 +191,7 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 		JFrame mainFrame = new JFrame("Data Column Setter");
 		this.mainFrame = mainFrame;
 		mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		//mainFrame.setSize(480, 640);
+		mainFrame.setSize(400, 200);
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setFont(font3);
 		Container contentPane = mainFrame.getContentPane();
@@ -159,7 +226,8 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	
 	private JPanel fieldgenearator(String title, JTextField tf){
 		JPanel p = new JPanel();
-		p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
+		//p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
+		p.setLayout(new GridLayout(1, 2));
 		p.add(new JLabel(title));
 		p.add(tf);
 		return p;					
@@ -173,6 +241,8 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 			this.p_y = Integer.valueOf(fieldy.getText());			
 			this.p_z = Integer.valueOf(fieldz.getText());			
 			testprintColumns();
+			WindowEvent windowClosing = new WindowEvent(this.mainFrame, WindowEvent.WINDOW_CLOSING);
+			mainFrame.dispatchEvent(windowClosing);
 		}
 		if (arg0.getSource() == cancelbutton){
 			WindowEvent windowClosing = new WindowEvent(this.mainFrame, WindowEvent.WINDOW_CLOSING);
