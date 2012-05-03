@@ -1,7 +1,11 @@
 // java version of the single track extractor
+// 
+// originally written as a jython script and then migrated. 
+// May 2-3, 2012
+// Kota Miura (miura@embl.de)
+
 package emblcmci.view3d;
 
-// migrated from jython script
 
 import javax.vecmath.Point3f;
 import javax.media.j3d.Transform3D;
@@ -10,12 +14,10 @@ import javax.vecmath.Vector3f;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import javax.vecmath.Color3f;
 import ij3d.Content;
 import ij3d.ContentCreator;
 import ij3d.Image3DUniverse;
 import ij3d.behaviors.ViewPlatformTransformer;
-import customnode.CustomLineMesh;
 import customnode.CustomMultiMesh;
 import ij.IJ;
 import ij.ImagePlus;
@@ -32,13 +34,13 @@ import ij.process.StackProcessor;
 import java.util.Properties;
 import ij.measure.Calibration;
 
-public class SingeleTackExtract{
+public class SingleTackExtract{
 
   String srcpath;
   String imgpath;
   int trackid;
 
-  public SingeleTackExtract(String srcpath, String imgpath, int trackid){
+  public SingleTackExtract(String srcpath, String imgpath, int trackid){
     this.srcpath = srcpath;
     this.imgpath = imgpath;
     this.trackid = trackid;
@@ -53,19 +55,16 @@ public class SingeleTackExtract{
     return aframe;
   }
 
-  //return a substack, defined by the argument. 
+  //return a substack, defined by the arguments. 
   public ImagePlus getSubstack(String imgpath, int zmin, int zmax, int timepoint){
 
-    //this line should be changed with path constrction
 	File imgfile = new File(imgpath);
-//    TiffDecoder td = new TiffDecoder(os.path.dirname(imgpath) , os.path.basename(imgpath));
     TiffDecoder td = new TiffDecoder(imgfile.getParent() , imgfile.getName());
 
     FileInfo[] fileinfoA = null;
 	try {
 		fileinfoA = td.getTiffInfo();
 	} catch (IOException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 		IJ.log("Opening failed: " + imgfile.getPath());
 	}
@@ -73,7 +72,6 @@ public class SingeleTackExtract{
     fo1.nImages = 1;
     FileOpener fo = new FileOpener(fo1);
     Properties props = fo.decodeDescriptionString(fileinfoA[0]);
-     //print props.toString();
     IJ.log(props.toString());
 
     int frames = Integer.parseInt(props.getProperty("frames"));
@@ -118,15 +116,15 @@ public class SingeleTackExtract{
   // main part
   public void showSingleTrack(){
     Image3DUniverse univ = new Image3DUniverse();
+    // follwoing two lines might not be needed, keep these lines for adding saving module later. 
 	File datafile = new File(srcpath);
     String destpath = datafile.getParent() + File.separator;    
-    //destpath = os.path.dirname(srcpath) + os.sep; jythonix  
     
     Plot4d p4d = new Plot4d(srcpath, Plot4d.DATATYPE_VOLOCITY);
     ArrayList<TrajectoryObj> tList = p4d.getTrajlist()	;
     ArrayList<Point3f> atrack = tList.get(trackid).getDotList();
     ArrayList<Integer> atimepoints = tList.get(trackid).getTimepoints();
-    ArrayList<Float> bnd = Plot4d.getBoudingBox(atrack); // arraylist of Float;
+    ArrayList<Integer> bnd = Plot4d.getBoudingBox(atrack); // arraylist of Float;
     ArrayList<ImagePlus> timeseries = new ArrayList<ImagePlus>();
     for (Integer tt : atimepoints){
         ImagePlus subsubimp = getSubstack(imgpath, bnd.get(2), bnd.get(5), tt);
@@ -148,10 +146,10 @@ public class SingeleTackExtract{
     double zs = calib.pixelDepth;
     int offset = 0; //micrometers;
 
-    int left = (int) ((Math.round(bnd.get(0))- offset)/xys) ;
-    int top  = (int) ((Math.round(bnd.get(1))- offset)/xys) - offset;
-    int ww = (int) ((Math.round(bnd.get(3) - bnd.get(0)) + 2 * offset) / xys);
-    int hh = (int) ((Math.round(bnd.get(4) - bnd.get(1)) + 2 * offset) / xys);
+    int left = (int) ((bnd.get(0)- offset)/xys) ;
+    int top  = (int) ((bnd.get(1)- offset)/xys - offset);
+    int ww = (int) ((bnd.get(3) - bnd.get(0) + 2 * offset) / xys);
+    int hh = (int) ((bnd.get(4) - bnd.get(1) + 2 * offset) / xys);
     ImageStack xycropstk = new StackProcessor(subimp.getStack(), null).crop(left, top, ww, hh);
     ImagePlus xycropimp = new ImagePlus("vol", xycropstk);
     xycropimp.setCalibration(calib);
@@ -169,10 +167,9 @@ public class SingeleTackExtract{
     obj.setThreshold(0);
     obj.setTransparency(0.1f);
     obj.setLocked(true) ;
-    //setTransparency(float transparency) ;
-    int dx = Math.round(bnd.get(0))- offset;
-    int dy = Math.round(bnd.get(1))- offset;
-    int dz = (int) (Math.floor(bnd.get(2) / zs) * zs);
+    int dx = bnd.get(0)- offset;
+    int dy = bnd.get(1)- offset;
+    int dz = (int) (Math.floor(bnd.get(2)/ zs) * zs);
     CustomMultiMesh trackmesh;
     Content cont;
 
@@ -189,7 +186,7 @@ public class SingeleTackExtract{
     //univ.addContent(ccs);
     univ.centerSelected(obj);
     ViewPlatformTransformer vtf = new ViewPlatformTransformer(univ, univ);
-    vtf.zoomTo(10)    ;
+    vtf.zoomTo(10);
   }
 
 
