@@ -16,6 +16,7 @@ import ij3d.Image3DUniverse;
 import ij3d.ImageWindow3D;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -23,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
@@ -49,7 +51,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.vecmath.Point3f;
 
 //import org.hamcrest.core.IsInstanceOf;
-
+import ij.io.OpenDialog;
 
 /**
  * @author miura
@@ -87,11 +89,12 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	Integer srx = 117;
 	Integer sry = 95;
 	Integer srz = 88;
+	String imgfilepath = "---";
 	
 	JFrame mainFrame;
 	JPanel panelTop;
 	JPanel panelToprow2;
-	private JPanel panelToprow3;
+	private JPanel panelToprow4;
 	
 	JPanel panelCenter;
 	JPanel panelCenterLeft;
@@ -107,8 +110,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	JButton filechoosebutton = new JButton("Choose Track File...");
 	JRadioButton resultsTableImportSwitch = new JRadioButton();
 	JButton columnsetButton = new JButton("set column order...");
+	private JPanel panelToprow3;
+	private JButton imagefileButton = new JButton("set image stack path...");
+	private JLabel imagepathtext = new JLabel(imgfilepath);
 	JLabel filepathtext = new JLabel("---");
-
+	
 	// central panel
 	JTextField fieldStartframe = new JTextField(Integer.toString(framestart), 4);
 	JTextField fieldEndframe = new JTextField(Integer.toString(frameend), 4);	
@@ -176,19 +182,18 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private JButton highlightOnTrackButton;
 	private JButton highlightOffTrackButton;
 	private DefaultListModel trackList;
+	private JButton extractTrackButton;
 	private ArrayList<Content> highlightedList;
 	private JPanel panelSwitchDispResolution;
 	private boolean flagNetDispFull;
 	private JPanel panelExport;
 	private boolean flagFullIncrem;
 	private JPanel panelSphereCenter;
-
-
-
-
-	
 	
 
+	Font font1verysmall = new Font("DefaultSmall", Font.PLAIN, 9);
+
+	
 	public void showDialog(){
 		Font font1 = new Font("Default", Font.PLAIN, 12);
 		Font font1small = new Font("DefaultSmall", Font.PLAIN, 12);		
@@ -206,13 +211,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		Container contentPane = mainFrame.getContentPane();
 		//FileChooserPanle
 		panelTop = new JPanel();
-		panelTop.setLayout(new GridLayout(3, 1));
+		panelTop.setLayout(new GridLayout(4, 1));
 		panelTop.setBorder(BorderFactory.createTitledBorder("Data Source"));
 		panelTop.add(filechoosebutton);
-		filechoosebutton.setFont(font1small);
 		filechoosebutton.addActionListener(this);
 		
-
 		panelToprow2 = new JPanel();
 		panelToprow2.setLayout(new GridLayout(1, 2));
 			resultsTableImportSwitch.setText("Use ResultsTable");
@@ -223,10 +226,18 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			columnsetButton.setFont(font1small);
 			columnsetButton.addActionListener(this);
 		panelTop.add(panelToprow2);
+
 		panelToprow3 = new JPanel();
-		panelToprow3.add(filepathtext);
-		filepathtext.setFont(font1small);
+		panelToprow3.setLayout(new GridLayout(1, 2));
+			panelToprow3.add(imagepathtext);
+			panelToprow3.add(imagefileButton);
+			imagefileButton.setFont(font1small);
+			imagefileButton.addActionListener(this);
 		panelTop.add(panelToprow3);
+		panelToprow4 = new JPanel();
+		panelToprow4.add(filepathtext);
+		filepathtext.setFont(font1small);
+		panelTop.add(panelToprow4);
 		
 		
 		// center, parameter choosing in the left and track lists in the right
@@ -421,7 +432,8 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		trackListPanel.setLayout(new BorderLayout());
 		trackListPanel.add(scrollPane, BorderLayout.CENTER);
 		list.addListSelectionListener
-        (new ToDoListSelectionHandler());
+        	(new ToDoListSelectionHandler());
+		
 		JPanel listSouth = new JPanel();
 		highlightOnTrackButton = new JButton("Highlight");
 		highlightOffTrackButton = new JButton("off");
@@ -429,6 +441,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		listSouth.add(highlightOnTrackButton, BoxLayout.X_AXIS);
 		highlightOnTrackButton.addActionListener(this);
 		highlightOffTrackButton.addActionListener(this);
+
+		extractTrackButton = new JButton("Extract");
+		listSouth.add(extractTrackButton, BoxLayout.X_AXIS);
+		extractTrackButton.addActionListener(this);
+		
 		trackListPanel.add(listSouth, BorderLayout.SOUTH);
 		return listModel;
 	}
@@ -484,6 +501,22 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			TrackDataLoader tdl = new TrackDataLoader();
 			tdl.columnsetter();
 		}
+		if (arg0.getSource() == imagefileButton){
+			OpenDialog od = new OpenDialog("Choose a hyperstack", "");		
+			if (od.getFileName() == "")
+				return;
+			String fullpath = od.getDirectory() + od.getFileName();
+			File ff = new File(fullpath);
+			if (ff.canRead() == false){
+				IJ.error("cannot read that file!");
+				return;
+			}
+			this.imgfilepath = fullpath;
+			imagepathtext.setText(this.imgfilepath);
+			imagepathtext.setFont(font1verysmall);
+			//imagepathtext.update(imagepathtext.getGraphics());
+		}
+		
 		if (arg0.getSource() == ColorCodedTracks){
 			if (ColorCodedTracks.isSelected()){
 				ColorCodedDyamicTracks.setSelected(false);
@@ -638,7 +671,18 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		if (arg0.getSource() == highlightOffTrackButton){
 			for(Content trackcontent:highlightedList)
 				univ.removeContent(trackcontent.getName());
-		}		
+		}
+		if (arg0.getSource() == extractTrackButton){
+			if (!list.isSelectionEmpty()) {
+				int index = list.getSelectedIndex();
+				TrajectoryObj currenttraj = p4d.trajlist.get(index);
+				int trackid = (int) Math.round(currenttraj.id);
+				PlotSIngleTrack pse = new PlotSIngleTrack(trackid);
+				pse.execute();
+			} else {
+				plotinfo.setText(plotinfohead + " ...track not selected");
+			}
+		}
 	}
 	
 	private void retrieveParameters(){
@@ -1006,7 +1050,29 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
         	return null; 
         }	
     }
-*/ 
+    
+*/
+    class PlotSIngleTrack extends SwingWorker<ArrayList<Object>, Object> {
+    	int trackid;
+    	
+		/**
+		 * @param trackid
+		 */
+		public PlotSIngleTrack(int trackid) {
+			super();
+			this.trackid = trackid;
+		}
+
+		@Override
+		protected ArrayList<Object> doInBackground() throws Exception {
+			
+			SingleTackExtract se = new SingleTackExtract(datapath, imgfilepath, trackid);
+			se.showSingleTrack();
+			
+			return null;
+		}
+    	
+    }
     class SaveNetDispData extends SwingWorker<ArrayList<Object>, Object> {
     	PlotNetDisplacement pt4d;
     	String savepath;
