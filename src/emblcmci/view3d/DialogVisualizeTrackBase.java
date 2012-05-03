@@ -640,8 +640,10 @@ public class DialogVisualizeTrackBase implements ActionListener, WindowListener 
     		Image3DUniverse univ = null;
     		univ = new Image3DUniverse();
     		this.univ = univ;		
+    		TrackDataLoader tld = new TrackDataLoader();
+    		ArrayList<TrajectoryObj> LtList = tld.loadFileVolocity(datapath);
     		PlotNetDisplacement Lp4d = new PlotNetDisplacement(univ);
-    		ArrayList<TrajectoryObj> LtList = Lp4d.loadFileVolocity(datapath);
+    		//ArrayList<TrajectoryObj> LtList = Lp4d.loadFileVolocity(datapath);
     		IJ.log("File loaded...");
     		UnivContents.set(0, univ);
     		UnivContents.set(1, Lp4d);
