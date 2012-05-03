@@ -23,14 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
@@ -57,7 +50,6 @@ import javax.vecmath.Point3f;
 
 //import org.hamcrest.core.IsInstanceOf;
 
-import util.opencsv.CSVReader;
 
 /**
  * @author miura
