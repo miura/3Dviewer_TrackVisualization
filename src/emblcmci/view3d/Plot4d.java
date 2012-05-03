@@ -877,7 +877,7 @@ public class Plot4d {
 	 * @param atrack
 	 * @return
 	 */
-	static public ArrayList<Float> getBoudingBox(ArrayList<Point3f> atrack){
+	static public ArrayList<Float> getBoudingBoxFloat(ArrayList<Point3f> atrack){
 		ArrayList<Float> bnd = new ArrayList<Float>(6);
 		bnd.add(atrack.get(0).x);
 		bnd.add(atrack.get(0).y);
@@ -892,6 +892,27 @@ public class Plot4d {
 			if (bnd.get(3) < item.x) bnd.set(3, item.x);
 			if (bnd.get(4) < item.y) bnd.set(4, item.y);
 			if (bnd.get(5) < item.z) bnd.set(5, item.z);
+		}
+		return bnd;		
+	}
+	/** calculate and returns the bounding box coordinates of a track. 
+	 * 
+	 */
+	static public ArrayList<Integer> getBoudingBox(ArrayList<Point3f> atrack){
+		ArrayList<Integer> bnd = new ArrayList<Integer>(6);
+		bnd.add(Math.round(atrack.get(0).x));
+		bnd.add(Math.round(atrack.get(0).y));
+		bnd.add(Math.round(atrack.get(0).z));
+		bnd.add(Math.round(atrack.get(0).x));
+		bnd.add(Math.round(atrack.get(0).y));
+		bnd.add(Math.round(atrack.get(0).z));
+		for (Point3f item : atrack){
+			if (bnd.get(0) > Math.round(item.x)) bnd.set(0, Math.round(item.x));
+			if (bnd.get(1) > Math.round(item.y)) bnd.set(1, Math.round(item.y));
+			if (bnd.get(2) > Math.round(item.z)) bnd.set(2, Math.round(item.z));
+			if (bnd.get(3) < Math.round(item.x)) bnd.set(3, Math.round(item.x));
+			if (bnd.get(4) < Math.round(item.y)) bnd.set(4, Math.round(item.y));
+			if (bnd.get(5) < Math.round(item.z)) bnd.set(5, Math.round(item.z));
 		}
 		return bnd;		
 	}
