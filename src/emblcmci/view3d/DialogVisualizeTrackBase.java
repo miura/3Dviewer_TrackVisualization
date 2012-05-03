@@ -71,6 +71,8 @@ public class DialogVisualizeTrackBase implements ActionListener, WindowListener 
 	Image3DUniverse univ;
 	ArrayList<TrajectoryObj> tList;
 	
+	String imgfilepath = "---";
+	
 	//parameters
 	String datapath = "not selected yet";
 		//flags for plotting
@@ -84,7 +86,7 @@ public class DialogVisualizeTrackBase implements ActionListener, WindowListener 
 	JFrame mainFrame;
 	JPanel panelTop;
 	JPanel panelToprow2;
-	private JPanel panelToprow3;
+	private JPanel panelToprow4;
 	
 	JPanel panelCenter;
 	JPanel panelCenterLeft;
@@ -180,10 +182,10 @@ public class DialogVisualizeTrackBase implements ActionListener, WindowListener 
 		resultsTableImportSwitch.setFont(font1small);
 		resultsTableImportSwitch.addActionListener(this);
 		panelTop.add(panelToprow2);
-		panelToprow3 = new JPanel();
-		panelToprow3.add(filepathtext);
+		panelToprow4 = new JPanel();
+		panelToprow4.add(filepathtext);
 		filepathtext.setFont(font1small);
-		panelTop.add(panelToprow3);
+		panelTop.add(panelToprow4);
 		
 		
 		// center, parameter choosing in the left and track lists in the right
