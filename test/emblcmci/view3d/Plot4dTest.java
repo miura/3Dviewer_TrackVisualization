@@ -2,6 +2,7 @@ package emblcmci.view3d;
 
 //import static org.junit.Assert.*;
 //import ij.IJ;
+import ij.IJ;
 import ij3d.Image3DUniverse;
 
 import java.io.IOException;
@@ -29,21 +30,25 @@ public class Plot4dTest {
 	private int rz;
 	ArrayList<Point3f> refline;
 	String path;
-	@Before
+//	@Before
 	public void setUp() throws Exception {
 		Image3DUniverse univ = new Image3DUniverse();
 		this.univ = univ;
-		PlotNetDisplacement p4d = new PlotNetDisplacement(univ);
+		
 		timestart = 0;
 		timeend = 23;
 		rx = 117;
 		ry = 95;
 		rz = 88;
-//		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
+		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
 //		String path = "/Users/miura/Dropbox/Mette/23h_/23hdatacut0_1_6_6.csv";
-		String path = "C:\\dropbox\\My Dropbox\\Mette\\Tracks.csv";
+//		String path = "C:\\dropbox\\My Dropbox\\Mette\\Tracks.csv";
 		this.path = path;
-		ArrayList<TrajectoryObj> trajlist = p4d.loadFileVolocity(path);
+		TrackDataLoader tld = new TrackDataLoader();
+		ArrayList<TrajectoryObj> trajlist = tld.loadFileVolocity(path);
+		PlotNetDisplacement p4d = new PlotNetDisplacement(univ, trajlist);
+
+		
 		this.p4d = p4d;
 		this.trajlist = trajlist;
 		this.refline = new ArrayList<Point3f>();
@@ -57,22 +62,76 @@ public class Plot4dTest {
 		refline.get(1).z = 63;
 		
 	}
-
-	@Test
+	@Before
+	public void setupBoryFile(){
+		Image3DUniverse univ = new Image3DUniverse();
+		this.univ = univ;
+		
+		timestart = 0;
+		timeend = 80;
+		rx = 117;
+		ry = 95;
+		rz = 88;
+		String path = "/Users/miura/Desktop/bory3DmovieMaking/c0track.csv";
+		this.path = path;
+		TrackDataLoader tld = new TrackDataLoader();
+		tld.setColumnOrder(2, 1, 4, 5, 6);
+		ArrayList<TrajectoryObj> trajlist = tld.loadFileVolocity(path);
+		PlotNetDisplacement p4d = new PlotNetDisplacement(univ, trajlist);
+		this.p4d = p4d;
+		this.trajlist = trajlist;
+		
+	}
+//	@Test
 	public void testLoadFileVolocity() {
-		Plot4d p4d = new Plot4d();
 		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
-		ArrayList<TrajectoryObj> trajlist = p4d.loadFileVolocity(path); 
+		TrackDataLoader tld = new TrackDataLoader();
+		tld.setColumnOrder(1, 2, 6, 7, 8);
+		ArrayList<TrajectoryObj> trajlist = tld.loadFileVolocity(path);
+		int counter = 0;
+		for (TrajectoryObj t : trajlist){
+			IJ.log("trackid: " + Double.toString(t.id));
+			counter = 0;
+			for (Point3f pos : t.dotList ){
+				IJ.log(Integer.toString(t.timepoints.get(counter)) + "\t" + 
+						Float.toString(pos.x) + "," +
+						Float.toString(pos.y) + "," +
+						Float.toString(pos.z));
+				counter++;
+			}
+		}
 		//fail("Not yet implemented");
 	}
 	@Test
+	public void testLoadFileVolocityBory() {
+//		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
+		String path = "/Users/miura/Desktop/bory3DmovieMaking/c0track.csv";		
+		TrackDataLoader tld = new TrackDataLoader();
+		tld.setColumnOrder(2, 1, 4, 5, 6);
+		ArrayList<TrajectoryObj> trajlist = tld.loadFileVolocity(path);
+		int counter = 0;
+		for (TrajectoryObj t : trajlist){
+			IJ.log("trackid: " + Double.toString(t.id));
+			counter = 0;
+			for (Point3f pos : t.dotList ){
+				IJ.log(Integer.toString(t.timepoints.get(counter)) + "\t" + 
+						Float.toString(pos.x) + "," +
+						Float.toString(pos.y) + "," +
+						Float.toString(pos.z));
+				counter++;
+			}
+		}
+		//fail("Not yet implemented");
+	}
+//	@Test
 	public void loadPointsFile() {
 		Plot4d p4d = new Plot4d();
-		String path = "/Users/miura/Dropbox/Mette/segmentation_z21-47t2-24_3CONVERTED.csv";
-		ArrayList<TrajectoryObj> trajlist = p4d.loadFileVolocity(path); 
+		String path = "/Users/miura/Dropbox/Mette/20_23h/segmentation_z21-47t2-24_3CONVERTED.csv";
+		TrackDataLoader tld = new TrackDataLoader();
+		ArrayList<DotObj> trajlist = tld.loadPointsFile(path);
 		//fail("Not yet implemented");
 	}
-	//@Test	
+	@Test	
 	public void PlotTimeColorCodedLineOnlyFinalFrame(){
 		//univ.show();
 		VirtualUniverse vu = new VirtualUniverse();
@@ -90,7 +149,7 @@ public class Plot4dTest {
 //	public void plotTrackDisplacements(){
 //		p4d.plotTrackDisplacements(timestart, timeend, this.trajlist, rx, ry, rz);
 //	}
-	@Test
+	//@Test
 	public void plotTrackNetDisplacementsPoint(){
 		Point3f refp = new Point3f(rx, ry, rz);
 		ArrayList<Point3f> ref = new ArrayList<Point3f>();
@@ -116,7 +175,7 @@ public class Plot4dTest {
 	public void plotTrackNetDispIncremental(){
 		p4d.plotTrackNetDispIncremental(timestart, timeend, this.trajlist, refline);
 	}
-	@Test
+	//@Test
 	public void datawriteTest() throws IOException{
 		String path = "/Users/miura/tmp";
 		p4d.saveNetDisplacementData(refline, path);

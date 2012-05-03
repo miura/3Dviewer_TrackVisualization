@@ -16,6 +16,7 @@ import ij3d.Image3DUniverse;
 import ij3d.ImageWindow3D;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -24,13 +25,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
@@ -56,8 +51,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.vecmath.Point3f;
 
 //import org.hamcrest.core.IsInstanceOf;
-
-import util.opencsv.CSVReader;
+import ij.io.OpenDialog;
 
 /**
  * @author miura
@@ -80,11 +74,24 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	boolean flagDynamicTrackNodes = false;	
 	Integer framestart = 0;
 	Integer frameend = 23;
+	Integer rx = 117;
+	Integer ry = 95;
+	Integer rz = 88;
+	Integer r0x = 117;
+	Integer r0y = 32;
+	Integer r0z = 20;	
+	Integer r1x = 121;
+	Integer r1y = 184;
+	Integer r1z = 20;	
+	Integer srx = 117;
+	Integer sry = 95;
+	Integer srz = 88;
+	String imgfilepath = "---";
 	
 	JFrame mainFrame;
 	JPanel panelTop;
 	JPanel panelToprow2;
-	private JPanel panelToprow3;
+	private JPanel panelToprow4;
 	
 	JPanel panelCenter;
 	JPanel panelCenterLeft;
@@ -98,8 +105,12 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	
 	JButton filechoosebutton = new JButton("Choose Track File...");
 	JRadioButton resultsTableImportSwitch = new JRadioButton();
+	JButton columnsetButton = new JButton("set column order...");
+	private JPanel panelToprow3;
+	private JButton imagefileButton = new JButton("set image stack path...");
+	private JLabel imagepathtext = new JLabel(imgfilepath);
 	JLabel filepathtext = new JLabel("---");
-
+	
 	// central panel
 	JTextField fieldStartframe = new JTextField(Integer.toString(framestart), 4);
 	JTextField fieldEndframe = new JTextField(Integer.toString(frameend), 4);	
@@ -146,8 +157,14 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private JButton highlightOnTrackButton;
 	private JButton highlightOffTrackButton;
 	private DefaultListModel trackList;
+	private JButton extractTrackButton;
 	private ArrayList<Content> highlightedList;
 	private boolean flagNetDispFull;
+	private JPanel panelExport;
+	private boolean flagFullIncrem;
+	private JPanel panelSphereCenter;
+	
+	Font font1verysmall = new Font("DefaultSmall", Font.PLAIN, 9);
 
 	public void showDialog(){
 		Font font1 = new Font("Default", Font.PLAIN, 12);
@@ -166,24 +183,33 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		Container contentPane = mainFrame.getContentPane();
 		//FileChooserPanle
 		panelTop = new JPanel();
-		panelTop.setLayout(new GridLayout(3, 1));
+		panelTop.setLayout(new GridLayout(4, 1));
 		panelTop.setBorder(BorderFactory.createTitledBorder("Data Source"));
 		panelTop.add(filechoosebutton);
-		filechoosebutton.setFont(font1small);
 		filechoosebutton.addActionListener(this);
 		
-
 		panelToprow2 = new JPanel();
 		panelToprow2.setLayout(new GridLayout(1, 2));
-		panelToprow2.add(resultsTableImportSwitch);
-		resultsTableImportSwitch.setText("Use ResultsTable");
-		resultsTableImportSwitch.setFont(font1small);
-		resultsTableImportSwitch.addActionListener(this);
+			resultsTableImportSwitch.setText("Use ResultsTable");
+			resultsTableImportSwitch.setFont(font1small);
+			resultsTableImportSwitch.addActionListener(this);
+			panelToprow2.add(resultsTableImportSwitch);
+			panelToprow2.add(columnsetButton);
+			columnsetButton.setFont(font1small);
+			columnsetButton.addActionListener(this);
 		panelTop.add(panelToprow2);
+
 		panelToprow3 = new JPanel();
-		panelToprow3.add(filepathtext);
-		filepathtext.setFont(font1small);
+		panelToprow3.setLayout(new GridLayout(1, 2));
+			panelToprow3.add(imagepathtext);
+			panelToprow3.add(imagefileButton);
+			imagefileButton.setFont(font1small);
+			imagefileButton.addActionListener(this);
 		panelTop.add(panelToprow3);
+		panelToprow4 = new JPanel();
+		panelToprow4.add(filepathtext);
+		filepathtext.setFont(font1small);
+		panelTop.add(panelToprow4);
 		
 		
 		// center, parameter choosing in the left and track lists in the right
@@ -293,7 +319,8 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		trackListPanel.setLayout(new BorderLayout());
 		trackListPanel.add(scrollPane, BorderLayout.CENTER);
 		list.addListSelectionListener
-        (new ToDoListSelectionHandler());
+        	(new ToDoListSelectionHandler());
+		
 		JPanel listSouth = new JPanel();
 		highlightOnTrackButton = new JButton("Highlight");
 		highlightOffTrackButton = new JButton("off");
@@ -301,6 +328,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		listSouth.add(highlightOnTrackButton, BoxLayout.X_AXIS);
 		highlightOnTrackButton.addActionListener(this);
 		highlightOffTrackButton.addActionListener(this);
+
+		extractTrackButton = new JButton("Extract");
+		listSouth.add(extractTrackButton, BoxLayout.X_AXIS);
+		extractTrackButton.addActionListener(this);
+		
 		trackListPanel.add(listSouth, BorderLayout.SOUTH);
 		return listModel;
 	}
@@ -330,7 +362,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			ArrayList<Integer> minmax;
 			this.datapath = fileChooseDialog();
 			filepathtext.setText(datapath);
-			minmax = getMinMaxFrame(datapath);
+			minmax = TrackDataLoader.getMinMaxFrame(datapath);
 			if (minmax.get(1) != null){
 				fieldStartframe.setText(minmax.get(0).toString());
 				fieldEndframe.setText(minmax.get(1).toString());
@@ -346,6 +378,26 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				filepathtext.setText(datapath);
 			}
 		}
+		if (arg0.getSource() == columnsetButton){
+			TrackDataLoader tdl = new TrackDataLoader();
+			tdl.columnsetter();
+		}
+		if (arg0.getSource() == imagefileButton){
+			OpenDialog od = new OpenDialog("Choose a hyperstack", "");		
+			if (od.getFileName() == "")
+				return;
+			String fullpath = od.getDirectory() + od.getFileName();
+			File ff = new File(fullpath);
+			if (ff.canRead() == false){
+				IJ.error("cannot read that file!");
+				return;
+			}
+			this.imgfilepath = fullpath;
+			imagepathtext.setText(this.imgfilepath);
+			imagepathtext.setFont(font1verysmall);
+			//imagepathtext.update(imagepathtext.getGraphics());
+		}
+		
 		if (arg0.getSource() == ColorCodedTracks){
 			if (ColorCodedTracks.isSelected()){
 				ColorCodedDyamicTracks.setSelected(false);
@@ -458,7 +510,18 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		if (arg0.getSource() == highlightOffTrackButton){
 			for(Content trackcontent:highlightedList)
 				univ.removeContent(trackcontent.getName());
-		}		
+		}
+		if (arg0.getSource() == extractTrackButton){
+			if (!list.isSelectionEmpty()) {
+				int index = list.getSelectedIndex();
+				TrajectoryObj currenttraj = p4d.trajlist.get(index);
+				int trackid = (int) Math.round(currenttraj.id);
+				PlotSIngleTrack pse = new PlotSIngleTrack(trackid);
+				pse.execute();
+			} else {
+				plotinfo.setText(plotinfohead + " ...track not selected");
+			}
+		}
 	}
 	
 	private void retrieveParameters(){
@@ -640,8 +703,9 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
     		Image3DUniverse univ = null;
     		univ = new Image3DUniverse();
     		this.univ = univ;		
-    		PlotNetDisplacement Lp4d = new PlotNetDisplacement(univ);
-    		ArrayList<TrajectoryObj> LtList = Lp4d.loadFileVolocity(datapath);
+    		TrackDataLoader tld = new TrackDataLoader();
+    		ArrayList<TrajectoryObj> LtList = tld.loadFileVolocity(datapath);
+    		PlotNetDisplacement Lp4d = new PlotNetDisplacement(univ, LtList);
     		IJ.log("File loaded...");
     		UnivContents.set(0, univ);
     		UnivContents.set(1, Lp4d);
@@ -780,7 +844,29 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
         	return null; 
         }	
     }
-*/ 
+    
+*/
+    class PlotSIngleTrack extends SwingWorker<ArrayList<Object>, Object> {
+    	int trackid;
+    	
+		/**
+		 * @param trackid
+		 */
+		public PlotSIngleTrack(int trackid) {
+			super();
+			this.trackid = trackid;
+		}
+
+		@Override
+		protected ArrayList<Object> doInBackground() throws Exception {
+			
+			SingleTackExtract se = new SingleTackExtract(datapath, imgfilepath, trackid);
+			se.showSingleTrack();
+			
+			return null;
+		}
+    	
+    }
     class SaveNetDispData extends SwingWorker<ArrayList<Object>, Object> {
     	PlotNetDisplacement pt4d;
     	String savepath;
@@ -803,48 +889,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 //		}
     
     }
-    static public ArrayList<Integer> getMinMaxFrame(String datapath){
 
-		File testaccess = new File(datapath);
-		if (!testaccess.exists()){
-			IJ.log("The file does not exists");
-			return null;
-		}
-		testaccess = null;
-		
-		CSVReader reader = null;
-		try {
-			reader = new CSVReader(new FileReader(datapath), ',');
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			IJ.log("file access failed");
-			e.printStackTrace();
-		}
-		List<String[]> ls = null;
-		try {
-			ls = reader.readAll();
-		} catch (IOException e) {
-			IJ.log("file reading failed");
-			e.printStackTrace();
-		}
-		Iterator<String[]> it = ls.iterator();
-		int counter = 0;
-		ArrayList<Integer> timepoints = new ArrayList<Integer>();
-		ArrayList<Integer> startendframeList = new ArrayList<Integer>();
-		while (it.hasNext()){
-			String[] cA = it.next();
-			if (counter != 0){
-	 			timepoints.add((int) (Double.valueOf(cA[2]).intValue()));  
-			}
-			counter++;
-		}
-	    Object objmax = Collections.max(timepoints);
-	    Object objmin = Collections.min(timepoints);
-	    startendframeList.add(Integer.valueOf(objmin.toString()));
-	    startendframeList.add(Integer.valueOf(objmax.toString()));
-	    IJ.log("min:" + objmin + " max:" + objmax);
-		return startendframeList;
-	}
 	
 	@Override
 	public void windowActivated(WindowEvent arg0) {

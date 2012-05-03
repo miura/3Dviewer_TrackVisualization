@@ -43,113 +43,22 @@ public class Plot4d {
 	public Plot4d(Image3DUniverse univ){
 		this.univ = univ;
 	}
+	public Plot4d(Image3DUniverse univ, ArrayList<TrajectoryObj> tList){
+		this.univ = univ;
+		this.trajlist = tList;
+	}	
 	/** No visualization, for access from scripts directly
 	 * 
 	 * @param datapath
 	 */
 	public Plot4d(String datapath, int datatype){
+		TrackDataLoader dataloader = new TrackDataLoader();
 		if (datatype == 0){
-			this.trajlist = loadFileVolocity(datapath);
-		}
-	}
 			
-	public ArrayList<TrajectoryObj> loadFileVolocity(String datapath){
+			this.trajlist = dataloader.loadFileVolocity(datapath);
+		}
+	}		
 
-		File testaccess = new File(datapath);
-		if (!testaccess.exists()){
-			IJ.log("The file does not exists");
-			return null;
-		}
-		testaccess = null;
-		
-		CSVReader reader = null;
-		try {
-			reader = new CSVReader(new FileReader(datapath), ',');
-		} catch (FileNotFoundException e) {
-			IJ.log("file access failed");
-			e.printStackTrace();
-		}
-		List<String[]> ls = null;
-		try {
-			ls = reader.readAll();
-		} catch (IOException e) {
-			IJ.log("file reading failed");
-			e.printStackTrace();
-		}
-		Iterator<String[]> it = ls.iterator();
-		int counter = 0;
-		double currentTrajID = 1;
-		ArrayList<Point3f> atraj = new ArrayList<Point3f>();
-		ArrayList<Integer> timepoints = new ArrayList<Integer>();
-		ArrayList<TrajectoryObj> trajlist = new ArrayList<TrajectoryObj>();
-		while (it.hasNext()){
-			String[] cA = it.next();
-			if (counter != 0){
-				if ((currentTrajID - Double.valueOf(cA[1]) != 0) && (atraj.size() > 0)){
-					//IJ.log(Double.toString(currentTrajID) + cA[1]);
-					TrajectoryObj atrajObj = new TrajectoryObj(currentTrajID, atraj, timepoints);
-					trajlist.add(atrajObj);
-					currentTrajID = Double.valueOf(cA[1]);
-					//cvec.clear();
-					atraj = new ArrayList<Point3f>();
-					timepoints = new ArrayList<Integer>();
-				}
-				// pixel positions
-	 			//cvec.add(Point3f(Double.valueOf(cA[3]),Double.valueOf(cA[4]),Double.valueOf(cA[5])));
-	 			// scaled positions
-	 			atraj.add(new Point3f(Float.valueOf(cA[6]),Float.valueOf(cA[7]),Float.valueOf(cA[8]))); 
-	 			timepoints.add((int) (Double.valueOf(cA[2]).intValue()));  
-			}
-			counter++;
-		}
-		this.trajlist = trajlist;
-		IJ.log("file loaded successfully");
-		return trajlist;
-	}
-	/** Loads coordinates of segmented particles.  
-	 * 
-	 * @param datapath full path to the csv file
-	 * 
-	 */
-	public ArrayList<DotObj> loadPointsFile(String datapath){
-
-		CSVReader reader = null;
-		try {
-			reader = new CSVReader(new FileReader(datapath), ',');
-		} catch (FileNotFoundException e) {
-			IJ.log("file access failed");
-			e.printStackTrace();
-		}
-		List<String[]> ls = null;
-		try {
-			ls = reader.readAll();
-		} catch (IOException e) {
-			IJ.log("file reading failed");
-			e.printStackTrace();
-		}
-		Iterator<String[]> it = ls.iterator();
-		int counter = 0;
-		double currentTrajID = 1.0;
-		ArrayList<DotObj> coords = new ArrayList<DotObj>();
-		while (it.hasNext()){
-			String[] cA = it.next();
-			if (counter != 0){
-				double pf = Double.valueOf(cA[2]);
-				double pmeanint = Double.valueOf(cA[7]);
-				double px = Double.valueOf(cA[10]);
-				double py = Double.valueOf(cA[11]);
-				double pz = Double.valueOf(cA[12]);
-				double sx = Double.valueOf(cA[13]);
-				double sy = Double.valueOf(cA[14]);
-				double sz = Double.valueOf(cA[15]);											
-				DotObj dotObj = new DotObj(pf, px, py, pz, sx, sy, sz, pmeanint);
-				coords.add(dotObj);
-			}
-			counter++;
-		}
-		this.coords = coords;
-		return coords;
-	}	
 	/**
 	 * check if a time point is included in the trajectory. 
 	 * @param timepoints
@@ -164,6 +73,22 @@ public class Plot4d {
 			IJ.log("timepoints array is null");
 		}
 		return includesthistime;
+	}
+	/** Check if there is next time point for this time point in data
+	 * 
+	 * @param thistimepoint
+	 * @param timepoints
+	 * @return
+	 */
+	public boolean nextTimePointExists(int thistimepoint, ArrayList<Integer> timepoints){
+		boolean exists = false;
+		for (int i=0; i < timepoints.size(); i++){
+			if (timepoints.get(i) == thistimepoint)
+				if ((i+1) < timepoints.size())
+					if (timepoints.get(i+1) == (thistimepoint+1))
+						exists = true;
+		}
+		return exists;
 	}
 
 	/** a method for retrieving index within trajectory object list. 
@@ -302,7 +227,8 @@ public class Plot4d {
 			cB = 1.0f - cR;
 			colornow = new Color3f(cR, 0.6f, cB);
 			for (TrajectoryObj curtraj : tList) {
-				if (CheckTimePointExists(i, curtraj.timepoints) && CheckTimePointExists(i+1, curtraj.timepoints)){
+//				if (CheckTimePointExists(i, curtraj.timepoints) && CheckTimePointExists(i+1, curtraj.timepoints)){
+				if (nextTimePointExists(i, curtraj.timepoints)){
 					ind = curtraj.timepoints.indexOf(i);
 					CustomLineMesh clm = new CustomLineMesh(curtraj.dotList.subList(ind, ind+2), CustomLineMesh.CONTINUOUS, colornow, 0.4f);
 					LineMultiMesh.add(clm);
@@ -968,7 +894,7 @@ public class Plot4d {
 	 * @param atrack
 	 * @return
 	 */
-	static public ArrayList<Float> getBoudingBox(ArrayList<Point3f> atrack){
+	static public ArrayList<Float> getBoudingBoxFloat(ArrayList<Point3f> atrack){
 		ArrayList<Float> bnd = new ArrayList<Float>(6);
 		bnd.add(atrack.get(0).x);
 		bnd.add(atrack.get(0).y);
@@ -983,6 +909,27 @@ public class Plot4d {
 			if (bnd.get(3) < item.x) bnd.set(3, item.x);
 			if (bnd.get(4) < item.y) bnd.set(4, item.y);
 			if (bnd.get(5) < item.z) bnd.set(5, item.z);
+		}
+		return bnd;		
+	}
+	/** calculate and returns the bounding box coordinates of a track. 
+	 * 
+	 */
+	static public ArrayList<Integer> getBoudingBox(ArrayList<Point3f> atrack){
+		ArrayList<Integer> bnd = new ArrayList<Integer>(6);
+		bnd.add(Math.round(atrack.get(0).x));
+		bnd.add(Math.round(atrack.get(0).y));
+		bnd.add(Math.round(atrack.get(0).z));
+		bnd.add(Math.round(atrack.get(0).x));
+		bnd.add(Math.round(atrack.get(0).y));
+		bnd.add(Math.round(atrack.get(0).z));
+		for (Point3f item : atrack){
+			if (bnd.get(0) > Math.round(item.x)) bnd.set(0, Math.round(item.x));
+			if (bnd.get(1) > Math.round(item.y)) bnd.set(1, Math.round(item.y));
+			if (bnd.get(2) > Math.round(item.z)) bnd.set(2, Math.round(item.z));
+			if (bnd.get(3) < Math.round(item.x)) bnd.set(3, Math.round(item.x));
+			if (bnd.get(4) < Math.round(item.y)) bnd.set(4, Math.round(item.y));
+			if (bnd.get(5) < Math.round(item.z)) bnd.set(5, Math.round(item.z));
 		}
 		return bnd;		
 	}

@@ -47,6 +47,6 @@ public class DialogVisualizeTracksTest {
 	@Test
 	public void testminmaxframe(){
 		DialogVisualizeTracks dg = new DialogVisualizeTracks();
-		dg.getMinMaxFrame(datapath);
+		TrackDataLoader.getMinMaxFrame(datapath);
 	}
 }
