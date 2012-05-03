@@ -138,27 +138,27 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 		TrajectoryObj atrajObj;
 		while (it.hasNext()){
 			String[] cA = it.next();
-			if (counter != 0){
-//				if ((currentTrajID - Double.valueOf(cA[p_trackid]) != 0) && (atraj.size() > 0)){
-			if (!trajIDexists(trajlist, Double.valueOf(cA[p_trackid]))){
+			if (counter > 0){
+				//				if ((currentTrajID - Double.valueOf(cA[p_trackid]) != 0) && (atraj.size() > 0)){
+				if (!trajIDexists(trajlist, Double.valueOf(cA[p_trackid]))){
 					//IJ.log(Double.toString(currentTrajID) + cA[1]);
-				atraj = new ArrayList<Point3f>();
-				timepoints = new ArrayList<Integer>();
-				atrajObj = new TrajectoryObj(Double.valueOf(cA[p_trackid]), atraj, timepoints);
-				trajlist.add(atrajObj);
+					atraj = new ArrayList<Point3f>();
+					timepoints = new ArrayList<Integer>();
+					atrajObj = new TrajectoryObj(Double.valueOf(cA[p_trackid]), atraj, timepoints);
+					trajlist.add(atrajObj);
 					//currentTrajID = Double.valueOf(cA[p_trackid]);
 					//cvec.clear();
-			} else {
-				atrajObj = getTrajObject(trajlist, Double.valueOf(cA[p_trackid]));
-				atraj = atrajObj.dotList;
-				timepoints = atrajObj.timepoints;
-				
-			}	
+				} else {
+					atrajObj = getTrajObject(trajlist, Double.valueOf(cA[p_trackid]));
+					atraj = atrajObj.dotList;
+					timepoints = atrajObj.timepoints;
+
+				}	
 				// pixel positions
-	 			//cvec.add(Point3f(Double.valueOf(cA[3]),Double.valueOf(cA[4]),Double.valueOf(cA[5])));
-	 			// scaled positions
-	 		atraj.add(new Point3f(Float.valueOf(cA[p_x]),Float.valueOf(cA[p_y]),Float.valueOf(cA[p_z]))); 
-	 		timepoints.add((int) (Double.valueOf(cA[p_frame]).intValue()));  
+				//cvec.add(Point3f(Double.valueOf(cA[3]),Double.valueOf(cA[4]),Double.valueOf(cA[5])));
+				// scaled positions
+				atraj.add(new Point3f(Float.valueOf(cA[p_x]),Float.valueOf(cA[p_y]),Float.valueOf(cA[p_z]))); 
+				timepoints.add((int) (Double.valueOf(cA[p_frame]).intValue()));  
 			}
 			counter++;
 		}
@@ -235,11 +235,11 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		if (arg0.getSource() == setbutton){
-			this.p_trackid = Integer.valueOf(fieldTrackid.getText());
-			this.p_frame = Integer.valueOf(fieldFrame.getText());			
-			this.p_x = Integer.valueOf(fieldx.getText());			
-			this.p_y = Integer.valueOf(fieldy.getText());			
-			this.p_z = Integer.valueOf(fieldz.getText());			
+			TrackDataLoader.p_trackid = Integer.valueOf(fieldTrackid.getText());
+			TrackDataLoader.p_frame = Integer.valueOf(fieldFrame.getText());			
+			TrackDataLoader.p_x = Integer.valueOf(fieldx.getText());			
+			TrackDataLoader.p_y = Integer.valueOf(fieldy.getText());			
+			TrackDataLoader.p_z = Integer.valueOf(fieldz.getText());			
 			testprintColumns();
 			WindowEvent windowClosing = new WindowEvent(this.mainFrame, WindowEvent.WINDOW_CLOSING);
 			mainFrame.dispatchEvent(windowClosing);
@@ -262,7 +262,14 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	public static void main(String[] args) {
         	TrackDataLoader tdl = new TrackDataLoader();
         	tdl.columnsetter();
-	}	
+	}
+	public void setColumnOrder(int p_trackid, int p_frame, int p_x, int p_y, int p_z){
+		TrackDataLoader.p_trackid = p_trackid;
+		TrackDataLoader.p_frame = p_frame;
+		TrackDataLoader.p_x = p_x;
+		TrackDataLoader.p_y = p_y;
+		TrackDataLoader.p_z = p_z;
+	}
 		
 	
 	/** Loads coordinates of segmented particles.  

@@ -74,6 +74,22 @@ public class Plot4d {
 		}
 		return includesthistime;
 	}
+	/** Check if there is next time point for this time point in data
+	 * 
+	 * @param thistimepoint
+	 * @param timepoints
+	 * @return
+	 */
+	public boolean nextTimePointExists(int thistimepoint, ArrayList<Integer> timepoints){
+		boolean exists = false;
+		for (int i=0; i < timepoints.size(); i++){
+			if (timepoints.get(i) == thistimepoint)
+				if ((i+1) < timepoints.size())
+					if (timepoints.get(i+1) == (thistimepoint+1))
+						exists = true;
+		}
+		return exists;
+	}
 
 	/** a method for retrieving index within trajectory object list. 
 	 * 
@@ -211,7 +227,8 @@ public class Plot4d {
 			cB = 1.0f - cR;
 			colornow = new Color3f(cR, 0.6f, cB);
 			for (TrajectoryObj curtraj : tList) {
-				if (CheckTimePointExists(i, curtraj.timepoints) && CheckTimePointExists(i+1, curtraj.timepoints)){
+//				if (CheckTimePointExists(i, curtraj.timepoints) && CheckTimePointExists(i+1, curtraj.timepoints)){
+				if (nextTimePointExists(i, curtraj.timepoints)){
 					ind = curtraj.timepoints.indexOf(i);
 					CustomLineMesh clm = new CustomLineMesh(curtraj.dotList.subList(ind, ind+2), CustomLineMesh.CONTINUOUS, colornow, 0.4f);
 					LineMultiMesh.add(clm);
