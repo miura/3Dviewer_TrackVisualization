@@ -10,18 +10,20 @@ package emblcmci.view3d;
  *  @author miura
  */
 import java.util.ArrayList;
+
+import javax.vecmath.Color3f;
 import javax.vecmath.Point3f;
 
 public class TrajectoryObj {
 	double id;
 	ArrayList<Point3f> dotList;
 	ArrayList<Integer> timepoints;
+	Color3f color;
 	
 	public TrajectoryObj(double id, ArrayList<Point3f> dotList, ArrayList<Integer> timepoints){
 		this.id = id;
 		this.dotList = dotList;
 		this.timepoints = timepoints; //a vector with time points of the trajectory. 
-
 	}
 
 	public ArrayList<Point3f> getDotList() {
@@ -30,5 +32,9 @@ public class TrajectoryObj {
 
 	public ArrayList<Integer> getTimepoints() {
 		return timepoints;
+	}
+	
+	public void setColor(Color3f color){
+		this.color = color;
 	}
 }

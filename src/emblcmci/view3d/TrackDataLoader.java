@@ -39,6 +39,8 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	
 	private JFrame mainFrame;
 	private JPanel panelTop;
+	// column position, the left most is 0th.
+	// volocity data: trackid=1, frame = 2, x = 6, y = 7, z = 8
 	static private int p_trackid = 1;
 	static private int p_frame = 2;
 	static private int p_x = 6;
