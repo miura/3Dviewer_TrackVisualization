@@ -27,6 +27,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.vecmath.Point3f;
@@ -46,17 +47,22 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	static private int p_x = 6;
 	static private int p_y = 7;
 	static private int p_z = 8;
-
+	static private int p_col = 10;
+	
 	JTextField fieldTrackid = new JTextField(Integer.toString(p_trackid), 4);	
 	JTextField fieldFrame = new JTextField(Integer.toString(p_frame), 4);	
 	JTextField fieldx = new JTextField(Integer.toString(p_x), 4);	
 	JTextField fieldy = new JTextField(Integer.toString(p_y), 4);		
 	JTextField fieldz = new JTextField(Integer.toString(p_z), 4);
+	JTextField fieldcolor = new JTextField(Integer.toString(p_col), 4);
+	private boolean switchTrackColor = false;
+	JRadioButton switchTrackColorButton = new JRadioButton("Color", switchTrackColor);
 	private JPanel paneltrackid;
 	private JPanel panelframe;		
 	private JPanel panelx;		
 	private JPanel panely;		
 	private JPanel panelz;
+	private JPanel panelcol;
 	private JPanel panelBottom;		
 	JButton setbutton = new JButton("Set");
 	JButton cancelbutton = new JButton("Cancel");	
@@ -66,7 +72,12 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 		TrackDataLoader tld = new TrackDataLoader();
 		tld.columnsetter();
 	}
-    static public ArrayList<Integer> getMinMaxFrame(String datapath){
+	
+	public boolean isSwitchTrackColor() {
+		return switchTrackColor;
+	}
+	
+	static public ArrayList<Integer> getMinMaxFrame(String datapath){
 
 		File testaccess = new File(datapath);
 		if (!testaccess.exists()){
@@ -206,11 +217,13 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 			panelx = fieldgenearator("x: ", fieldx);
 			panely = fieldgenearator("y: ", fieldy);
 			panelz = fieldgenearator("z: ", fieldz);
+			panelcol = fieldgenearatorOpt(switchTrackColorButton, "Color", fieldcolor);
 		panelTop.add(paneltrackid);
 		panelTop.add(panelframe);
 		panelTop.add(panelx);
 		panelTop.add(panely);
 		panelTop.add(panelz);
+		panelTop.add(panelcol);
 		
 		contentPane.add(panelTop, BorderLayout.CENTER);
 		
@@ -225,7 +238,8 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 		WindowManager.addWindow(mainFrame);
 		mainFrame.setVisible(true);		
 	}
-	
+
+	// default style
 	private JPanel fieldgenearator(String title, JTextField tf){
 		JPanel p = new JPanel();
 		//p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
@@ -234,6 +248,18 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 		p.add(tf);
 		return p;					
 	}
+	// optional style
+	private JPanel fieldgenearatorOpt(JRadioButton onoff, String title, JTextField tf){
+		JPanel p = new JPanel();
+		//p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
+		p.setLayout(new GridLayout(1, 2));
+		p.add(onoff);
+		p.add(tf);
+		//p.add(new JLabel(title));
+		p.add(tf);
+		return p;					
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		if (arg0.getSource() == setbutton){
@@ -241,7 +267,8 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 			TrackDataLoader.p_frame = Integer.valueOf(fieldFrame.getText());			
 			TrackDataLoader.p_x = Integer.valueOf(fieldx.getText());			
 			TrackDataLoader.p_y = Integer.valueOf(fieldy.getText());			
-			TrackDataLoader.p_z = Integer.valueOf(fieldz.getText());			
+			TrackDataLoader.p_z = Integer.valueOf(fieldz.getText());
+			TrackDataLoader.p_col = Integer.valueOf(fieldcolor.getText());
 			testprintColumns();
 			WindowEvent windowClosing = new WindowEvent(this.mainFrame, WindowEvent.WINDOW_CLOSING);
 			mainFrame.dispatchEvent(windowClosing);
@@ -258,6 +285,7 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 		IJ.log("x column: " + Integer.toString(p_x));
 		IJ.log("y column: " + Integer.toString(p_y));
 		IJ.log("z column: " + Integer.toString(p_z));
+		IJ.log("col column: " + Integer.toString(p_col));
 		
 	}
 	// for debugging, stand-alone
