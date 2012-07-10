@@ -32,7 +32,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.vecmath.Point3f;
 
-import emblcmci.view3d.DialogVisualizeTracks.DoPlot;
+//import emblcmci.view3d.DialogVisualizeTracks.DoPlot;
 
 import util.opencsv.CSVReader;
 
