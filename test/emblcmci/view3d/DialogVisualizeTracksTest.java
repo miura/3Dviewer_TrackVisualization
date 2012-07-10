@@ -41,7 +41,7 @@ public class DialogVisualizeTracksTest {
 //		dg.flagNetDisplacement = true;
 		dg.framestart = 0;
 		dg.frameend = 23;
-		DoPlot dp =  new DoPlot(this.univ, dg, dg.datapath);
+		DoPlot dp =  new DoPlot(dg, dg.datapath);
 		dp.execute();
 	}
 	//@Test

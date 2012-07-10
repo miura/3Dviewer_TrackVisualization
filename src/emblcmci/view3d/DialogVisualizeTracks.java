@@ -466,7 +466,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				//doPlotting();
 				if (this.univ != null)
 					this.univ.close();
-				DoPlot dp = new DoPlot(this.univ, this, datapath);
+				DoPlot dp = new DoPlot(this, datapath);
 				dp.execute();
 				
 			} else {

@@ -25,9 +25,9 @@ class DoPlot extends SwingWorker<ArrayList<Object>, Object> {
 //   	frame = DialogVisualizeTracks.this.mainFrame;
 //    }
     
-    public DoPlot(Image3DUniverse parentuniv ,DialogVisualizeTracks gui, String datapath) {
+    public DoPlot(DialogVisualizeTracks gui, String datapath) {
     	gui.mainFrame = frame;
-    	this.univ = parentuniv;
+//    	this.univ = parentuniv;
     	this.datapath = datapath;
     }
     
@@ -46,7 +46,7 @@ class DoPlot extends SwingWorker<ArrayList<Object>, Object> {
 		this.univ = univ;		
 		TrackDataLoader tld = new TrackDataLoader();
 		ArrayList<TrajectoryObj> LtList = tld.loadFileVolocity(datapath);
-		PlotNetDisplacement Lp4d = new PlotNetDisplacement(univ, LtList);
+		PlotNetDisplacement Lp4d = new PlotNetDisplacement(univ, LtList); // a class extending Plot4d
 		IJ.log("File loaded...");
 		UnivContents.set(0, univ);
 		UnivContents.set(1, Lp4d);
@@ -100,11 +100,11 @@ class DoPlot extends SwingWorker<ArrayList<Object>, Object> {
 			e.printStackTrace();
 		}
 		//if (univcontents.get(0) != null)
-			gui.univ = (Image3DUniverse) univcontents.get(0);
+//			gui.univ = (Image3DUniverse) univcontents.get(0);
 		//if (univcontents.get(1) != null)
-			gui.p4d = (PlotNetDisplacement) univcontents.get(1);
+//			gui.p4d = (PlotNetDisplacement) univcontents.get(1);
 		//if (univcontents.get(2) != null)
-			gui.tList = (ArrayList<TrajectoryObj>) univcontents.get(2);
+//			gui.tList = (ArrayList<TrajectoryObj>) univcontents.get(2);
 		if (univcontents.get(3) instanceof ij3d.Content)
 			gui.listColorcofdedTracks = (Content) univcontents.get(3);
 		if (univcontents.get(4) instanceof ArrayList<?>)
