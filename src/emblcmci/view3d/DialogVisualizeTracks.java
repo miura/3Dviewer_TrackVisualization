@@ -390,7 +390,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			}
 		}
 		if (arg0.getSource() == columnsetButton){
-			TrackDataLoader tdl = new TrackDataLoader();
+			TrackDataLoader tdl = new TrackDataLoader(vt);
 			tdl.columnsetter();
 		}
 		if (arg0.getSource() == imagefileButton){

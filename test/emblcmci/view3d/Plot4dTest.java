@@ -129,7 +129,7 @@ public class Plot4dTest {
 //		String path = "/Users/miura/Desktop/bory3DmovieMaking/c0track.csv";	
 		String path = "/Users/miura/Dropbox/ToDo/Pavel/dataconverted.csv";
 		TrackDataLoader tld = new TrackDataLoader();
-		tld.switchTrackColor = true;
+		tld.setSwitchTrackColor(true);
 		ArrayList<TrajectoryObj> trajlist = tld.loadFileVolocity(path);
 		int counter = 0;
 		for (TrajectoryObj t : trajlist){
@@ -137,10 +137,10 @@ public class Plot4dTest {
 			IJ.log("color" + t.color.x + t.color.y + t.color.z);
 			counter = 0;
 			for (Point3f pos : t.dotList ){
-				IJ.log(Integer.toString(t.timepoints.get(counter)) + "\t" + 
-						Float.toString(pos.x) + "," +
-						Float.toString(pos.y) + "," +
-						Float.toString(pos.z));
+//				IJ.log(Integer.toString(t.timepoints.get(counter)) + "\t" + 
+//						Float.toString(pos.x) + "," +
+//						Float.toString(pos.y) + "," +
+//						Float.toString(pos.z));
 				counter++;
 			}
 		}

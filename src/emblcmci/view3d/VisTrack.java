@@ -45,12 +45,12 @@ public class VisTrack {
 	ArrayList<Content> listDynamicTracks;
 	ArrayList<Content> listDynamicNodes;
 
-	// extended version
 	boolean flagNetDisplacement = false;
 	boolean flagNetDisplacementLineref = false;
 	boolean flagAngularDisplacement = false;
 	boolean flagNetDispFull;
 	boolean flagFullIncrem;
+	boolean useTrackColor;
 	public ArrayList<Content> listNetDisplacements;
 	public ArrayList<Content> listNetDisplacementsLineRef;
 

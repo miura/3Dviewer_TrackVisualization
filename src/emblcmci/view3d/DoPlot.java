@@ -36,9 +36,13 @@ class DoPlot extends SwingWorker<ArrayList<Object>, Object> {
 		vt.tList = tld.loadFileVolocity(datapath);		
 		vt.p4d = new PlotNetDisplacement(vt.univ, vt.tList); // a class extending Plot4d		
 		IJ.log("File loaded...");
+		IJ.log("Color option:" + vt.useTrackColor);
 		if ((vt.framestart != null) && (vt.frameend != null)){
 			if (vt.flagColorCodedTracks) {
-				vt.listColorcofdedTracks = vt.p4d.PlotTimeColorCodedLineOnlyFinalFrame(vt.framestart, vt.frameend, vt.tList);				
+				if (vt.useTrackColor)
+					vt.listColorcofdedTracks = vt.p4d.PlotColoredLineStatic(vt.framestart, vt.frameend, vt.tList);				
+				else
+					vt.listColorcofdedTracks = vt.p4d.PlotTimeColorCodedLineOnlyFinalFrame(vt.framestart, vt.frameend, vt.tList);				
 				IJ.log("3D track plotted");
 			}
 			if (vt.flagTrackNodes){
@@ -88,18 +92,18 @@ class DoPlot extends SwingWorker<ArrayList<Object>, Object> {
     protected void done() {
         //plotbut.setText("execute");
         //plotbut.setEnabled(true);
-		ArrayList<Object> univcontents = null;
-		try {
-			univcontents = get();
-		} catch (InterruptedException e) {
-			//IJ.log("timeout");
-			 showErrorDialog("timeout");
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-//			IJ.log("failed processing");
-			 showErrorDialog("failed processing");
-			e.printStackTrace();
-		}	
+//		ArrayList<Object> univcontents = null;
+//		try {
+//			univcontents = get();
+//		} catch (InterruptedException e) {
+//			//IJ.log("timeout");
+//			 showErrorDialog("timeout");
+//			e.printStackTrace();
+//		} catch (ExecutionException e) {
+////			IJ.log("failed processing");
+//			 showErrorDialog("failed processing");
+//			e.printStackTrace();
+//		}	
    		vt.univ.show();
 		vt.univwin = vt.univ.getWindow();	
 		vt.univwin.addWindowListener(vt.gui);

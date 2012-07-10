@@ -242,6 +242,27 @@ public class Plot4d {
 		return ccs;
 		
 	}
+	/** Plots tracks in static way (track in a single frame) 
+	 * ... uses lineMesh for rapid plotting. 
+	 * tracks are colored according to data (MTrackJ converted)
+	 * in collaboration with Pavel @ Arendt, 20120700
+	 * @return track contents.  
+	 */
+	public Content PlotColoredLineStatic(int timestart, int timeend, ArrayList<TrajectoryObj> tList){
+		CustomMultiMesh LineMultiMesh = new CustomMultiMesh();
+		Color3f col = new Color3f(1.0f, 1.0f, 1.0f);
+		for (TrajectoryObj curtraj : tList) {
+			if (curtraj.useDefinedColor)
+				col = curtraj.color;
+			IJ.log(curtraj.color.x +","+ curtraj.color.y +","+ curtraj.color.z);
+			CustomLineMesh clm = new CustomLineMesh(curtraj.dotList, CustomLineMesh.CONTINUOUS, col, 0.4f);
+			LineMultiMesh.add(clm);
+		}
+		Content ccs = ContentCreator.createContent(LineMultiMesh, "color_coded_Tracks", (int) 0);
+		univ.addContent(ccs);
+		ccs.setLocked(true);
+		return ccs;		
+	}		
 	/** creates line-track content from single track. 
 	 * 
 	 * @param tList

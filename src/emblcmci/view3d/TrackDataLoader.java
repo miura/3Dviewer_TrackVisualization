@@ -57,7 +57,7 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	JTextField fieldy = new JTextField(Integer.toString(p_y), 4);		
 	JTextField fieldz = new JTextField(Integer.toString(p_z), 4);
 	JTextField fieldcolor = new JTextField(Integer.toString(p_col), 4);
-	boolean switchTrackColor = false;
+	private static boolean switchTrackColor = false;
 	JRadioButton switchTrackColorButton = new JRadioButton("Color", switchTrackColor);
 	private JPanel paneltrackid;
 	private JPanel panelframe;		
@@ -67,7 +67,14 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	private JPanel panelcol;
 	private JPanel panelBottom;		
 	JButton setbutton = new JButton("Set");
-	JButton cancelbutton = new JButton("Cancel");	
+	JButton cancelbutton = new JButton("Cancel");
+	private VisTrack vt;	
+
+	public TrackDataLoader() {
+	}
+	public TrackDataLoader(VisTrack vt) {
+		this.vt = vt;
+	}
 
 	public void run(String arg) {
 		// TODO Auto-generated method stub
@@ -77,6 +84,9 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	
 	public boolean isSwitchTrackColor() {
 		return switchTrackColor;
+	}
+	static void setSwitchTrackColor(boolean switchTrackColor) {
+		TrackDataLoader.switchTrackColor = switchTrackColor;
 	}
 	
 	static public ArrayList<Integer> getMinMaxFrame(String datapath){
@@ -161,11 +171,12 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 					atraj = new ArrayList<Point3f>();
 					timepoints = new ArrayList<Integer>();
 					atrajObj = new TrajectoryObj(Double.valueOf(cA[p_trackid]), atraj, timepoints);
-					trajlist.add(atrajObj);
-					if (switchTrackColor && cA[p_col] != null){
+					if (switchTrackColor){
+						IJ.log(cA[p_col]);
 						atrajObj.setColor(stringHex2Color(cA[p_col]));
 						atrajObj.useDefinedColor = true;
 					}
+					trajlist.add(atrajObj);
 					//currentTrajID = Double.valueOf(cA[p_trackid]);
 					//cvec.clear();
 				} else {
@@ -236,6 +247,7 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 			panely = fieldgenearator("y: ", fieldy);
 			panelz = fieldgenearator("z: ", fieldz);
 			panelcol = fieldgenearatorOpt(switchTrackColorButton, "Color", fieldcolor);
+			switchTrackColorButton.addActionListener(this);
 		panelTop.add(paneltrackid);
 		panelTop.add(panelframe);
 		panelTop.add(panelx);
@@ -280,6 +292,8 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
+		if (arg0.getSource() == switchTrackColorButton)
+			switchTrackColor = switchTrackColorButton.isEnabled();
 		if (arg0.getSource() == setbutton){
 			TrackDataLoader.p_trackid = Integer.valueOf(fieldTrackid.getText());
 			TrackDataLoader.p_frame = Integer.valueOf(fieldFrame.getText());			
@@ -287,6 +301,11 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 			TrackDataLoader.p_y = Integer.valueOf(fieldy.getText());			
 			TrackDataLoader.p_z = Integer.valueOf(fieldz.getText());
 			TrackDataLoader.p_col = Integer.valueOf(fieldcolor.getText());
+			if (switchTrackColor){
+				vt.useTrackColor = true;
+				IJ.log("option chosen: use track color from data");
+			} else
+				IJ.log("option: none chosen");
 			testprintColumns();
 			WindowEvent windowClosing = new WindowEvent(this.mainFrame, WindowEvent.WINDOW_CLOSING);
 			mainFrame.dispatchEvent(windowClosing);
@@ -308,7 +327,8 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	}
 	// for debugging, stand-alone
 	public static void main(String[] args) {
-        	TrackDataLoader tdl = new TrackDataLoader();
+			VisTrack vt = new VisTrack();
+        	TrackDataLoader tdl = new TrackDataLoader(vt);
         	tdl.columnsetter();
 	}
 	public void setColumnOrder(int p_trackid, int p_frame, int p_x, int p_y, int p_z){
