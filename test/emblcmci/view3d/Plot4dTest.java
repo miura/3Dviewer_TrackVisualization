@@ -62,7 +62,7 @@ public class Plot4dTest {
 		refline.get(1).z = 63;
 		
 	}
-	@Before
+//	@Before
 	public void setupBoryFile(){
 		Image3DUniverse univ = new Image3DUniverse();
 		this.univ = univ;
@@ -102,7 +102,7 @@ public class Plot4dTest {
 		}
 		//fail("Not yet implemented");
 	}
-	@Test
+//	@Test
 	public void testLoadFileVolocityBory() {
 //		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
 		String path = "/Users/miura/Desktop/bory3DmovieMaking/c0track.csv";		
@@ -123,6 +123,30 @@ public class Plot4dTest {
 		}
 		//fail("Not yet implemented");
 	}
+	@Test
+	public void testLoadFilePavel() {
+//		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
+//		String path = "/Users/miura/Desktop/bory3DmovieMaking/c0track.csv";	
+		String path = "/Users/miura/Dropbox/ToDo/Pavel/dataconverted.csv";
+		TrackDataLoader tld = new TrackDataLoader();
+		tld.switchTrackColor = true;
+		ArrayList<TrajectoryObj> trajlist = tld.loadFileVolocity(path);
+		int counter = 0;
+		for (TrajectoryObj t : trajlist){
+			IJ.log("trackid: " + Double.toString(t.id));
+			IJ.log("color" + t.color.x + t.color.y + t.color.z);
+			counter = 0;
+			for (Point3f pos : t.dotList ){
+				IJ.log(Integer.toString(t.timepoints.get(counter)) + "\t" + 
+						Float.toString(pos.x) + "," +
+						Float.toString(pos.y) + "," +
+						Float.toString(pos.z));
+				counter++;
+			}
+		}
+		//fail("Not yet implemented");
+	}	
+						
 //	@Test
 	public void loadPointsFile() {
 		Plot4d p4d = new Plot4d();
@@ -131,7 +155,7 @@ public class Plot4dTest {
 		ArrayList<DotObj> trajlist = tld.loadPointsFile(path);
 		//fail("Not yet implemented");
 	}
-	@Test	
+	//@Test	
 	public void PlotTimeColorCodedLineOnlyFinalFrame(){
 		//univ.show();
 		VirtualUniverse vu = new VirtualUniverse();
