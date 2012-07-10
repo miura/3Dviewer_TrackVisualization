@@ -6,6 +6,8 @@ import ij3d.ImageWindow3D;
 
 import java.util.ArrayList;
 
+import javax.swing.JPanel;
+
 /**
  * Stores all the contents, including parameters set in the dialog. 
  * added afterwards for separating GUI and contents.  
@@ -23,7 +25,7 @@ public class VisTrack {
 	boolean flagColorCodedTracks = false;
 	boolean flagTrackNodes = false;
 	boolean flagDynamicColorCodedTracks = false;
-	boolean flagDynamicTrackNodes = false;	
+	boolean flagDynamicTrackNodes = false;
 	Integer framestart = 0;
 	Integer frameend = 23;
 	Integer rx = 117;
@@ -42,5 +44,14 @@ public class VisTrack {
 	ArrayList<Content> listStaticNodes;
 	ArrayList<Content> listDynamicTracks;
 	ArrayList<Content> listDynamicNodes;
+
+	// extended version
+	boolean flagNetDisplacement = false;
+	boolean flagNetDisplacementLineref = false;
+	boolean flagAngularDisplacement = false;
+	boolean flagNetDispFull;
+	boolean flagFullIncrem;
+	public ArrayList<Content> listNetDisplacements;
+	public ArrayList<Content> listNetDisplacementsLineRef;
 
 }

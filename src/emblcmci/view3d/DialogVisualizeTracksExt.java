@@ -64,89 +64,90 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 	private ImageWindow3D univwin;
 	Image3DUniverse univ;
 	ArrayList<TrajectoryObj> tList;
-	
-	//parameters
-	String datapath = "not selected yet";
-		//flags for plotting
-	boolean flagColorCodedTracks = false;
-	boolean flagTrackNodes = false;
-	boolean flagDynamicColorCodedTracks = false;
-	boolean flagDynamicTrackNodes = false;
-	boolean flagNetDisplacement = false;
-	boolean flagNetDisplacementLineref = false;
-	boolean flagAngularDisplacement = false;	
-	Integer framestart = 0;
-	Integer frameend = 23;
-	Integer rx = 117;
-	Integer ry = 95;
-	Integer rz = 88;
-	Integer r0x = 117;
-	Integer r0y = 32;
-	Integer r0z = 20;	
-	Integer r1x = 121;
-	Integer r1y = 184;
-	Integer r1z = 20;	
-	Integer srx = 117;
-	Integer sry = 95;
-	Integer srz = 88;
-	String imgfilepath = "---";
-	
-	JFrame mainFrame;
-	JPanel panelTop;
-	JPanel panelToprow2;
-	private JPanel panelToprow4;
-	
-	JPanel panelCenter;
-	JPanel panelCenterLeft;
-	//JPanel panelBottomRight;
 
-	private JPanel panelFrames;
-	private JPanel panelBottom;
-	private JPanel panelBottom1;
-	private JPanel panelBottom2;
+	VisTrack vt;
+	//parameters
+//	String datapath = "not selected yet";
+//		//flags for plotting
+//	boolean flagColorCodedTracks = false;
+//	boolean flagTrackNodes = false;
+//	boolean flagDynamicColorCodedTracks = false;
+//	boolean flagDynamicTrackNodes = false;
+//	boolean flagNetDisplacement = false;
+//	boolean flagNetDisplacementLineref = false;
+//	boolean flagAngularDisplacement = false;	
+//	Integer framestart = 0;
+//	Integer frameend = 23;
+//	Integer rx = 117;
+//	Integer ry = 95;
+//	Integer rz = 88;
+//	Integer r0x = 117;
+//	Integer r0y = 32;
+//	Integer r0z = 20;	
+//	Integer r1x = 121;
+//	Integer r1y = 184;
+//	Integer r1z = 20;	
+//	Integer srx = 117;
+//	Integer sry = 95;
+//	Integer srz = 88;
+//	String imgfilepath = "---";
+	
+//	JFrame mainFrame;
+//	JPanel panelTop;
+//	JPanel panelToprow2;
+//	private JPanel panelToprow4;
+//	
+//	JPanel panelCenter;
+//	JPanel panelCenterLeft;
+//	//JPanel panelBottomRight;
+//
+//	private JPanel panelFrames;
+//	private JPanel panelBottom;
+//	private JPanel panelBottom1;
+//	private JPanel panelBottom2;
 	private JPanel panelRefPoints;
 	private JPanel panelAngular;
-	
-	JButton filechoosebutton = new JButton("Choose Track File...");
-	JRadioButton resultsTableImportSwitch = new JRadioButton();
-	JButton columnsetButton = new JButton("set column order...");
-	private JPanel panelToprow3;
-	private JButton imagefileButton = new JButton("set image stack path...");
-	private JLabel imagepathtext = new JLabel(imgfilepath);
-	JLabel filepathtext = new JLabel("---");
-	
-	// central panel
-	JTextField fieldStartframe = new JTextField(Integer.toString(framestart), 4);
-	JTextField fieldEndframe = new JTextField(Integer.toString(frameend), 4);	
-	JCheckBox ColorCodedTracks = new JCheckBox("Tracks (3D only)");
-	JRadioButton switchColorCodedTracks = new JRadioButton();
-	JCheckBox TrackNodes = new JCheckBox("Nodes (3D only)");
-	JRadioButton switchTrackNodes = new JRadioButton();
-	JCheckBox ColorCodedDyamicTracks = new JCheckBox("Dynamic Tracks");
-	JCheckBox DynamicTrackNodes = new JCheckBox("Dynamic Nodes");
+//	
+//	JButton filechoosebutton = new JButton("Choose Track File...");
+//	JRadioButton resultsTableImportSwitch = new JRadioButton();
+//	JButton columnsetButton = new JButton("set column order...");
+//	private JPanel panelToprow3;
+//	private JButton imagefileButton = new JButton("set image stack path...");
+//	private JLabel imagepathtext = new JLabel(imgfilepath);
+//	JLabel filepathtext = new JLabel("---");
+//	
+//	// central panel
+//	JTextField fieldStartframe = new JTextField(Integer.toString(framestart), 4);
+//	JTextField fieldEndframe = new JTextField(Integer.toString(frameend), 4);	
+//	JCheckBox ColorCodedTracks = new JCheckBox("Tracks (3D only)");
+//	JRadioButton switchColorCodedTracks = new JRadioButton();
+//	JCheckBox TrackNodes = new JCheckBox("Nodes (3D only)");
+//	JRadioButton switchTrackNodes = new JRadioButton();
+//	JCheckBox ColorCodedDyamicTracks = new JCheckBox("Dynamic Tracks");
+//	JCheckBox DynamicTrackNodes = new JCheckBox("Dynamic Nodes");
 	JCheckBox NetDisplacements = new JCheckBox("Net Displacement (point ref)");
 	JRadioButton switchNetDisplacements = new JRadioButton();
-	private JTextField fieldRX = new JTextField(Integer.toString(rx));
-	private JTextField fieldRY = new JTextField(Integer.toString(ry));
-	private JTextField fieldRZ = new JTextField(Integer.toString(rz));
+	private JTextField fieldRX;
+	private JTextField fieldRY;
+	private JTextField fieldRZ;
 
-	JCheckBox NetDisplacementsLineRef = new JCheckBox("Net Displacement (line ref)");
-	JRadioButton switchNetDisplacementsLineRef = new JRadioButton();
-	private JTextField fieldR0X = new JTextField(Integer.toString(r0x));
-	private JTextField fieldR0Y = new JTextField(Integer.toString(r0y));
-	private JTextField fieldR0Z = new JTextField(Integer.toString(r0z));
-	private JTextField fieldR1X = new JTextField(Integer.toString(r1x));
-	private JTextField fieldR1Y = new JTextField(Integer.toString(r1y));
-	private JTextField fieldR1Z = new JTextField(Integer.toString(r1z));
+	JCheckBox NetDisplacementsLineRef;
+	JRadioButton switchNetDisplacementsLineRef;
+	private JTextField fieldR0X;
+	private JTextField fieldR0Y;
+	private JTextField fieldR0Z;
+	private JTextField fieldR1X;
+	private JTextField fieldR1Y;
+	private JTextField fieldR1Z;
 	
-	JRadioButton switchDispFullTrack = new JRadioButton();
-	JRadioButton switchDispIncrement = new JRadioButton();
-	private JButton exportNetDispbutton = new JButton("Export NetDisp Data");
-	
+//	JRadioButton switchDispFullTrack = new JRadioButton();
+//	JRadioButton switchDispIncrement = new JRadioButton();
+//	private JButton exportNetDispbutton;
+//	
 	JCheckBox NetAngular = new JCheckBox("Angular Displacements");
-	private JTextField AngfieldRX = new JTextField(Integer.toString(rx));
-	private JTextField AngfieldRY = new JTextField(Integer.toString(ry));
-	private JTextField AngfieldRZ = new JTextField(Integer.toString(rz));
+	private JTextField AngfieldRX;
+	private JTextField AngfieldRY;
+	private JTextField AngfieldRZ;
 	
 	JScrollPane scrollPane;
 	JTextArea textArea;
@@ -179,27 +180,56 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 	private JPanel panelNode3d;
 	private JPanel panelCenterRight;
 	private JList list;
-	private JButton highlightOnTrackButton;
-	private JButton highlightOffTrackButton;
-	private DefaultListModel trackList;
-	private JButton extractTrackButton;
-	private ArrayList<Content> highlightedList;
+//	private JButton highlightOnTrackButton;
+//	private JButton highlightOffTrackButton;
+//	private DefaultListModel trackList;
+//	private JButton extractTrackButton;
+//	private ArrayList<Content> highlightedList;
 	private JPanel panelSwitchDispResolution;
-	private boolean flagNetDispFull;
+//	private boolean flagNetDispFull;
 	private JPanel panelExport;
-	private boolean flagFullIncrem;
+//	private boolean flagFullIncrem;
 	private JPanel panelSphereCenter;
 	
 
 	Font font1verysmall = new Font("DefaultSmall", Font.PLAIN, 9);
+	/**
+	 * 
+	 */
+	public DialogVisualizeTracksExt() {
+		super();
+		// TODO Auto-generated constructor stub
+		this.vt = super.vt;
+		initializeComponentsExt();
+	}
+	public void initializeComponentsExt() {
+		NetDisplacements = new JCheckBox("Net Displacement (point ref)");
+		switchNetDisplacements = new JRadioButton();
+		fieldRX = new JTextField(Integer.toString(vt.rx));
+		fieldRY = new JTextField(Integer.toString(vt.ry));
+		fieldRZ = new JTextField(Integer.toString(vt.rz));
 
-	
+		NetDisplacementsLineRef = new JCheckBox("Net Displacement (line ref)");
+		switchNetDisplacementsLineRef = new JRadioButton();
+		fieldR0X = new JTextField(Integer.toString(vt.r0x));
+		fieldR0Y = new JTextField(Integer.toString(vt.r0y));
+		fieldR0Z = new JTextField(Integer.toString(vt.r0z));
+		fieldR1X = new JTextField(Integer.toString(vt.r1x));
+		fieldR1Y = new JTextField(Integer.toString(vt.r1y));
+		fieldR1Z = new JTextField(Integer.toString(vt.r1z));
+		
+//		exportNetDispbutton = new JButton("Export NetDisp Data");
+		AngfieldRX = new JTextField(Integer.toString(vt.rx));
+		AngfieldRY = new JTextField(Integer.toString(vt.ry));
+		AngfieldRZ = new JTextField(Integer.toString(vt.rz));
+	}
+
 	public void showDialog(){
-		Font font1 = new Font("Default", Font.PLAIN, 12);
+//		Font font1 = new Font("Default", Font.PLAIN, 12);
 		Font font1small = new Font("DefaultSmall", Font.PLAIN, 12);		
-		Font font2 = new Font("Serif", Font.BOLD, 15);
+//		Font font2 = new Font("Serif", Font.BOLD, 15);
 		Font font3 = new Font("Times New Roman", Font.ITALIC, 15);
-		Font font4 = new Font("Arial", Font.ITALIC|Font.BOLD, 12);
+//		Font font4 = new Font("Arial", Font.ITALIC|Font.BOLD, 12);
 		
 		JFrame mainFrame = new JFrame("Visualize Tracks");
 		this.mainFrame = mainFrame;
@@ -603,12 +633,12 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 				this.p4d = new PlotNetDisplacement(this.datapath, Plot4d.DATATYPE_VOLOCITY);
 			}
 			ArrayList<Point3f> ref = new ArrayList<Point3f>();
-			if (flagNetDisplacement) {
-				ref.add(new Point3f(rx, ry, rz));
+			if (vt.flagNetDisplacement) {
+				ref.add(new Point3f(vt.rx, vt.ry, vt.rz));
 				IJ.log("... exporting point reference net displacement vectors");
 			} else {
-				ref.add(new Point3f(r0x, r0y, r0z));
-				ref.add(new Point3f(r1x, r1y, r1z));
+				ref.add(new Point3f(vt.r0x, vt.r0y, vt.r0z));
+				ref.add(new Point3f(vt.r1x, vt.r1y, vt.r1z));
 				IJ.log("... exporting line reference net displacement vectors");
 			}
 			SaveNetDispData exporter = new SaveNetDispData(this.p4d, ref);
@@ -625,14 +655,15 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 				retrieveParameters();
 				plotinfo.setText(plotinfohead + this.datapath);
 				//doPlotting();
-				if (this.univ != null)
-					this.univ.close();
-				DoPlot dp = new DoPlot(this.univ);
+				if (vt.univ != null)
+					vt.univ.close();
+				DoPlot dp = new DoPlot(vt, datapath);
 				dp.execute();
 				
 			} else {
 				plotinfo.setText(plotinfohead + " need to set the frame range");
 			}
+		
 		}
 		if (arg0.getSource() == doclosebutton){
 			WindowEvent windowClosing = new WindowEvent(this.mainFrame, WindowEvent.WINDOW_CLOSING);
@@ -686,26 +717,26 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 	}
 	
 	private void retrieveParameters(){
-		framestart = Integer.valueOf(fieldStartframe.getText());
-		frameend = Integer.valueOf(fieldEndframe.getText());
-		flagColorCodedTracks = ColorCodedTracks.isSelected();
-		flagTrackNodes = TrackNodes.isSelected();
-		flagDynamicColorCodedTracks = ColorCodedDyamicTracks.isSelected();
-		flagDynamicTrackNodes = DynamicTrackNodes.isSelected();
-		flagNetDisplacement = NetDisplacements.isSelected();
-		flagNetDisplacementLineref = NetDisplacementsLineRef.isSelected();
-		flagNetDispFull = switchDispFullTrack.isSelected();
-		flagFullIncrem = switchDispIncrement.isSelected();
-		rx  = Integer.valueOf(fieldRX.getText());
-		ry  = Integer.valueOf(fieldRY.getText());
-		rz  = Integer.valueOf(fieldRZ.getText());
-		r0x  = Integer.valueOf(fieldR0X.getText());
-		r0y  = Integer.valueOf(fieldR0Y.getText());
-		r0z  = Integer.valueOf(fieldR0Z.getText());
-		r1x  = Integer.valueOf(fieldR1X.getText());
-		r1y  = Integer.valueOf(fieldR1Y.getText());
-		r1z  = Integer.valueOf(fieldR1Z.getText());
-		flagAngularDisplacement = NetAngular.isSelected();
+		vt.framestart = Integer.valueOf(fieldStartframe.getText());
+		vt.frameend = Integer.valueOf(fieldEndframe.getText());
+		vt.flagColorCodedTracks = ColorCodedTracks.isSelected();
+		vt.flagTrackNodes = TrackNodes.isSelected();
+		vt.flagDynamicColorCodedTracks = ColorCodedDyamicTracks.isSelected();
+		vt.flagDynamicTrackNodes = DynamicTrackNodes.isSelected();
+		vt.flagNetDisplacement = NetDisplacements.isSelected();
+		vt.flagNetDisplacementLineref = NetDisplacementsLineRef.isSelected();
+		vt.flagNetDispFull = switchDispFullTrack.isSelected();
+		vt.flagFullIncrem = switchDispIncrement.isSelected();
+		vt.rx  = Integer.valueOf(fieldRX.getText());
+		vt.ry  = Integer.valueOf(fieldRY.getText());
+		vt.rz  = Integer.valueOf(fieldRZ.getText());
+		vt.r0x  = Integer.valueOf(fieldR0X.getText());
+		vt.r0y  = Integer.valueOf(fieldR0Y.getText());
+		vt.r0z  = Integer.valueOf(fieldR0Z.getText());
+		vt.r1x  = Integer.valueOf(fieldR1X.getText());
+		vt.r1y  = Integer.valueOf(fieldR1Y.getText());
+		vt.r1z  = Integer.valueOf(fieldR1Z.getText());
+		vt.flagAngularDisplacement = NetAngular.isSelected();
 		
 	}
 	private class ToDoListSelectionHandler 
@@ -847,149 +878,149 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 		
 	}
 	*/
-	
-    // class for asynchronous processing
-	//@TODO for being really thread safe, returned values should be
-	//using returned List of values and captured using get() method inside done(). 
-	//in this case, type should be specified as List<Object> or so. 
-	// see http://itpro.nikkeibp.co.jp/article/COLUMN/20070413/268205/
-    class DoPlot extends SwingWorker<ArrayList<Object>, Object> {
-		private Image3DUniverse univ;
-		private JFrame frame;
-        public DoPlot() {
-        	frame = DialogVisualizeTracksExt.this.mainFrame;
-        }
-        
-        public DoPlot(Image3DUniverse parentuniv) {
-        	frame = DialogVisualizeTracksExt.this.mainFrame;
-        	this.univ = parentuniv;
-        }
-        
-         
-        //asynchronous processing
-        @Override
-        public ArrayList<Object> doInBackground() {
-            // processing that takes long time
-            //try {
-            //    TimeUnit.SECONDS.sleep(10L);
-            //} catch (InterruptedException ex) {}
-    		ArrayList<Object> UnivContents = new ArrayList<Object>();
-    		for (int i = 0; i < 10 ; i++) UnivContents.add(0);
-    		Image3DUniverse univ = null;
-    		univ = new Image3DUniverse();
-    		this.univ = univ;		
-    		TrackDataLoader tld = new TrackDataLoader();
-    		ArrayList<TrajectoryObj> LtList = tld.loadFileVolocity(datapath);
-    		PlotNetDisplacement Lp4d = new PlotNetDisplacement(univ, LtList);
-    		IJ.log("File loaded...");
-    		UnivContents.set(0, univ);
-    		UnivContents.set(1, Lp4d);
-    		UnivContents.set(2, LtList);
-    		
-    		if ((framestart != null) && (frameend != null)){
-    			if (flagColorCodedTracks) {
-    				Content LlistColorcofdedTracks = Lp4d.PlotTimeColorCodedLineOnlyFinalFrame(framestart, frameend, LtList);
-    				IJ.log("3D track plotted");
-    				UnivContents.set(3, LlistColorcofdedTracks);
-    			}
-    			if (flagTrackNodes){
-    				ArrayList<Content> LlistStaticNodes = Lp4d.plotTrajectorySpheres(framestart, frameend, LtList, true);
-    				IJ.log("Dynamic nodes plotted");
-    				UnivContents.set(4, LlistStaticNodes);
-    			}
-    			if (flagDynamicColorCodedTracks) {
-    				ArrayList<Content> LlistDynamicTracks = Lp4d.PlotTimeColorCodedLine(framestart, frameend, LtList);
-    				IJ.log("3D dynamic track plotting done");
-    				UnivContents.set(5, LlistDynamicTracks);
-    			}
-    			if (flagDynamicTrackNodes){
-    				ArrayList<Content> LlistDynamicNodes = Lp4d.plotTrajectorySpheres(framestart, frameend, LtList, false);
-    				IJ.log("Dynamic nodes plotted");
-    				UnivContents.set(6, LlistDynamicNodes);
-    			}
-    			if (flagNetDisplacement){
-    				ArrayList<Point3f> refpoint = new ArrayList<Point3f>();
-    				refpoint.add(new Point3f(rx, ry, rz));
-    				ArrayList<Content> LlistNetDisplacements;
-    				if (flagNetDispFull)
-    					LlistNetDisplacements = Lp4d.plotTrackNetDisplacements(framestart, frameend, LtList, refpoint);			
-    				else
-    					LlistNetDisplacements = Lp4d.plotTrackNetDispIncremental(framestart, frameend, LtList, refpoint);			
-    				IJ.log("Net Displacement vectors plotted");
-    				UnivContents.set(7, LlistNetDisplacements);
-    			}
-    			if (flagNetDisplacementLineref){
-    				ArrayList<Point3f> refline = new ArrayList<Point3f>();
-    				refline.add(new Point3f(r0x, r0y, r0z));
-    				refline.add(new Point3f(r1x, r1y, r1z));
-    				ArrayList<Content> LlistNetDisplacementsLineRef;
-    				if (flagNetDispFull)
-    					LlistNetDisplacementsLineRef = Lp4d.plotTrackNetDisplacements(framestart, frameend, LtList, refline);			
-    				else
-    					LlistNetDisplacementsLineRef = Lp4d.plotTrackNetDispIncremental(framestart, frameend, LtList, refline);			
-    				IJ.log("Net Displacement vectors (LineRef) plotted");
-    				UnivContents.set(8, LlistNetDisplacementsLineRef);
-    			}
-    			if (flagAngularDisplacement){
-    				ArrayList<Point3f> refpoint = new ArrayList<Point3f>();
-    				refpoint.add(new Point3f(srx, sry, srz));    				
-    				Lp4d.plotTrackAngularDispIncremental(framestart, frameend, LtList, refpoint);	
-    			}
-    		}
- 
-            return UnivContents;
-        }
-         
-        // processing to be done after the above process
-        //@SuppressWarnings("unchecked")
-		@Override
-        protected void done() {
-            //plotbut.setText("execute");
-            //plotbut.setEnabled(true);
-
-    		ArrayList<Object> univcontents = null;
-    		try {
-				univcontents = get();
-			} catch (InterruptedException e) {
-				//IJ.log("timeout");
-				 showErrorDialog("timeout");
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-//				IJ.log("failed processing");
-				 showErrorDialog("failed processing");
-				e.printStackTrace();
-			}
-			//if (univcontents.get(0) != null)
-				DialogVisualizeTracksExt.this.univ = (Image3DUniverse) univcontents.get(0);
-			//if (univcontents.get(1) != null)
-				DialogVisualizeTracksExt.this.p4d = (PlotNetDisplacement) univcontents.get(1);
-			//if (univcontents.get(2) != null)
-				DialogVisualizeTracksExt.this.tList = (ArrayList<TrajectoryObj>) univcontents.get(2);
-			if (univcontents.get(3) instanceof ij3d.Content)
-				DialogVisualizeTracksExt.this.listColorcofdedTracks = (Content) univcontents.get(3);
-			if (univcontents.get(4) instanceof ArrayList<?>)
-				DialogVisualizeTracksExt.this.listStaticNodes = (ArrayList<Content>) univcontents.get(4);
-			if (univcontents.get(5)  instanceof ArrayList<?>)
-				DialogVisualizeTracksExt.this.listDynamicTracks = (ArrayList<Content>) univcontents.get(5);
-			if (univcontents.get(6)  instanceof ArrayList<?>)
-				DialogVisualizeTracksExt.this.listDynamicNodes = (ArrayList<Content>) univcontents.get(6);
-			if (univcontents.get(7)  instanceof ArrayList<?>)
-				DialogVisualizeTracksExt.this.listNetDisplacements = (ArrayList<Content>) univcontents.get(7);
-			if (univcontents.get(8)  instanceof ArrayList<?>)
-				DialogVisualizeTracksExt.this.listNetDisplacementsLineRef = (ArrayList<Content>) univcontents.get(8);
-			
-       		DialogVisualizeTracksExt.this.univ.show();
-    		univwin = DialogVisualizeTracksExt.this.univ.getWindow();	
-    		univwin.addWindowListener(DialogVisualizeTracksExt.this);
-    		DialogVisualizeTracksExt.this.fillTrackList( DialogVisualizeTracksExt.this.trackList, DialogVisualizeTracksExt.this.tList);
-        }
-        private void showErrorDialog(String message) {
-            JOptionPane.showMessageDialog(frame, message, "failed...", JOptionPane.ERROR_MESSAGE);
-        }
+//	
+//    // class for asynchronous processing
+//	//@TODO for being really thread safe, returned values should be
+//	//using returned List of values and captured using get() method inside done(). 
+//	//in this case, type should be specified as List<Object> or so. 
+//	// see http://itpro.nikkeibp.co.jp/article/COLUMN/20070413/268205/
+//    class DoPlot extends SwingWorker<ArrayList<Object>, Object> {
+//		private Image3DUniverse univ;
+//		private JFrame frame;
+//        public DoPlot() {
+//        	frame = DialogVisualizeTracksExt.this.mainFrame;
+//        }
+//        
+//        public DoPlot(Image3DUniverse parentuniv) {
+//        	frame = DialogVisualizeTracksExt.this.mainFrame;
+//        	this.univ = parentuniv;
+//        }
+//        
+//         
+//        //asynchronous processing
+//        @Override
+//        public ArrayList<Object> doInBackground() {
+//            // processing that takes long time
+//            //try {
+//            //    TimeUnit.SECONDS.sleep(10L);
+//            //} catch (InterruptedException ex) {}
+//    		ArrayList<Object> UnivContents = new ArrayList<Object>();
+//    		for (int i = 0; i < 10 ; i++) UnivContents.add(0);
+//    		Image3DUniverse univ = null;
+//    		univ = new Image3DUniverse();
+//    		this.univ = univ;		
+//    		TrackDataLoader tld = new TrackDataLoader();
+//    		ArrayList<TrajectoryObj> LtList = tld.loadFileVolocity(datapath);
+//    		PlotNetDisplacement Lp4d = new PlotNetDisplacement(univ, LtList);
+//    		IJ.log("File loaded...");
+//    		UnivContents.set(0, univ);
+//    		UnivContents.set(1, Lp4d);
+//    		UnivContents.set(2, LtList);
+//    		
+//    		if ((vt.framestart != null) && (vt.frameend != null)){
+//    			if (vt.flagColorCodedTracks) {
+//    				Content LlistColorcofdedTracks = Lp4d.PlotTimeColorCodedLineOnlyFinalFrame(framestart, frameend, LtList);
+//    				IJ.log("3D track plotted");
+//    				UnivContents.set(3, LlistColorcofdedTracks);
+//    			}
+//    			if (vt.flagTrackNodes){
+//    				ArrayList<Content> LlistStaticNodes = Lp4d.plotTrajectorySpheres(framestart, frameend, LtList, true);
+//    				IJ.log("Dynamic nodes plotted");
+//    				UnivContents.set(4, LlistStaticNodes);
+//    			}
+//    			if (vt.flagDynamicColorCodedTracks) {
+//    				ArrayList<Content> LlistDynamicTracks = Lp4d.PlotTimeColorCodedLine(framestart, frameend, LtList);
+//    				IJ.log("3D dynamic track plotting done");
+//    				UnivContents.set(5, LlistDynamicTracks);
+//    			}
+//    			if (vt.flagDynamicTrackNodes){
+//    				ArrayList<Content> LlistDynamicNodes = Lp4d.plotTrajectorySpheres(framestart, frameend, LtList, false);
+//    				IJ.log("Dynamic nodes plotted");
+//    				UnivContents.set(6, LlistDynamicNodes);
+//    			}
+//    			if (vt.flagNetDisplacement){
+//    				ArrayList<Point3f> refpoint = new ArrayList<Point3f>();
+//    				refpoint.add(new Point3f(rx, ry, rz));
+//    				ArrayList<Content> LlistNetDisplacements;
+//    				if (vt.flagNetDispFull)
+//    					LlistNetDisplacements = Lp4d.plotTrackNetDisplacements(framestart, frameend, LtList, refpoint);			
+//    				else
+//    					LlistNetDisplacements = Lp4d.plotTrackNetDispIncremental(framestart, frameend, LtList, refpoint);			
+//    				IJ.log("Net Displacement vectors plotted");
+//    				UnivContents.set(7, LlistNetDisplacements);
+//    			}
+//    			if (vt.flagNetDisplacementLineref){
+//    				ArrayList<Point3f> refline = new ArrayList<Point3f>();
+//    				refline.add(new Point3f(r0x, r0y, r0z));
+//    				refline.add(new Point3f(r1x, r1y, r1z));
+//    				ArrayList<Content> LlistNetDisplacementsLineRef;
+//    				if (vt.flagNetDispFull)
+//    					LlistNetDisplacementsLineRef = Lp4d.plotTrackNetDisplacements(framestart, frameend, LtList, refline);			
+//    				else
+//    					LlistNetDisplacementsLineRef = Lp4d.plotTrackNetDispIncremental(framestart, frameend, LtList, refline);			
+//    				IJ.log("Net Displacement vectors (LineRef) plotted");
+//    				UnivContents.set(8, LlistNetDisplacementsLineRef);
+//    			}
+//    			if (vt.flagAngularDisplacement){
+//    				ArrayList<Point3f> refpoint = new ArrayList<Point3f>();
+//    				refpoint.add(new Point3f(vt.srx, vt.sry, vt.srz));    				
+//    				Lp4d.plotTrackAngularDispIncremental(vt.framestart, vt.frameend, LtList, refpoint);	
+//    			}
+//    		}
+// 
+//            return UnivContents;
+//        }
+//         
+//        // processing to be done after the above process
+//        //@SuppressWarnings("unchecked")
+//		@Override
+//        protected void done() {
+//            //plotbut.setText("execute");
+//            //plotbut.setEnabled(true);
+//
+//    		ArrayList<Object> univcontents = null;
+//    		try {
+//				univcontents = get();
+//			} catch (InterruptedException e) {
+//				//IJ.log("timeout");
+//				 showErrorDialog("timeout");
+//				e.printStackTrace();
+//			} catch (ExecutionException e) {
+////				IJ.log("failed processing");
+//				 showErrorDialog("failed processing");
+//				e.printStackTrace();
+//			}
+//			//if (univcontents.get(0) != null)
+//				DialogVisualizeTracksExt.this.univ = (Image3DUniverse) univcontents.get(0);
+//			//if (univcontents.get(1) != null)
+//				DialogVisualizeTracksExt.this.p4d = (PlotNetDisplacement) univcontents.get(1);
+//			//if (univcontents.get(2) != null)
+//				DialogVisualizeTracksExt.this.tList = (ArrayList<TrajectoryObj>) univcontents.get(2);
+//			if (univcontents.get(3) instanceof ij3d.Content)
+//				DialogVisualizeTracksExt.this.listColorcofdedTracks = (Content) univcontents.get(3);
+//			if (univcontents.get(4) instanceof ArrayList<?>)
+//				DialogVisualizeTracksExt.this.listStaticNodes = (ArrayList<Content>) univcontents.get(4);
+//			if (univcontents.get(5)  instanceof ArrayList<?>)
+//				DialogVisualizeTracksExt.this.listDynamicTracks = (ArrayList<Content>) univcontents.get(5);
+//			if (univcontents.get(6)  instanceof ArrayList<?>)
+//				DialogVisualizeTracksExt.this.listDynamicNodes = (ArrayList<Content>) univcontents.get(6);
+//			if (univcontents.get(7)  instanceof ArrayList<?>)
+//				DialogVisualizeTracksExt.this.listNetDisplacements = (ArrayList<Content>) univcontents.get(7);
+//			if (univcontents.get(8)  instanceof ArrayList<?>)
+//				DialogVisualizeTracksExt.this.listNetDisplacementsLineRef = (ArrayList<Content>) univcontents.get(8);
+//			
+//       		DialogVisualizeTracksExt.this.univ.show();
+//    		univwin = DialogVisualizeTracksExt.this.univ.getWindow();	
+//    		univwin.addWindowListener(DialogVisualizeTracksExt.this);
+//    		DialogVisualizeTracksExt.this.fillTrackList( DialogVisualizeTracksExt.this.trackList, DialogVisualizeTracksExt.this.tList);
+//        }
+//        private void showErrorDialog(String message) {
+//            JOptionPane.showMessageDialog(frame, message, "failed...", JOptionPane.ERROR_MESSAGE);
+//        }
                                      
           
         
-    }
+//    }
  
 //    class PlotSIngleTrack extends SwingWorker<ArrayList<Object>, Object> {
 //    	int trackid;

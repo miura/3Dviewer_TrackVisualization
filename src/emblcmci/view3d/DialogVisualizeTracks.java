@@ -69,15 +69,15 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	JFrame mainFrame;
 	JPanel panelTop;
 	JPanel panelToprow2;
-	private JPanel panelToprow4;
+	protected JPanel panelToprow4;
 	
 	JPanel panelCenter;
 	JPanel panelCenterLeft;
 
-	private JPanel panelFrames;
-	private JPanel panelBottom;
-	private JPanel panelBottom1;
-	private JPanel panelBottom2;
+	protected JPanel panelFrames;
+	protected JPanel panelBottom;
+	protected JPanel panelBottom1;
+	protected JPanel panelBottom2;
 
 	
 	JButton filechoosebutton;
@@ -100,7 +100,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	
 	JRadioButton switchDispFullTrack;
 	JRadioButton switchDispIncrement;
-	private JButton exportNetDispbutton;
+	JButton exportNetDispbutton;
 	
 	
 	JScrollPane scrollPane;
@@ -131,11 +131,11 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private JPanel panelNode3d;
 	private JPanel panelCenterRight;
 	private JList list;
-	private JButton highlightOnTrackButton;
-	private JButton highlightOffTrackButton;
+	protected JButton highlightOnTrackButton;
+	protected JButton highlightOffTrackButton;
 	DefaultListModel trackList;
-	private JButton extractTrackButton;
-	private ArrayList<Content> highlightedList;
+	protected JButton extractTrackButton;
+	protected ArrayList<Content> highlightedList;
 	private boolean flagNetDispFull;
 	private JPanel panelExport;
 	private boolean flagFullIncrem;
@@ -352,7 +352,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		trackListPanel.add(listSouth, BorderLayout.SOUTH);
 		return listModel;
 	}
-	void fillTrackList(DefaultListModel listModel, ArrayList<TrajectoryObj> tList){
+	public void fillTrackList(DefaultListModel listModel, ArrayList<TrajectoryObj> tList){
 		String trackname;
 		for (TrajectoryObj atrack : tList){
 			 trackname = "track " + Integer.toString( (int) atrack.id);
