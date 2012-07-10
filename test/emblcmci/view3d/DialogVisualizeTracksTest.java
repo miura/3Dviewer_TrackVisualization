@@ -39,9 +39,9 @@ public class DialogVisualizeTracksTest {
 		dg.datapath = "/Users/miura/Dropbox/Mette/Tracks.csv";
 		//dg.flagDynamicColorCodedTracks = true;
 //		dg.flagNetDisplacement = true;
-		dg.framestart = 0;
-		dg.frameend = 23;
-		DoPlot dp =  new DoPlot(dg, dg.datapath);
+		dg.vt.framestart = 0;
+		dg.vt.frameend = 23;
+		DoPlot dp =  new DoPlot(dg.vt, dg.datapath);
 		dp.execute();
 	}
 	//@Test
