@@ -69,15 +69,15 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	JFrame mainFrame;
 	JPanel panelTop;
 	JPanel panelToprow2;
-	private JPanel panelToprow4;
+	protected JPanel panelToprow4;
 	
 	JPanel panelCenter;
 	JPanel panelCenterLeft;
 
-	private JPanel panelFrames;
-	private JPanel panelBottom;
-	private JPanel panelBottom1;
-	private JPanel panelBottom2;
+	protected JPanel panelFrames;
+	protected JPanel panelBottom;
+	protected JPanel panelBottom1;
+	protected JPanel panelBottom2;
 
 	
 	JButton filechoosebutton;
@@ -98,9 +98,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	JCheckBox ColorCodedDyamicTracks;
 	JCheckBox DynamicTrackNodes;
 	
-	JRadioButton switchDispFullTrack;
-	JRadioButton switchDispIncrement;
-	private JButton exportNetDispbutton;
+//	JButton exportNetDispbutton;
 	
 	
 	JScrollPane scrollPane;
@@ -130,15 +128,15 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private JPanel panelTrack3d;
 	private JPanel panelNode3d;
 	private JPanel panelCenterRight;
-	private JList list;
-	private JButton highlightOnTrackButton;
-	private JButton highlightOffTrackButton;
+	protected JList list;
+	protected JButton highlightOnTrackButton;
+	protected JButton highlightOffTrackButton;
 	DefaultListModel trackList;
-	private JButton extractTrackButton;
-	private ArrayList<Content> highlightedList;
-	private boolean flagNetDispFull;
+	protected JButton extractTrackButton;
+	protected ArrayList<Content> highlightedList;
+//	private boolean flagNetDispFull;
 	private JPanel panelExport;
-	private boolean flagFullIncrem;
+//	private boolean flagFullIncrem;
 	private JPanel panelSphereCenter;
 	
 	Font font1verysmall = new Font("DefaultSmall", Font.PLAIN, 9);
@@ -171,9 +169,6 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		ColorCodedDyamicTracks = new JCheckBox("Dynamic Tracks");
 		DynamicTrackNodes = new JCheckBox("Dynamic Nodes");
 
-		switchDispFullTrack = new JRadioButton();
-		switchDispIncrement = new JRadioButton();
-		exportNetDispbutton = new JButton("Export NetDisp Data");
 		// bottom panel
 		plotinfo = new JLabel(plotinfohead);
 		doplotbutton = new JButton("Plot!");
@@ -352,7 +347,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		trackListPanel.add(listSouth, BorderLayout.SOUTH);
 		return listModel;
 	}
-	void fillTrackList(DefaultListModel listModel, ArrayList<TrajectoryObj> tList){
+	public void fillTrackList(DefaultListModel listModel, ArrayList<TrajectoryObj> tList){
 		String trackname;
 		for (TrajectoryObj atrack : tList){
 			 trackname = "track " + Integer.toString( (int) atrack.id);
@@ -449,29 +444,6 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				TrackNodes.setSelected(false);
 			}
 		}		
-
-		if (arg0.getSource() == switchDispFullTrack){
-			switchDispIncrement.setSelected(!switchDispFullTrack.isSelected());
-			exportNetDispbutton.setEnabled(false);
-		}
-		if (arg0.getSource() == switchDispIncrement){
-			switchDispFullTrack.setSelected(!switchDispIncrement.isSelected());
-			exportNetDispbutton.setEnabled(true);
-		}
-
-		if (arg0.getSource() == exportNetDispbutton){
-			if (this.datapath == null){
-				IJ.log("no data path provided for calculation");
-				return;
-			}
-			retrieveParameters();
-			if (vt.p4d == null){
-				vt.p4d = new PlotNetDisplacement(this.datapath, Plot4d.DATATYPE_VOLOCITY);
-			}
-			ArrayList<Point3f> ref = new ArrayList<Point3f>();
-			SaveNetDispData exporter = new SaveNetDispData(vt.p4d, ref);
-			exporter.execute();
-		}
 		
 		//*********** from here, bottom of the panel
 		if (arg0.getSource() == doplotbutton){
@@ -773,28 +745,28 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		}
     	
     }
-    class SaveNetDispData extends SwingWorker<ArrayList<Object>, Object> {
-    	PlotNetDisplacement pt4d;
-    	String savepath;
-		private ArrayList<Point3f> ref;
-    	public SaveNetDispData(PlotNetDisplacement pt4d, ArrayList<Point3f> ref){
-    		this.pt4d = pt4d;
-    		this.ref = ref;
-    	} 
-		@Override
-		protected ArrayList<Object> doInBackground() throws Exception {
-			DirectoryChooser dc = new DirectoryChooser("choose save detination");
-			savepath = dc.getDirectory();
-			IJ.log("target folder: " + savepath);
-			this.pt4d.saveNetDisplacementData(ref, savepath);
-			return null;
-		}
+//    class SaveNetDispData extends SwingWorker<ArrayList<Object>, Object> {
+//    	PlotNetDisplacement pt4d;
+//    	String savepath;
+//		private ArrayList<Point3f> ref;
+//    	public SaveNetDispData(PlotNetDisplacement pt4d, ArrayList<Point3f> ref){
+//    		this.pt4d = pt4d;
+//    		this.ref = ref;
+//    	} 
+//		@Override
+//		protected ArrayList<Object> doInBackground() throws Exception {
+//			DirectoryChooser dc = new DirectoryChooser("choose save detination");
+//			savepath = dc.getDirectory();
+//			IJ.log("target folder: " + savepath);
+//			this.pt4d.saveNetDisplacementData(ref, savepath);
+//			return null;
+//		}
 //		@Override
 //        protected void done() {
 //			// get()
 //		}
     
-    }
+//    }
 
 	
 	@Override

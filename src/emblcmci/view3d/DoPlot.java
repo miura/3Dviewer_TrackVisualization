@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
+import javax.vecmath.Point3f;
 
 // class for asynchronous processing
 //@TODO for being really thread safe, returned values should be
@@ -52,6 +53,32 @@ class DoPlot extends SwingWorker<ArrayList<Object>, Object> {
 				vt.listDynamicNodes = vt.p4d.plotTrajectorySpheres(vt.framestart, vt.frameend, vt.tList, false);
 				IJ.log("Dynamic nodes plotted");
 			}
+			// from here is extended
+			if (vt.flagNetDisplacement){
+				ArrayList<Point3f> refpoint = new ArrayList<Point3f>();
+				refpoint.add(new Point3f(vt.rx, vt.ry, vt.rz));
+				if (vt.flagNetDispFull)
+					vt.listNetDisplacements = vt.p4d.plotTrackNetDisplacements(vt.framestart, vt.frameend, vt.tList, refpoint);			
+				else
+					vt.listNetDisplacements = vt.p4d.plotTrackNetDispIncremental(vt.framestart, vt.frameend, vt.tList, refpoint);			
+				IJ.log("Net Displacement vectors plotted");
+			}
+			if (vt.flagNetDisplacementLineref){
+				ArrayList<Point3f> refline = new ArrayList<Point3f>();
+				refline.add(new Point3f(vt.r0x, vt.r0y, vt.r0z));
+				refline.add(new Point3f(vt.r1x, vt.r1y, vt.r1z));
+				//ArrayList<Content> LlistNetDisplacementsLineRef;
+				if (vt.flagNetDispFull)
+					vt.listNetDisplacementsLineRef = vt.p4d.plotTrackNetDisplacements(vt.framestart, vt.frameend, vt.tList, refline);			
+				else
+					vt.listNetDisplacementsLineRef = vt.p4d.plotTrackNetDispIncremental(vt.framestart, vt.frameend, vt.tList, refline);			
+				IJ.log("Net Displacement vectors (LineRef) plotted");
+			}
+			if (vt.flagAngularDisplacement){
+				ArrayList<Point3f> refpoint = new ArrayList<Point3f>();
+				refpoint.add(new Point3f(vt.srx, vt.sry, vt.srz));    				
+				vt.p4d.plotTrackAngularDispIncremental(vt.framestart, vt.frameend, vt.tList, refpoint);	
+			}			
 		}
         return null;
     }
