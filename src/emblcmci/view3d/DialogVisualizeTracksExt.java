@@ -59,72 +59,9 @@ import ij.io.OpenDialog;
  */
 public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements ActionListener, WindowListener {
 
-//	private PlotNetDisplacement p4d;
-//	//private PlotNetDisplacement p4dnet;
-//	private ImageWindow3D univwin;
-//	Image3DUniverse univ;
-//	ArrayList<TrajectoryObj> tList;
-
 	VisTrack vt;
-	//parameters
-//	String datapath = "not selected yet";
-//		//flags for plotting
-//	boolean flagColorCodedTracks = false;
-//	boolean flagTrackNodes = false;
-//	boolean flagDynamicColorCodedTracks = false;
-//	boolean flagDynamicTrackNodes = false;
-//	boolean flagNetDisplacement = false;
-//	boolean flagNetDisplacementLineref = false;
-//	boolean flagAngularDisplacement = false;	
-//	Integer framestart = 0;
-//	Integer frameend = 23;
-//	Integer rx = 117;
-//	Integer ry = 95;
-//	Integer rz = 88;
-//	Integer r0x = 117;
-//	Integer r0y = 32;
-//	Integer r0z = 20;	
-//	Integer r1x = 121;
-//	Integer r1y = 184;
-//	Integer r1z = 20;	
-//	Integer srx = 117;
-//	Integer sry = 95;
-//	Integer srz = 88;
-//	String imgfilepath = "---";
-	
-//	JFrame mainFrame;
-//	JPanel panelTop;
-//	JPanel panelToprow2;
-//	private JPanel panelToprow4;
-//	
-//	JPanel panelCenter;
-//	JPanel panelCenterLeft;
-//	//JPanel panelBottomRight;
-//
-//	private JPanel panelFrames;
-//	private JPanel panelBottom;
-//	private JPanel panelBottom1;
-//	private JPanel panelBottom2;
 	private JPanel panelRefPoints;
 	private JPanel panelAngular;
-//	
-//	JButton filechoosebutton = new JButton("Choose Track File...");
-//	JRadioButton resultsTableImportSwitch = new JRadioButton();
-//	JButton columnsetButton = new JButton("set column order...");
-//	private JPanel panelToprow3;
-//	private JButton imagefileButton = new JButton("set image stack path...");
-//	private JLabel imagepathtext = new JLabel(imgfilepath);
-//	JLabel filepathtext = new JLabel("---");
-//	
-//	// central panel
-//	JTextField fieldStartframe = new JTextField(Integer.toString(framestart), 4);
-//	JTextField fieldEndframe = new JTextField(Integer.toString(frameend), 4);	
-//	JCheckBox ColorCodedTracks = new JCheckBox("Tracks (3D only)");
-//	JRadioButton switchColorCodedTracks = new JRadioButton();
-//	JCheckBox TrackNodes = new JCheckBox("Nodes (3D only)");
-//	JRadioButton switchTrackNodes = new JRadioButton();
-//	JCheckBox ColorCodedDyamicTracks = new JCheckBox("Dynamic Tracks");
-//	JCheckBox DynamicTrackNodes = new JCheckBox("Dynamic Nodes");
 	JCheckBox NetDisplacements = new JCheckBox("Net Displacement (point ref)");
 	JRadioButton switchNetDisplacements = new JRadioButton();
 	private JTextField fieldRX;
@@ -142,6 +79,9 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 	
 //	JRadioButton switchDispFullTrack = new JRadioButton();
 //	JRadioButton switchDispIncrement = new JRadioButton();
+	JRadioButton switchDispFullTrack;
+	JRadioButton switchDispIncrement;
+	
 //	private JButton exportNetDispbutton;
 //	
 	JCheckBox NetAngular = new JCheckBox("Angular Displacements");
@@ -153,25 +93,11 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 	JTextArea textArea;
 	
 	//bottom
-//	String plotinfohead = "   Plot Info: ";
-//	JLabel plotinfo = new JLabel(plotinfohead);
-//	JButton doplotbutton = new JButton("Plot!");
-//	JButton doclosebutton = new JButton("Close");
-//	JButton doAddbutton = new JButton("Add");
 
-	
-	//examples (could be discarded)
-	JLabel label;
-	JButton button;
-	
 	//added later, to be organized
 	private JPanel panelBottom3;
 	private Content listColorcofdedTracks = null;
-//	private ArrayList<Content> listStaticNodes;
-//	private ArrayList<Content> listDynamicTracks;
-//	private ArrayList<Content> listDynamicNodes;
-//	private ArrayList<Content> listNetDisplacements;
-//	private ArrayList<Content> listNetDisplacementsLineRef;
+
 	private JPanel panelRef0Points;
 	private JPanel panelRef1Points;
 	static int clicknum = 0;
@@ -179,16 +105,12 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 	private JPanel panelTrack3d;
 	private JPanel panelNode3d;
 	private JPanel panelCenterRight;
-//	private JList list;
-//	private JButton highlightOnTrackButton;
-//	private JButton highlightOffTrackButton;
-//	private DefaultListModel trackList;
-//	private JButton extractTrackButton;
-//	private ArrayList<Content> highlightedList;
+
+
 	private JPanel panelSwitchDispResolution;
-//	private boolean flagNetDispFull;
+	private boolean flagNetDispFull;
 	private JPanel panelExport;
-//	private boolean flagFullIncrem;
+	private boolean flagFullIncrem;
 	private JPanel panelSphereCenter;
 	
 
@@ -203,6 +125,9 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 		initializeComponentsExt();
 	}
 	public void initializeComponentsExt() {
+		switchDispFullTrack = new JRadioButton();
+		switchDispIncrement = new JRadioButton();
+		
 		NetDisplacements = new JCheckBox("Net Displacement (point ref)");
 		switchNetDisplacements = new JRadioButton();
 		fieldRX = new JTextField(Integer.toString(vt.rx));

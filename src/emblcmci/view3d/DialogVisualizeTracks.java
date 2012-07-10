@@ -98,8 +98,6 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	JCheckBox ColorCodedDyamicTracks;
 	JCheckBox DynamicTrackNodes;
 	
-	JRadioButton switchDispFullTrack;
-	JRadioButton switchDispIncrement;
 	JButton exportNetDispbutton;
 	
 	
@@ -136,9 +134,9 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	DefaultListModel trackList;
 	protected JButton extractTrackButton;
 	protected ArrayList<Content> highlightedList;
-	private boolean flagNetDispFull;
+//	private boolean flagNetDispFull;
 	private JPanel panelExport;
-	private boolean flagFullIncrem;
+//	private boolean flagFullIncrem;
 	private JPanel panelSphereCenter;
 	
 	Font font1verysmall = new Font("DefaultSmall", Font.PLAIN, 9);
@@ -171,8 +169,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		ColorCodedDyamicTracks = new JCheckBox("Dynamic Tracks");
 		DynamicTrackNodes = new JCheckBox("Dynamic Nodes");
 
-		switchDispFullTrack = new JRadioButton();
-		switchDispIncrement = new JRadioButton();
+
 		exportNetDispbutton = new JButton("Export NetDisp Data");
 		// bottom panel
 		plotinfo = new JLabel(plotinfohead);
