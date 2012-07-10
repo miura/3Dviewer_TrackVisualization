@@ -59,11 +59,11 @@ import ij.io.OpenDialog;
  */
 public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements ActionListener, WindowListener {
 
-	private PlotNetDisplacement p4d;
-	//private PlotNetDisplacement p4dnet;
-	private ImageWindow3D univwin;
-	Image3DUniverse univ;
-	ArrayList<TrajectoryObj> tList;
+//	private PlotNetDisplacement p4d;
+//	//private PlotNetDisplacement p4dnet;
+//	private ImageWindow3D univwin;
+//	Image3DUniverse univ;
+//	ArrayList<TrajectoryObj> tList;
 
 	VisTrack vt;
 	//parameters
@@ -153,11 +153,11 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 	JTextArea textArea;
 	
 	//bottom
-	String plotinfohead = "   Plot Info: ";
-	JLabel plotinfo = new JLabel(plotinfohead);
-	JButton doplotbutton = new JButton("Plot!");
-	JButton doclosebutton = new JButton("Close");
-	JButton doAddbutton = new JButton("Add");
+//	String plotinfohead = "   Plot Info: ";
+//	JLabel plotinfo = new JLabel(plotinfohead);
+//	JButton doplotbutton = new JButton("Plot!");
+//	JButton doclosebutton = new JButton("Close");
+//	JButton doAddbutton = new JButton("Add");
 
 	
 	//examples (could be discarded)
@@ -167,11 +167,11 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 	//added later, to be organized
 	private JPanel panelBottom3;
 	private Content listColorcofdedTracks = null;
-	private ArrayList<Content> listStaticNodes;
-	private ArrayList<Content> listDynamicTracks;
-	private ArrayList<Content> listDynamicNodes;
-	private ArrayList<Content> listNetDisplacements;
-	private ArrayList<Content> listNetDisplacementsLineRef;
+//	private ArrayList<Content> listStaticNodes;
+//	private ArrayList<Content> listDynamicTracks;
+//	private ArrayList<Content> listDynamicNodes;
+//	private ArrayList<Content> listNetDisplacements;
+//	private ArrayList<Content> listNetDisplacementsLineRef;
 	private JPanel panelRef0Points;
 	private JPanel panelRef1Points;
 	static int clicknum = 0;
@@ -179,7 +179,7 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 	private JPanel panelTrack3d;
 	private JPanel panelNode3d;
 	private JPanel panelCenterRight;
-	private JList list;
+//	private JList list;
 //	private JButton highlightOnTrackButton;
 //	private JButton highlightOffTrackButton;
 //	private DefaultListModel trackList;
@@ -629,8 +629,8 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 				return;
 			}
 			retrieveParameters();
-			if (this.p4d == null){
-				this.p4d = new PlotNetDisplacement(this.datapath, Plot4d.DATATYPE_VOLOCITY);
+			if (vt.p4d == null){
+				vt.p4d = new PlotNetDisplacement(this.datapath, Plot4d.DATATYPE_VOLOCITY);
 			}
 			ArrayList<Point3f> ref = new ArrayList<Point3f>();
 			if (vt.flagNetDisplacement) {
@@ -641,7 +641,7 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 				ref.add(new Point3f(vt.r1x, vt.r1y, vt.r1z));
 				IJ.log("... exporting line reference net displacement vectors");
 			}
-			SaveNetDispData exporter = new SaveNetDispData(this.p4d, ref);
+			SaveNetDispData exporter = new SaveNetDispData(vt.p4d, ref);
 			exporter.execute();
 		}
 		if (arg0.getSource() == NetAngular){
@@ -692,21 +692,21 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 		if (arg0.getSource() == highlightOnTrackButton){
 			if (!list.isSelectionEmpty()) {
 				int index = list.getSelectedIndex();
-				Content httrack = p4d.HighlightSelectedSingleTrack(tList, index);
+				Content httrack = vt.p4d.HighlightSelectedSingleTrack(vt.tList, index);
 				highlightedList.add(httrack);
-				plotinfo.setText(trackinfotext(tList, index, plotinfohead));
+				plotinfo.setText(trackinfotext(vt.tList, index, plotinfohead));
 			} else {
 				plotinfo.setText(plotinfohead + " ...track not selected");
 			}
 		}
 		if (arg0.getSource() == highlightOffTrackButton){
 			for(Content trackcontent:highlightedList)
-				univ.removeContent(trackcontent.getName());
+				vt.univ.removeContent(trackcontent.getName());
 		}
 		if (arg0.getSource() == extractTrackButton){
 			if (!list.isSelectionEmpty()) {
 				int index = list.getSelectedIndex();
-				TrajectoryObj currenttraj = p4d.trajlist.get(index);
+				TrajectoryObj currenttraj = vt.p4d.trajlist.get(index);
 				int trackid = (int) Math.round(currenttraj.id);
 				PlotSIngleTrack pse = new PlotSIngleTrack(trackid);
 				pse.execute();
@@ -748,7 +748,7 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 				return;
 			}
 			int index = DialogVisualizeTracksExt.this.list.getSelectedIndex();
-			plotinfo.setText(trackinfotext(tList, index, plotinfohead));
+			plotinfo.setText(trackinfotext(vt.tList, index, plotinfohead));
 		}
 
 	}

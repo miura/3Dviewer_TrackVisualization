@@ -130,7 +130,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private JPanel panelTrack3d;
 	private JPanel panelNode3d;
 	private JPanel panelCenterRight;
-	private JList list;
+	protected JList list;
 	protected JButton highlightOnTrackButton;
 	protected JButton highlightOffTrackButton;
 	DefaultListModel trackList;
