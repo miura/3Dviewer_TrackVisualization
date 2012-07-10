@@ -59,9 +59,9 @@ import ij.io.OpenDialog;
  */
 public class DialogVisualizeTracks implements ActionListener, WindowListener {
 
-	private PlotNetDisplacement p4d;
+	PlotNetDisplacement p4d;
 	//private PlotNetDisplacement p4dnet;
-	private ImageWindow3D univwin;
+	ImageWindow3D univwin;
 	Image3DUniverse univ;
 	ArrayList<TrajectoryObj> tList;
 	
@@ -143,10 +143,10 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	
 	//added later, to be organized
 	private JPanel panelBottom3;
-	private Content listColorcofdedTracks = null;
-	private ArrayList<Content> listStaticNodes;
-	private ArrayList<Content> listDynamicTracks;
-	private ArrayList<Content> listDynamicNodes;
+	Content listColorcofdedTracks = null;
+	ArrayList<Content> listStaticNodes;
+	ArrayList<Content> listDynamicTracks;
+	ArrayList<Content> listDynamicNodes;
 
 	static int clicknum = 0;
 
@@ -156,7 +156,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private JList list;
 	private JButton highlightOnTrackButton;
 	private JButton highlightOffTrackButton;
-	private DefaultListModel trackList;
+	DefaultListModel trackList;
 	private JButton extractTrackButton;
 	private ArrayList<Content> highlightedList;
 	private boolean flagNetDispFull;
