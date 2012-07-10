@@ -74,7 +74,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	boolean flagDynamicTrackNodes = false;
 	boolean flagNetDisplacement = false;
 	boolean flagNetDisplacementLineref = false;
-	private boolean flagAngularDisplacement = false;	
+	boolean flagAngularDisplacement = false;	
 	Integer framestart = 0;
 	Integer frameend = 23;
 	Integer rx = 117;
