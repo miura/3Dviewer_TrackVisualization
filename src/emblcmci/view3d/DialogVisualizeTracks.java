@@ -59,71 +59,45 @@ import ij.io.OpenDialog;
  */
 public class DialogVisualizeTracks implements ActionListener, WindowListener {
 
-	PlotNetDisplacement p4d;
-	//private PlotNetDisplacement p4dnet;
-	ImageWindow3D univwin;
-	Image3DUniverse univ;
-	ArrayList<TrajectoryObj> tList;
+	VisTrack vt;
 	
 	//parameters
 	String datapath = "not selected yet";
-		//flags for plotting
-	boolean flagColorCodedTracks = false;
-	boolean flagTrackNodes = false;
-	boolean flagDynamicColorCodedTracks = false;
-	boolean flagDynamicTrackNodes = false;	
-	Integer framestart = 0;
-	Integer frameend = 23;
-	Integer rx = 117;
-	Integer ry = 95;
-	Integer rz = 88;
-	Integer r0x = 117;
-	Integer r0y = 32;
-	Integer r0z = 20;	
-	Integer r1x = 121;
-	Integer r1y = 184;
-	Integer r1z = 20;	
-	Integer srx = 117;
-	Integer sry = 95;
-	Integer srz = 88;
 	String imgfilepath = "---";
 	
 	JFrame mainFrame;
 	JPanel panelTop;
 	JPanel panelToprow2;
-	private JPanel panelToprow4;
+	protected JPanel panelToprow4;
 	
 	JPanel panelCenter;
 	JPanel panelCenterLeft;
-	//JPanel panelBottomRight;
 
-	private JPanel panelFrames;
-	private JPanel panelBottom;
-	private JPanel panelBottom1;
-	private JPanel panelBottom2;
+	protected JPanel panelFrames;
+	protected JPanel panelBottom;
+	protected JPanel panelBottom1;
+	protected JPanel panelBottom2;
 
 	
-	JButton filechoosebutton = new JButton("Choose Track File...");
-	JRadioButton resultsTableImportSwitch = new JRadioButton();
-	JButton columnsetButton = new JButton("set column order...");
-	private JPanel panelToprow3;
-	private JButton imagefileButton = new JButton("set image stack path...");
-	private JLabel imagepathtext = new JLabel(imgfilepath);
-	JLabel filepathtext = new JLabel("---");
+	JButton filechoosebutton;
+	JRadioButton resultsTableImportSwitch;
+	JButton columnsetButton;
+	JPanel panelToprow3;
+	JButton imagefileButton;
+	JLabel imagepathtext;
+	JLabel filepathtext;
 	
 	// central panel
-	JTextField fieldStartframe = new JTextField(Integer.toString(framestart), 4);
-	JTextField fieldEndframe = new JTextField(Integer.toString(frameend), 4);	
-	JCheckBox ColorCodedTracks = new JCheckBox("Tracks (3D only)");
-	JRadioButton switchColorCodedTracks = new JRadioButton();
-	JCheckBox TrackNodes = new JCheckBox("Nodes (3D only)");
-	JRadioButton switchTrackNodes = new JRadioButton();
-	JCheckBox ColorCodedDyamicTracks = new JCheckBox("Dynamic Tracks");
-	JCheckBox DynamicTrackNodes = new JCheckBox("Dynamic Nodes");
+	JTextField fieldStartframe;
+	JTextField fieldEndframe;	
+	JCheckBox ColorCodedTracks;
+	JRadioButton switchColorCodedTracks ;
+	JCheckBox TrackNodes ;
+	JRadioButton switchTrackNodes;
+	JCheckBox ColorCodedDyamicTracks;
+	JCheckBox DynamicTrackNodes;
 	
-	JRadioButton switchDispFullTrack = new JRadioButton();
-	JRadioButton switchDispIncrement = new JRadioButton();
-	private JButton exportNetDispbutton = new JButton("Export NetDisp Data");
+//	JButton exportNetDispbutton;
 	
 	
 	JScrollPane scrollPane;
@@ -131,10 +105,10 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	
 	//bottom
 	String plotinfohead = "   Plot Info: ";
-	JLabel plotinfo = new JLabel(plotinfohead);
-	JButton doplotbutton = new JButton("Plot!");
-	JButton doclosebutton = new JButton("Close");
-	JButton doAddbutton = new JButton("Add");
+	JLabel plotinfo;
+	JButton doplotbutton;
+	JButton doclosebutton;
+	JButton doAddbutton;
 
 	
 	//examples (could be discarded)
@@ -153,20 +127,56 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	private JPanel panelTrack3d;
 	private JPanel panelNode3d;
 	private JPanel panelCenterRight;
-	private JList list;
-	private JButton highlightOnTrackButton;
-	private JButton highlightOffTrackButton;
+	protected JList list;
+	protected JButton highlightOnTrackButton;
+	protected JButton highlightOffTrackButton;
 	DefaultListModel trackList;
-	private JButton extractTrackButton;
-	private ArrayList<Content> highlightedList;
-	private boolean flagNetDispFull;
+	protected JButton extractTrackButton;
+	protected ArrayList<Content> highlightedList;
+//	private boolean flagNetDispFull;
 	private JPanel panelExport;
-	private boolean flagFullIncrem;
+//	private boolean flagFullIncrem;
 	private JPanel panelSphereCenter;
 	
 	Font font1verysmall = new Font("DefaultSmall", Font.PLAIN, 9);
 
+	
+	public DialogVisualizeTracks() {
+		super();
+		VisTrack vt = new VisTrack();
+		this.vt = vt;
+		vt.gui = this;
+		initializeComponents();
+	}
+
+	public void initializeComponents() {
+		filechoosebutton = new JButton("Choose Track File...");
+		resultsTableImportSwitch = new JRadioButton();
+		columnsetButton = new JButton("set column order...");
+
+		imagefileButton = new JButton("set image stack path...");
+		imagepathtext = new JLabel(imgfilepath);
+		filepathtext = new JLabel("---");
+
+		// central panel
+		fieldStartframe = new JTextField(Integer.toString(vt.framestart), 4);
+		fieldEndframe = new JTextField(Integer.toString(vt.frameend), 4);
+		ColorCodedTracks = new JCheckBox("Tracks (3D only)");
+		switchColorCodedTracks = new JRadioButton();
+		TrackNodes = new JCheckBox("Nodes (3D only)");
+		switchTrackNodes = new JRadioButton();
+		ColorCodedDyamicTracks = new JCheckBox("Dynamic Tracks");
+		DynamicTrackNodes = new JCheckBox("Dynamic Nodes");
+
+		// bottom panel
+		plotinfo = new JLabel(plotinfohead);
+		doplotbutton = new JButton("Plot!");
+		doclosebutton = new JButton("Close");
+		doAddbutton = new JButton("Add");
+	}
+
 	public void showDialog(){
+		
 		Font font1 = new Font("Default", Font.PLAIN, 12);
 		Font font1small = new Font("DefaultSmall", Font.PLAIN, 12);		
 		Font font2 = new Font("Serif", Font.BOLD, 15);
@@ -336,7 +346,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		trackListPanel.add(listSouth, BorderLayout.SOUTH);
 		return listModel;
 	}
-	void fillTrackList(DefaultListModel listModel, ArrayList<TrajectoryObj> tList){
+	public void fillTrackList(DefaultListModel listModel, ArrayList<TrajectoryObj> tList){
 		String trackname;
 		for (TrajectoryObj atrack : tList){
 			 trackname = "track " + Integer.toString( (int) atrack.id);
@@ -379,7 +389,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 			}
 		}
 		if (arg0.getSource() == columnsetButton){
-			TrackDataLoader tdl = new TrackDataLoader();
+			TrackDataLoader tdl = new TrackDataLoader(vt);
 			tdl.columnsetter();
 		}
 		if (arg0.getSource() == imagefileButton){
@@ -433,29 +443,6 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				TrackNodes.setSelected(false);
 			}
 		}		
-
-		if (arg0.getSource() == switchDispFullTrack){
-			switchDispIncrement.setSelected(!switchDispFullTrack.isSelected());
-			exportNetDispbutton.setEnabled(false);
-		}
-		if (arg0.getSource() == switchDispIncrement){
-			switchDispFullTrack.setSelected(!switchDispIncrement.isSelected());
-			exportNetDispbutton.setEnabled(true);
-		}
-
-		if (arg0.getSource() == exportNetDispbutton){
-			if (this.datapath == null){
-				IJ.log("no data path provided for calculation");
-				return;
-			}
-			retrieveParameters();
-			if (this.p4d == null){
-				this.p4d = new PlotNetDisplacement(this.datapath, Plot4d.DATATYPE_VOLOCITY);
-			}
-			ArrayList<Point3f> ref = new ArrayList<Point3f>();
-			SaveNetDispData exporter = new SaveNetDispData(this.p4d, ref);
-			exporter.execute();
-		}
 		
 		//*********** from here, bottom of the panel
 		if (arg0.getSource() == doplotbutton){
@@ -464,9 +451,9 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 				retrieveParameters();
 				plotinfo.setText(plotinfohead + this.datapath);
 				//doPlotting();
-				if (this.univ != null)
-					this.univ.close();
-				DoPlot dp = new DoPlot(this.univ);
+				if (vt.univ != null)
+					vt.univ.close();
+				DoPlot dp = new DoPlot(vt, datapath);
 				dp.execute();
 				
 			} else {
@@ -500,21 +487,21 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		if (arg0.getSource() == highlightOnTrackButton){
 			if (!list.isSelectionEmpty()) {
 				int index = list.getSelectedIndex();
-				Content httrack = p4d.HighlightSelectedSingleTrack(tList, index);
+				Content httrack = vt.p4d.HighlightSelectedSingleTrack(vt.tList, index);
 				highlightedList.add(httrack);
-				plotinfo.setText(trackinfotext(tList, index, plotinfohead));
+				plotinfo.setText(trackinfotext(vt.tList, index, plotinfohead));
 			} else {
 				plotinfo.setText(plotinfohead + " ...track not selected");
 			}
 		}
 		if (arg0.getSource() == highlightOffTrackButton){
 			for(Content trackcontent:highlightedList)
-				univ.removeContent(trackcontent.getName());
+				vt.univ.removeContent(trackcontent.getName());
 		}
 		if (arg0.getSource() == extractTrackButton){
 			if (!list.isSelectionEmpty()) {
 				int index = list.getSelectedIndex();
-				TrajectoryObj currenttraj = p4d.trajlist.get(index);
+				TrajectoryObj currenttraj = vt.p4d.trajlist.get(index);
 				int trackid = (int) Math.round(currenttraj.id);
 				PlotSIngleTrack pse = new PlotSIngleTrack(trackid);
 				pse.execute();
@@ -525,12 +512,12 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	}
 	
 	private void retrieveParameters(){
-		framestart = Integer.valueOf(fieldStartframe.getText());
-		frameend = Integer.valueOf(fieldEndframe.getText());
-		flagColorCodedTracks = ColorCodedTracks.isSelected();
-		flagTrackNodes = TrackNodes.isSelected();
-		flagDynamicColorCodedTracks = ColorCodedDyamicTracks.isSelected();
-		flagDynamicTrackNodes = DynamicTrackNodes.isSelected();
+		vt.framestart = Integer.valueOf(fieldStartframe.getText());
+		vt.frameend = Integer.valueOf(fieldEndframe.getText());
+		vt.flagColorCodedTracks = ColorCodedTracks.isSelected();
+		vt.flagTrackNodes = TrackNodes.isSelected();
+		vt.flagDynamicColorCodedTracks = ColorCodedDyamicTracks.isSelected();
+		vt.flagDynamicTrackNodes = DynamicTrackNodes.isSelected();
 		
 	}
 	private class ToDoListSelectionHandler 
@@ -542,7 +529,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
                                 return;
             }
 			int index = DialogVisualizeTracks.this.list.getSelectedIndex();
-            plotinfo.setText(trackinfotext(tList, index, plotinfohead));
+            plotinfo.setText(trackinfotext(vt.tList, index, plotinfohead));
 		}
 		
 	}
@@ -673,117 +660,7 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 	}
 	*/
 	
-    // class for asynchronous processing
-	//@TODO for being really thread safe, returned values should be
-	//using returned List of values and captured using get() method inside done(). 
-	//in this case, type should be specified as List<Object> or so. 
-	// see http://itpro.nikkeibp.co.jp/article/COLUMN/20070413/268205/
-    class DoPlot extends SwingWorker<ArrayList<Object>, Object> {
-		private Image3DUniverse univ;
-		private JFrame frame;
-        public DoPlot() {
-        	frame = DialogVisualizeTracks.this.mainFrame;
-        }
-        
-        public DoPlot(Image3DUniverse parentuniv) {
-        	frame = DialogVisualizeTracks.this.mainFrame;
-        	this.univ = parentuniv;
-        }
-        
-         
-        //asynchronous processing
-        @Override
-        public ArrayList<Object> doInBackground() {
-            // processing that takes long time
-            //try {
-            //    TimeUnit.SECONDS.sleep(10L);
-            //} catch (InterruptedException ex) {}
-    		ArrayList<Object> UnivContents = new ArrayList<Object>();
-    		for (int i = 0; i < 10 ; i++) UnivContents.add(0);
-    		Image3DUniverse univ = null;
-    		univ = new Image3DUniverse();
-    		this.univ = univ;		
-    		TrackDataLoader tld = new TrackDataLoader();
-    		ArrayList<TrajectoryObj> LtList = tld.loadFileVolocity(datapath);
-    		PlotNetDisplacement Lp4d = new PlotNetDisplacement(univ, LtList);
-    		IJ.log("File loaded...");
-    		UnivContents.set(0, univ);
-    		UnivContents.set(1, Lp4d);
-    		UnivContents.set(2, LtList);
-    		
-    		if ((framestart != null) && (frameend != null)){
-    			if (flagColorCodedTracks) {
-    				Content LlistColorcofdedTracks = Lp4d.PlotTimeColorCodedLineOnlyFinalFrame(framestart, frameend, LtList);
-    				IJ.log("3D track plotted");
-    				UnivContents.set(3, LlistColorcofdedTracks);
-    			}
-    			if (flagTrackNodes){
-    				ArrayList<Content> LlistStaticNodes = Lp4d.plotTrajectorySpheres(framestart, frameend, LtList, true);
-    				IJ.log("Dynamic nodes plotted");
-    				UnivContents.set(4, LlistStaticNodes);
-    			}
-    			if (flagDynamicColorCodedTracks) {
-    				ArrayList<Content> LlistDynamicTracks = Lp4d.PlotTimeColorCodedLine(framestart, frameend, LtList);
-    				IJ.log("3D dynamic track plotting done");
-    				UnivContents.set(5, LlistDynamicTracks);
-    			}
-    			if (flagDynamicTrackNodes){
-    				ArrayList<Content> LlistDynamicNodes = Lp4d.plotTrajectorySpheres(framestart, frameend, LtList, false);
-    				IJ.log("Dynamic nodes plotted");
-    				UnivContents.set(6, LlistDynamicNodes);
-    			}
 
-    		}
- 
-            return UnivContents;
-        }
-         
-        // processing to be done after the above process
-        //@SuppressWarnings("unchecked")
-		@Override
-        protected void done() {
-            //plotbut.setText("execute");
-            //plotbut.setEnabled(true);
-
-    		ArrayList<Object> univcontents = null;
-    		try {
-				univcontents = get();
-			} catch (InterruptedException e) {
-				//IJ.log("timeout");
-				 showErrorDialog("timeout");
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-//				IJ.log("failed processing");
-				 showErrorDialog("failed processing");
-				e.printStackTrace();
-			}
-			//if (univcontents.get(0) != null)
-				DialogVisualizeTracks.this.univ = (Image3DUniverse) univcontents.get(0);
-			//if (univcontents.get(1) != null)
-				DialogVisualizeTracks.this.p4d = (PlotNetDisplacement) univcontents.get(1);
-			//if (univcontents.get(2) != null)
-				DialogVisualizeTracks.this.tList = (ArrayList<TrajectoryObj>) univcontents.get(2);
-			if (univcontents.get(3) instanceof ij3d.Content)
-				DialogVisualizeTracks.this.listColorcofdedTracks = (Content) univcontents.get(3);
-			if (univcontents.get(4) instanceof ArrayList<?>)
-				DialogVisualizeTracks.this.listStaticNodes = (ArrayList<Content>) univcontents.get(4);
-			if (univcontents.get(5)  instanceof ArrayList<?>)
-				DialogVisualizeTracks.this.listDynamicTracks = (ArrayList<Content>) univcontents.get(5);
-			if (univcontents.get(6)  instanceof ArrayList<?>)
-				DialogVisualizeTracks.this.listDynamicNodes = (ArrayList<Content>) univcontents.get(6);
-			
-       		DialogVisualizeTracks.this.univ.show();
-    		univwin = DialogVisualizeTracks.this.univ.getWindow();	
-    		univwin.addWindowListener(DialogVisualizeTracks.this);
-    		DialogVisualizeTracks.this.fillTrackList( DialogVisualizeTracks.this.trackList, DialogVisualizeTracks.this.tList);
-        }
-        private void showErrorDialog(String message) {
-            JOptionPane.showMessageDialog(frame, message, "failed...", JOptionPane.ERROR_MESSAGE);
-        }
-                                     
-          
-        
-    }
     /** to add more plot to current Image3DUniverse.
      * not finished yet. 
      * a class for asynchronous processing, 
@@ -867,28 +744,28 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 		}
     	
     }
-    class SaveNetDispData extends SwingWorker<ArrayList<Object>, Object> {
-    	PlotNetDisplacement pt4d;
-    	String savepath;
-		private ArrayList<Point3f> ref;
-    	public SaveNetDispData(PlotNetDisplacement pt4d, ArrayList<Point3f> ref){
-    		this.pt4d = pt4d;
-    		this.ref = ref;
-    	} 
-		@Override
-		protected ArrayList<Object> doInBackground() throws Exception {
-			DirectoryChooser dc = new DirectoryChooser("choose save detination");
-			savepath = dc.getDirectory();
-			IJ.log("target folder: " + savepath);
-			this.pt4d.saveNetDisplacementData(ref, savepath);
-			return null;
-		}
+//    class SaveNetDispData extends SwingWorker<ArrayList<Object>, Object> {
+//    	PlotNetDisplacement pt4d;
+//    	String savepath;
+//		private ArrayList<Point3f> ref;
+//    	public SaveNetDispData(PlotNetDisplacement pt4d, ArrayList<Point3f> ref){
+//    		this.pt4d = pt4d;
+//    		this.ref = ref;
+//    	} 
+//		@Override
+//		protected ArrayList<Object> doInBackground() throws Exception {
+//			DirectoryChooser dc = new DirectoryChooser("choose save detination");
+//			savepath = dc.getDirectory();
+//			IJ.log("target folder: " + savepath);
+//			this.pt4d.saveNetDisplacementData(ref, savepath);
+//			return null;
+//		}
 //		@Override
 //        protected void done() {
 //			// get()
 //		}
     
-    }
+//    }
 
 	
 	@Override
@@ -898,8 +775,8 @@ public class DialogVisualizeTracks implements ActionListener, WindowListener {
 
 	@Override
 	public void windowClosed(WindowEvent arg0) {
-		if (arg0.getSource() == univwin){
-			this.univ = null;
+		if (arg0.getSource() == vt.univwin){
+			vt.univ = null;
 			doplotbutton.setEnabled(true);
 		}
 		

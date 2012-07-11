@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
-import emblcmci.view3d.DialogVisualizeTracks.DoPlot;
+import emblcmci.view3d.DoPlot;
 
 public class DialogVisualizeTracksTest {
 
@@ -33,18 +33,18 @@ public class DialogVisualizeTracksTest {
 		dg.showDialog();
 	}
 
-	//@Test
+	@Test
 	public void doPlotting(){
 		DialogVisualizeTracks dg = new DialogVisualizeTracks();
 		dg.datapath = "/Users/miura/Dropbox/Mette/Tracks.csv";
 		//dg.flagDynamicColorCodedTracks = true;
 //		dg.flagNetDisplacement = true;
-		dg.framestart = 0;
-		dg.frameend = 23;
-		DoPlot dp =  dg.new DoPlot(this.univ);
+		dg.vt.framestart = 0;
+		dg.vt.frameend = 23;
+		DoPlot dp =  new DoPlot(dg.vt, dg.datapath);
 		dp.execute();
 	}
-	@Test
+	//@Test
 	public void testminmaxframe(){
 		DialogVisualizeTracks dg = new DialogVisualizeTracks();
 		TrackDataLoader.getMinMaxFrame(datapath);
