@@ -5,6 +5,7 @@ import ij.WindowManager;
 import ij.plugin.PlugIn;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
@@ -30,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.vecmath.Color3f;
 import javax.vecmath.Point3f;
 
 //import emblcmci.view3d.DialogVisualizeTracks.DoPlot;
@@ -55,7 +57,7 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	JTextField fieldy = new JTextField(Integer.toString(p_y), 4);		
 	JTextField fieldz = new JTextField(Integer.toString(p_z), 4);
 	JTextField fieldcolor = new JTextField(Integer.toString(p_col), 4);
-	private boolean switchTrackColor = false;
+	private static boolean switchTrackColor = false;
 	JRadioButton switchTrackColorButton = new JRadioButton("Color", switchTrackColor);
 	private JPanel paneltrackid;
 	private JPanel panelframe;		
@@ -65,7 +67,14 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	private JPanel panelcol;
 	private JPanel panelBottom;		
 	JButton setbutton = new JButton("Set");
-	JButton cancelbutton = new JButton("Cancel");	
+	JButton cancelbutton = new JButton("Cancel");
+	private VisTrack vt;	
+
+	public TrackDataLoader() {
+	}
+	public TrackDataLoader(VisTrack vt) {
+		this.vt = vt;
+	}
 
 	public void run(String arg) {
 		// TODO Auto-generated method stub
@@ -75,6 +84,9 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	
 	public boolean isSwitchTrackColor() {
 		return switchTrackColor;
+	}
+	static void setSwitchTrackColor(boolean switchTrackColor) {
+		TrackDataLoader.switchTrackColor = switchTrackColor;
 	}
 	
 	static public ArrayList<Integer> getMinMaxFrame(String datapath){
@@ -119,6 +131,7 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	    IJ.log("min:" + objmin + " max:" + objmax);
 		return startendframeList;
 	}
+	// data loader from a given full path
 	public ArrayList<TrajectoryObj> loadFileVolocity(String datapath){
 
 		File testaccess = new File(datapath);
@@ -158,6 +171,11 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 					atraj = new ArrayList<Point3f>();
 					timepoints = new ArrayList<Integer>();
 					atrajObj = new TrajectoryObj(Double.valueOf(cA[p_trackid]), atraj, timepoints);
+					if (switchTrackColor){
+						IJ.log(cA[p_col]);
+						atrajObj.setColor(stringHex2Color(cA[p_col]));
+						atrajObj.useDefinedColor = true;
+					}
 					trajlist.add(atrajObj);
 					//currentTrajID = Double.valueOf(cA[p_trackid]);
 					//cvec.clear();
@@ -171,7 +189,8 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 				//cvec.add(Point3f(Double.valueOf(cA[3]),Double.valueOf(cA[4]),Double.valueOf(cA[5])));
 				// scaled positions
 				atraj.add(new Point3f(Float.valueOf(cA[p_x]),Float.valueOf(cA[p_y]),Float.valueOf(cA[p_z]))); 
-				timepoints.add((int) (Double.valueOf(cA[p_frame]).intValue()));  
+				timepoints.add((int) (Double.valueOf(cA[p_frame]).intValue()));
+				
 			}
 			counter++;
 		}
@@ -197,6 +216,16 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 		return null;
 	}
 	
+	/** COnvert hexstring to color3f. 
+	 * 
+	 * @param hexstring: Color in Hex string such as "FF00FF" (= R, G, B)
+	 * @return Color3f 
+	 */
+	public Color3f stringHex2Color(String hexstring){
+		int dec = Integer.parseInt(hexstring, 16);
+		return new Color3f(new Color(dec)); 
+	}
+	
 		
 	public void columnsetter(){
 		
@@ -218,6 +247,7 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 			panely = fieldgenearator("y: ", fieldy);
 			panelz = fieldgenearator("z: ", fieldz);
 			panelcol = fieldgenearatorOpt(switchTrackColorButton, "Color", fieldcolor);
+			switchTrackColorButton.addActionListener(this);
 		panelTop.add(paneltrackid);
 		panelTop.add(panelframe);
 		panelTop.add(panelx);
@@ -248,7 +278,7 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 		p.add(tf);
 		return p;					
 	}
-	// optional style
+	// optional style, written for setting color column number
 	private JPanel fieldgenearatorOpt(JRadioButton onoff, String title, JTextField tf){
 		JPanel p = new JPanel();
 		//p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
@@ -262,6 +292,8 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
+		if (arg0.getSource() == switchTrackColorButton)
+			switchTrackColor = switchTrackColorButton.isEnabled();
 		if (arg0.getSource() == setbutton){
 			TrackDataLoader.p_trackid = Integer.valueOf(fieldTrackid.getText());
 			TrackDataLoader.p_frame = Integer.valueOf(fieldFrame.getText());			
@@ -269,6 +301,11 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 			TrackDataLoader.p_y = Integer.valueOf(fieldy.getText());			
 			TrackDataLoader.p_z = Integer.valueOf(fieldz.getText());
 			TrackDataLoader.p_col = Integer.valueOf(fieldcolor.getText());
+			if (switchTrackColor){
+				vt.useTrackColor = true;
+				IJ.log("option chosen: use track color from data");
+			} else
+				IJ.log("option: none chosen");
 			testprintColumns();
 			WindowEvent windowClosing = new WindowEvent(this.mainFrame, WindowEvent.WINDOW_CLOSING);
 			mainFrame.dispatchEvent(windowClosing);
@@ -290,7 +327,8 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 	}
 	// for debugging, stand-alone
 	public static void main(String[] args) {
-        	TrackDataLoader tdl = new TrackDataLoader();
+			VisTrack vt = new VisTrack();
+        	TrackDataLoader tdl = new TrackDataLoader(vt);
         	tdl.columnsetter();
 	}
 	public void setColumnOrder(int p_trackid, int p_frame, int p_x, int p_y, int p_z){
@@ -299,6 +337,10 @@ public class TrackDataLoader implements ActionListener, PlugIn {
 		TrackDataLoader.p_x = p_x;
 		TrackDataLoader.p_y = p_y;
 		TrackDataLoader.p_z = p_z;
+	}
+	public void setColumnOrder(int p_trackid, int p_frame, int p_x, int p_y, int p_z, int p_col){
+		setColumnOrder(p_trackid,  p_frame, p_x, p_y, p_z);
+		TrackDataLoader.p_col = p_col;
 	}
 		
 	

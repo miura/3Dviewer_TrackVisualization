@@ -18,12 +18,16 @@ public class TrajectoryObj {
 	double id;
 	ArrayList<Point3f> dotList;
 	ArrayList<Integer> timepoints;
+	
+	//to define track colors using data (MTrackJ output)
 	Color3f color;
+	boolean useDefinedColor = false;
 	
 	public TrajectoryObj(double id, ArrayList<Point3f> dotList, ArrayList<Integer> timepoints){
 		this.id = id;
 		this.dotList = dotList;
 		this.timepoints = timepoints; //a vector with time points of the trajectory. 
+		this.color = null;
 	}
 
 	public ArrayList<Point3f> getDotList() {

@@ -51,6 +51,7 @@ public class VisTrack {
 	boolean flagAngularDisplacement = false;
 	boolean flagNetDispFull;
 	boolean flagFullIncrem;
+	boolean useTrackColor;
 	public ArrayList<Content> listNetDisplacements;
 	public ArrayList<Content> listNetDisplacementsLineRef;
 
