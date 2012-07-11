@@ -5,28 +5,17 @@ import ij3d.Content;
 import ij3d.ContentCreator;
 import ij3d.Image3DUniverse;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.vecmath.Color3f;
 import javax.vecmath.Point3f;
 
-import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
-import util.opencsv.CSVReader;
-import util.opencsv.CSVWriter;
 import customnode.CustomLineMesh;
 import customnode.CustomMultiMesh;
 import customnode.CustomTriangleMesh;
 import customnode.Mesh_Maker;
-import emblcmci.view3d.CalcNetDisplacement.DispVec;
 
 
 public class Plot4d {
