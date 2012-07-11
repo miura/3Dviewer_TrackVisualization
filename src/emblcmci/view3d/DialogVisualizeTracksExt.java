@@ -418,7 +418,7 @@ public class DialogVisualizeTracksExt extends DialogVisualizeTracks implements A
 			}
 		}
 		if (arg0.getSource() == columnsetButton){
-			TrackDataLoader tdl = new TrackDataLoader();
+			TrackDataLoader tdl = new TrackDataLoader(vt);
 			tdl.columnsetter();
 		}
 		if (arg0.getSource() == imagefileButton){
