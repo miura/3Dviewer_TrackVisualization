@@ -9,14 +9,10 @@ package emblcmci.view3d;
 
 import ij.IJ;
 import ij.WindowManager;
-import ij.io.DirectoryChooser;
 import ij.io.OpenDialog;
 import ij3d.Content;
-import ij3d.Image3DUniverse;
-import ij3d.ImageWindow3D;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -26,7 +22,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -36,7 +31,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -48,10 +42,7 @@ import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.vecmath.Point3f;
 
-//import org.hamcrest.core.IsInstanceOf;
-import ij.io.OpenDialog;
 
 /**
  * @author miura
