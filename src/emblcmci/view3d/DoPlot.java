@@ -43,11 +43,12 @@ class DoPlot extends SwingWorker<ArrayList<Object>, Object> {
 					vt.listColorcofdedTracks = vt.p4d.PlotColoredLineStatic(vt.framestart, vt.frameend, vt.tList);				
 				else
 					vt.listColorcofdedTracks = vt.p4d.PlotTimeColorCodedLineOnlyFinalFrame(vt.framestart, vt.frameend, vt.tList);				
-				IJ.log("3D track plotted");
+				IJ.log("static track plotted");
 			}
 			if (vt.flagTrackNodes){
-				vt.listStaticNodes = vt.p4d.plotTrajectorySpheres(vt.framestart, vt.frameend, vt.tList, true);				
-				IJ.log("Dynamic nodes plotted");
+				//vt.listStaticNodes = vt.p4d.plotTrajectorySpheres(vt.framestart, vt.frameend, vt.tList, true);				
+				vt.listStaticNodes = vt.p4d.plotTrajectorySpheresStatic(vt.framestart, vt.frameend, vt.tList);					
+				IJ.log("static nodes plotted");
 			}
 			if (vt.flagDynamicColorCodedTracks) {
 				vt.listDynamicTracks = vt.p4d.PlotTimeColorCodedLine(vt.framestart, vt.frameend, vt.tList);				

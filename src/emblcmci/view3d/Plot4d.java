@@ -321,6 +321,7 @@ public class Plot4d {
 		int i, j;
 		ArrayList<Content> contentsList = new ArrayList<Content>();
 		int nodesnum;
+		IJ.log("Plot Spheres from" + timestart + " to " + timeend);
 		for (i = timestart; i < timeend; i++){
 			nodesnum = 0;
 			ArrayList<Point3f> spheres = new ArrayList<Point3f>();
@@ -336,14 +337,40 @@ public class Plot4d {
 					nodesnum++;
 				}
 			}
+			if (nodesnum > 0 ) {
+				CustomTriangleMesh csp = new CustomTriangleMesh(spheres, new Color3f(1.0f, 1.0f, 1.0f), 0.0f);
+				Content ccs;
+				if (switch3d)
+					ccs = ContentCreator.createContent(csp, "TrajectoryNodes" + Integer.toString(i), 0);
+				else
+					ccs = ContentCreator.createContent(csp, "TrajectoryNodes" + Integer.toString(i), i-timestart);
+				univ.addContent(ccs);
+				contentsList.add(ccs);
+				IJ.log("timepoint "+ Integer.toString(i) + "..." + Integer.toString(nodesnum));
+			} else
+				IJ.log("timepoint "+ Integer.toString(i) + "... no nodes.");
+		}
+		//univ.addContentLater(contentsList);
+		for (Content item : contentsList)
+			item.setLocked(true);
+		IJ.log("done plotting");
+		return contentsList;
+	}
+	//20120710 for straightforward static sphere node plotting. 
+	public ArrayList<Content> plotTrajectorySpheresStatic(int timestart, int timeend, ArrayList<TrajectoryObj> tList){
+		ArrayList<Content> contentsList = new ArrayList<Content>();
+		IJ.log("Plot Spheres from" + timestart + " to " + timeend);
+		for (TrajectoryObj curtraj : tList) {
+			ArrayList<Point3f> spheres = new ArrayList<Point3f>();
+			for (Point3f p3f : curtraj.dotList){
+				List<Point3f> sphere = Mesh_Maker.createSphere(p3f.x, p3f.y, p3f.z, 0.5, 24, 24);
+				spheres.addAll(sphere);
+			}
 			CustomTriangleMesh csp = new CustomTriangleMesh(spheres, new Color3f(1.0f, 1.0f, 1.0f), 0.0f);
 			Content ccs;
-			if (switch3d)
-				ccs = ContentCreator.createContent(csp, "TrajectoryNodes" + Integer.toString(i), 0);
-			else
-				ccs = ContentCreator.createContent(csp, "TrajectoryNodes" + Integer.toString(i), i-timestart);
+			ccs = ContentCreator.createContent(csp, "Track" + Double.toString(curtraj.id), 0);
 			contentsList.add(ccs);
-			IJ.log("timepoint "+ Integer.toString(i) + "..." + Integer.toString(nodesnum));
+			IJ.log("Done:" + "Track" + Double.toString(curtraj.id));
 		}
 		univ.addContentLater(contentsList);
 		for (Content item : contentsList)
