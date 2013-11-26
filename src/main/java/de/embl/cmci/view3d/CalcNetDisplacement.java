@@ -1,4 +1,4 @@
-package emblcmci.view3d;
+package de.embl.cmci.view3d;
 
 import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
 
