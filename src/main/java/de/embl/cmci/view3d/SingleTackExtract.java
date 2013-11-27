@@ -4,7 +4,7 @@
 // May 2-3, 2012
 // Kota Miura (miura@embl.de)
 
-package emblcmci.view3d;
+package de.embl.cmci.view3d;
 
 
 import javax.vecmath.Point3f;
@@ -23,7 +23,7 @@ import de.embl.cmci.Extractfrom4D;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
-import ij.io.FileInfo;
+import de.embl.cmci.Extractfrom4D;
 import ij.io.FileOpener;
 import ij.io.TiffDecoder;
 import ij.plugin.FileInfoVirtualStack;
