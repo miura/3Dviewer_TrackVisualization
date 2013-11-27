@@ -1,4 +1,4 @@
-package emblcmci.view3d;
+package de.embl.cmci.view3d;
 
 import ij3d.Content;
 import ij3d.Image3DUniverse;

@@ -1,4 +1,4 @@
-package emblcmci.view3d;
+package de.embl.cmci.view3d;
 
 /** An object for single trajectory. 
  *  text data of trajectories are converted to an ArrayList of TrajectoryObj.

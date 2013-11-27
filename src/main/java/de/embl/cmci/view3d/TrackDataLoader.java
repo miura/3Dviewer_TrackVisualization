@@ -1,4 +1,4 @@
-package emblcmci.view3d;
+package de.embl.cmci.view3d;
 
 import ij.IJ;
 import ij.WindowManager;
@@ -34,7 +34,7 @@ import javax.swing.SwingUtilities;
 import javax.vecmath.Color3f;
 import javax.vecmath.Point3f;
 
-//import emblcmci.view3d.DialogVisualizeTracks.DoPlot;
+//import de.embl.cmci.view3d.DialogVisualizeTracks.DoPlot;
 
 import util.opencsv.CSVReader;
 
