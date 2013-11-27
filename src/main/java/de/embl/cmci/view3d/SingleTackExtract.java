@@ -24,6 +24,7 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import de.embl.cmci.Extractfrom4D;
+import ij.io.FileInfo;
 import ij.io.FileOpener;
 import ij.io.TiffDecoder;
 import ij.plugin.FileInfoVirtualStack;
