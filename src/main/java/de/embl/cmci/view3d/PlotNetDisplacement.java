@@ -13,8 +13,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javax.vecmath.Color3f;
-import javax.vecmath.Point3f;
+import org.scijava.vecmath.Color3f;
+import org.scijava.vecmath.Point3f;
 
 import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
 
@@ -458,7 +458,7 @@ public class PlotNetDisplacement extends Plot4d{
 	 * @return
 	 */
 	public Content createLineReferenceContent(int timestart, ArrayList<Point3f> ref){
-		List<Point3f> referenceline = Mesh_Maker.createTube(
+		List<Point3f> referenceline = (List<Point3f>) Mesh_Maker.createTube(
 				new double[]{ref.get(0).x, ref.get(1).x},
 				new double[]{ref.get(0).y, ref.get(1).y},
 				new double[]{ref.get(0).z, ref.get(1).z},
@@ -500,7 +500,7 @@ public class PlotNetDisplacement extends Plot4d{
 		Point3f spoint;
 		for (TrajectoryObj traj : tList) 	{
 			spoint = traj.dotList.get(timestart);
-			List<Point3f> sphere = Mesh_Maker.createSphere(
+			List<Point3f> sphere = (List<Point3f>) Mesh_Maker.createSphere(
 					spoint.x, 
 					spoint.y, 
 					spoint.z, 

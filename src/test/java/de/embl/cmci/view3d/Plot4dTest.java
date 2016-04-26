@@ -6,7 +6,7 @@ import java.util.Map;
 
 import javax.media.j3d.VirtualUniverse;
 //import javax.vecmath.Point3d;
-import javax.vecmath.Point3f;
+import org.scijava.vecmath.Point3f;
 
 import org.junit.Test;
 
@@ -130,7 +130,7 @@ public class Plot4dTest {
 	public void testLoadFilePavel() {
 //		String path = "/Users/miura/Dropbox/Mette/Tracks.csv";
 //		String path = "/Users/miura/Desktop/bory3DmovieMaking/c0track.csv";	
-		String path = "/Users/miura/Dropbox/ToDo/Pavel/dataconverted.csv";
+		String path = "/Users/miura/Dropbox/_ToDo/Pavel/dataconverted.csv";
 		TrackDataLoader tld = new TrackDataLoader();
 		tld.setSwitchTrackColor(true);
 		ArrayList<TrajectoryObj> trajlist = tld.loadFileVolocity(path);

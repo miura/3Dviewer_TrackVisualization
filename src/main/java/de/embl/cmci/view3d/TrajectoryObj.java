@@ -11,9 +11,10 @@ package de.embl.cmci.view3d;
  */
 import java.util.ArrayList;
 
-import javax.vecmath.Color3f;
-import javax.vecmath.Point3f;
+import org.scijava.vecmath.Color3f;
+import org.scijava.vecmath.Point3f;
 
+@SuppressWarnings("restriction")
 public class TrajectoryObj {
 	double id;
 	ArrayList<Point3f> dotList;

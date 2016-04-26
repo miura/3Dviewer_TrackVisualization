@@ -53,7 +53,7 @@ import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.vecmath.Point3f;
+import org.scijava.vecmath.Point3f;
 
 //import org.hamcrest.core.IsInstanceOf;
 

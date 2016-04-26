@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
-import javax.vecmath.Point3f;
+import org.scijava.vecmath.Point3f;
 
 // class for asynchronous processing
 //@TODO for being really thread safe, returned values should be

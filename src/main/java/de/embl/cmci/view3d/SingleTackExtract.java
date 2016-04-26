@@ -7,9 +7,9 @@
 package de.embl.cmci.view3d;
 
 
-import javax.vecmath.Point3f;
-import javax.media.j3d.Transform3D;
-import javax.vecmath.Vector3f;
+import org.scijava.vecmath.Point3f;
+import org.scijava.java3d.Transform3D;
+import org.scijava.vecmath.Vector3f;
 
 import java.io.File;
 import java.io.IOException;
