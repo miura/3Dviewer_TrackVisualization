@@ -1,4 +1,4 @@
-package emblcmci.view3d;
+package de.embl.cmci.view3d;
 
 
 import ij3d.Image3DUniverse;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
-import emblcmci.view3d.DoPlot;
+import de.embl.cmci.view3d.DoPlot;
 
 public class DialogVisualizeTracksTest {
 

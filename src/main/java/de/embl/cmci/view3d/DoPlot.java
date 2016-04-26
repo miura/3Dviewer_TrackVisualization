@@ -17,7 +17,7 @@ import javax.vecmath.Point3f;
 //using returned List of values and captured using get() method inside done(). 
 //in this case, type should be specified as List<Object> or so. 
 // see http://itpro.nikkeibp.co.jp/article/COLUMN/20070413/268205/
-class DoPlot extends SwingWorker<ArrayList<Object>, Object> {
+public class DoPlot extends SwingWorker<ArrayList<Object>, Object> {
 	private VisTrack vt;
 	private JFrame frame;
 	private String datapath;

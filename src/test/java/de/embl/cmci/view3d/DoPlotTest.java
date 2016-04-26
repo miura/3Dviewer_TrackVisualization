@@ -1,10 +1,15 @@
-package emblcmci.view3d;
+package de.embl.cmci.view3d;
 
-import static org.junit.Assert.*;
+//import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import de.embl.cmci.view3d.VisTrack;
+import de.embl.cmci.view3d.DoPlot;
+
+
+@SuppressWarnings("unused")
 public class DoPlotTest {
 
 	//@Before
@@ -12,10 +17,10 @@ public class DoPlotTest {
 	
 	}
 
-	//@Test
-	public void testDone() {
-		fail("Not yet implemented");
-	}
+	////@Test
+	//public void testDone() {
+		//fail("Not yet implemented");
+	//}
 
 	@Test
 	public void testDoPlot() {
@@ -25,9 +30,9 @@ public class DoPlotTest {
 		dp.execute();
 	}
 
-	//@Test
-	public void testDoInBackground() {
-		fail("Not yet implemented");
-	}
+//	//@Test
+//	public void testDoInBackground() {
+//		fail("Not yet implemented");
+//	}
 
 }

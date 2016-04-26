@@ -1,9 +1,4 @@
-package emblcmci.view3d;
-
-//import static org.junit.Assert.*;
-//import ij.IJ;
-import ij.IJ;
-import ij3d.Image3DUniverse;
+package de.embl.cmci.view3d;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,11 +8,19 @@ import javax.media.j3d.VirtualUniverse;
 //import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import emblcmci.view3d.Plot4d;
+import de.embl.cmci.view3d.DotObj;
+import de.embl.cmci.view3d.Plot4d;
+import de.embl.cmci.view3d.PlotNetDisplacement;
+import de.embl.cmci.view3d.TrackDataLoader;
+import de.embl.cmci.view3d.TrajectoryObj;
+//import static org.junit.Assert.*;
+//import ij.IJ;
+import ij.IJ;
+import ij3d.Image3DUniverse;
 
+@SuppressWarnings("restriction")
 public class Plot4dTest {
 
 	PlotNetDisplacement p4d;

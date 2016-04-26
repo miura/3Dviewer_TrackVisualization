@@ -1,4 +1,4 @@
-package emblcmci.view3d;
+package de.embl.cmci.view3d;
 
 import static org.junit.Assert.*;
 import ij.ImagePlus;
